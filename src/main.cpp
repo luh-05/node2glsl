@@ -1,3 +1,4 @@
+#include "spdlog/spdlog.h"
 #include <iostream>
 
-int main() { std::cout << "hello world!" << std::endl; }
+int main() { spdlog::info("Hello World!"); }

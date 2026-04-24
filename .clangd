@@ -1,0 +1,7 @@
+CompileFlags:
+  Remove:
+    - -fdeps-format=*
+    - -fdeps-file=*
+    - -fdeps-target=*
+    - -fmodule-mapper=*
+    - -fmodules-ts

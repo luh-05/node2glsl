@@ -18,6 +18,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         buildInputs = with pkgs; [
           gcc
+          clang-tools
           cmake
           ninja
           sdl3
