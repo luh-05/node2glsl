@@ -9,6 +9,7 @@
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlgpu3.h>
 #include <imgui_impl_sdlrenderer3.h>
 
 static SDL_Window *window = nullptr;
@@ -17,7 +18,7 @@ static ImGuiIO *io = nullptr;
 
 bool trySDLFunc(bool ret) {
   if (!ret)
-    spdlog::error("SDL Error: ", SDL_GetError());
+    spdlog::error("SDL Error: {}", SDL_GetError());
   return ret;
 }
 
@@ -37,8 +38,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
               SDL_WINDOW_HIDDEN,
           &window, &renderer)))
     return SDL_APP_FAILURE;
-  // SDL_SetRenderLogicalPresentation(renderer, 800, 600,
-  //                                  SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
   SDL_SetRenderVSync(renderer, 1);
   SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);

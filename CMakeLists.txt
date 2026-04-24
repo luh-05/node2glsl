@@ -33,6 +33,7 @@ add_library(imgui STATIC
   # add backend sources when you uncomment SDL3:
   deps/imgui/backends/imgui_impl_sdl3.cpp
   deps/imgui/backends/imgui_impl_sdlrenderer3.cpp
+  deps/imgui/backends/imgui_impl_sdlgpu3.cpp
 )
 
 target_include_directories(imgui PUBLIC
