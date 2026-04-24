@@ -47,6 +47,10 @@ add_library(imgui STATIC
   deps/imgui/backends/imgui_impl_sdlgpu3.cpp
 )
 
+target_link_libraries(imgui PRIVATE
+  SDL3::SDL3
+)
+
 target_include_directories(imgui PUBLIC
   deps/imgui/
   deps/imgui/backends/
@@ -54,6 +58,11 @@ target_include_directories(imgui PUBLIC
 
 # spdlog
 add_subdirectory(deps/spdlog)
+
+# sdl3-shadercross
+# find_package(SDL3_shadercross REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SHADERC REQUIRED IMPORTED_TARGET shaderc)
 
 # demos
 add_subdirectory(demos)
