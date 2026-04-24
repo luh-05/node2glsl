@@ -24,10 +24,27 @@ set(ABSL_BUILD_TESTING OFF)
 add_subdirectory(deps/abseil-cpp)
 
 # imgui
-# add_subdirectory(deps/imgui)
+add_library(imgui STATIC
+  deps/imgui/imgui.cpp
+  deps/imgui/imgui_draw.cpp
+  deps/imgui/imgui_tables.cpp
+  deps/imgui/imgui_widgets.cpp
+  deps/imgui/imgui_demo.cpp          # only needed if you call ShowDemoWindow
+  # add backend sources when you uncomment SDL3:
+  deps/imgui/backends/imgui_impl_sdl3.cpp
+  deps/imgui/backends/imgui_impl_sdlrenderer3.cpp
+)
+
+target_include_directories(imgui PUBLIC
+  deps/imgui/
+  deps/imgui/backends/
+)
 
 # spdlog
 add_subdirectory(deps/spdlog)
+
+# demos
+add_subdirectory(demos)
 
 # source
 add_subdirectory(src)
