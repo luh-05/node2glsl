@@ -1,5 +1,5 @@
 {
-  description = "Axon Sandbox";
+  description = "node2glsl flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -16,19 +16,19 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        nativeBuildInputs = with pkgs; [
+        buildInputs = with pkgs; [
           gcc
           cmake
-          make
           ninja
           sdl3
+          imgui
           pkg-config
           lazygit
         ];
       in
       {
         devShell = pkgs.mkShell {
-          inherit nativeBuildInputs;
+          inherit buildInputs;
           shellHook = ''
           '';
         };
