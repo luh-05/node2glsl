@@ -16,14 +16,14 @@ Utility to convert a shader node-graph to glsl
 ```sh
 git clone git@github.com:luh-05/node2glsl.git
 cd node2glsl
-git submodule update --init --recurse
+git submodule update --init --recursive
 ```
 
 **Clone (https)**:
 ```sh
 git clone https://github.com/luh-05/node2glsl.git
 cd node2glsl
-git submodule update --init --recurse
+git submodule update --init --recursive
 ```
 ### Step 2 (Compile)
 **On Linux**:
