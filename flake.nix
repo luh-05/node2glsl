@@ -24,6 +24,7 @@
           sdl3
           pkg-config
           lazygit
+          cloc
         ];
       in
       {
