@@ -1,7 +1,10 @@
+#include <SDL3/SDL_error.h>
+#include <cstdint>
 #include <string.h>
 
 #include <SDL3/SDL_gpu.h>
 #include <spdlog/spdlog.h>
+#include <vector>
 
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
@@ -17,6 +20,10 @@
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 #include "absl/flags/usage.h"
+
+#include <shaderc/shaderc.h>
+#include <shaderc/shaderc.hpp>
+#include <shaderc/status.h>
 
 ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
           "gpu driver to use");
@@ -34,17 +41,38 @@ void logSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
     return SDL_APP_FAILURE;                                                    \
   }
 
+std::vector<uint32_t> compileGLSLToSpv(const std::string &source,
+                                       shaderc_shader_kind kind,
+                                       const char *filename) {
+  shaderc::Compiler compiler;
+  shaderc::CompileOptions options;
+
+  options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+  shaderc::SpvCompilationResult module =
+      compiler.CompileGlslToSpv(source, kind, filename, options);
+
+  if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+    spdlog::error("Shaderc error: {}", module.GetErrorMessage());
+    return std::vector<uint32_t>();
+  }
+
+  return {module.cbegin(), module.cend()};
+}
+
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+  // Abseil flags setup
   absl::SetProgramUsageMessage("Simple pathtracer for volumetric shaders\n"
                                "Usage: viewer [options]");
   absl::ParseCommandLine(argc, argv);
 
+  // SDL Setup
   spdlog::info("Setting up SDL");
   SDL_SetAppMetadata("sdl3gpu", "1.0", "node2glsl.demos.sdl3gpu");
 
   TRY_SDL(SDL_Init(SDL_INIT_VIDEO));
 
-  spdlog::info("Creating Window and Renderer");
+  spdlog::info("Creating Window");
   float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
   window = SDL_CreateWindow(
       "sdl3gpu", static_cast<int>(800 * main_scale),
@@ -55,6 +83,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_FAILURE;
   }
 
+  // Set up GPU device
   spdlog::info("Setting up GPU Device");
 
   char *driver = nullptr;
@@ -82,10 +111,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_FAILURE;
   }
 
-  if (argc < 2) {
-    spdlog::warn("No driver provided! Inferred {}",
-                 SDL_GetGPUDeviceDriver(device));
+  if (!absl::GetFlag(FLAGS_gpu_driver).has_value()) {
+    spdlog::warn("No driver provided!");
   }
+  spdlog::info("Using driver '{}'", SDL_GetGPUDeviceDriver(device));
 
   TRY_SDL(SDL_ClaimWindowForGPUDevice(device, window));
   SDL_SetGPUSwapchainParameters(device, window,
@@ -94,6 +123,36 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
   SDL_ShowWindow(window);
+
+  spdlog::info("Compiling shaders");
+  std::string vertex_code = "#version 450 \n\
+\n\
+layout(location = 0) in vec3 inPosition; \n\
+\n\
+void main() { \n\
+  gl_Position = vec4(inPosition, 1.0); \n\
+} ";
+  spdlog::info("Vertex shader code:\n {}", vertex_code);
+  std::vector<uint32_t> vertex_spv =
+      compileGLSLToSpv(vertex_code, shaderc_vertex_shader, "./shader/def.vert");
+  SDL_GPUShaderCreateInfo vertex_shader_create_info;
+  vertex_shader_create_info.code_size = vertex_spv.size() * sizeof(uint32_t);
+  vertex_shader_create_info.code =
+      reinterpret_cast<const uint8_t *>(vertex_spv.data());
+  vertex_shader_create_info.entrypoint = "main";
+  vertex_shader_create_info.format = shader_format;
+  vertex_shader_create_info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+  vertex_shader_create_info.num_samplers = 0;
+  vertex_shader_create_info.num_storage_textures = 0;
+  vertex_shader_create_info.num_storage_buffers = 0;
+  vertex_shader_create_info.num_uniform_buffers = 1;
+  vertex_shader_create_info.props = 0;
+  SDL_GPUShader *vertex_shader =
+      SDL_CreateGPUShader(device, &vertex_shader_create_info);
+  if (vertex_shader == nullptr) {
+    spdlog::error("Couldn't compile shaders: {}", SDL_GetError());
+    return SDL_APP_FAILURE;
+  }
 
   spdlog::info("Setting up imgui");
   // Setup Dear ImGui context
