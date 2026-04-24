@@ -17,12 +17,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release/lib
 # CMAKE_ARCHIVE_OUTPUT_DIRECTORY intentionally unset
 
 find_package(SDL3 REQUIRED)
-# find_package(dearimgui REQUIRED)
 
 # abseil
 set(ABSL_PROPAGATE_CXX_STD ON)
 set(ABSL_BUILD_TESTING OFF)
 add_subdirectory(deps/abseil-cpp)
+
+# imgui
+# add_subdirectory(deps/imgui)
+
+# spdlog
+add_subdirectory(deps/spdlog)
 
 # source
 add_subdirectory(src)

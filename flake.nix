@@ -21,7 +21,6 @@
           cmake
           ninja
           sdl3
-          imgui
           pkg-config
           lazygit
         ];
@@ -30,6 +29,7 @@
         devShell = pkgs.mkShell {
           inherit buildInputs;
           shellHook = ''
+            alias la="eza -lA"
           '';
         };
       }

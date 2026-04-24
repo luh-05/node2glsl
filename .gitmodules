@@ -1,3 +1,9 @@
 [submodule "deps/abseil-cpp"]
 	path = deps/abseil-cpp
 	url = git@github.com:abseil/abseil-cpp.git
+[submodule "deps/spdlog"]
+	path = deps/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "deps/imgui"]
+	path = deps/imgui
+	url = git@github.com:ocornut/imgui.git
