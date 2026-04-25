@@ -1,6 +1,6 @@
 add_executable(viewer
   main.cpp
-  # shader.cpp
+  shader.cpp
 )
 
 target_link_libraries(viewer PRIVATE
