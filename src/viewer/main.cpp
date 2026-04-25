@@ -1,6 +1,7 @@
 #include "shader.h"
 #include "spdlog/common.h"
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_pixels.h>
 #include <cstdint>
 #include <string.h>
 
@@ -37,6 +38,8 @@ static ImGuiIO *io = nullptr;
 static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 static ntg::viz::Shader *vertex_shader = nullptr;
 static ntg::viz::Shader *fragment_shader = nullptr;
+static SDL_GPUGraphicsPipeline *pipeline = nullptr;
+static SDL_GPUBuffer *index_buffer = nullptr;
 
 void logSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
 
@@ -151,7 +154,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   if (!vertex_shader->loadShaderFromFile("./src/viewer/shader/def.vert",
                                          "def.vert", ntg::viz::SPIRV_VERTEX,
                                          &vertex_shader_attribs)) {
-    spdlog::error("An error occured whilst compiling shaders!");
+    spdlog::error("An error occured whilst loading shaders!");
     return SDL_APP_FAILURE;
   }
 
@@ -165,7 +168,90 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   if (!fragment_shader->loadShaderFromFile("./src/viewer/shader/def.frag",
                                            "def.frag", ntg::viz::SPIRV_FRAGMENT,
                                            &fragment_shader_attribs)) {
-    spdlog::error("An error occured whilst compiling shaders!");
+    spdlog::error("An error occured whilst loading shaders!");
+    return SDL_APP_FAILURE;
+  }
+
+  spdlog::info("Creating graphics pipeline");
+  SDL_GPUGraphicsPipelineCreateInfo pipeline_create_info;
+  pipeline_create_info.vertex_shader = vertex_shader->getShader();
+  pipeline_create_info.fragment_shader = fragment_shader->getShader();
+  SDL_GPUVertexInputState vertex_input_state;
+  vertex_input_state.vertex_buffer_descriptions = nullptr;
+  vertex_input_state.num_vertex_buffers = 0;
+  vertex_input_state.vertex_attributes = nullptr;
+  vertex_input_state.num_vertex_attributes = 0;
+  pipeline_create_info.vertex_input_state = vertex_input_state;
+  pipeline_create_info.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+  SDL_GPURasterizerState rasterizer_state;
+  rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+  rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+  rasterizer_state.front_face = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE;
+  rasterizer_state.depth_bias_constant_factor = 1.0f;
+  rasterizer_state.depth_bias_clamp = 0.0f;
+  rasterizer_state.depth_bias_slope_factor = 1.0f;
+  rasterizer_state.enable_depth_bias = false;
+  rasterizer_state.enable_depth_clip = false;
+  rasterizer_state.padding1 = 0;
+  rasterizer_state.padding2 = 0;
+  pipeline_create_info.rasterizer_state = rasterizer_state;
+  SDL_GPUMultisampleState multisample_state;
+  multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+  multisample_state.sample_mask = 0;
+  multisample_state.enable_mask = false;
+  multisample_state.enable_alpha_to_coverage = false;
+  multisample_state.padding2 = 0;
+  multisample_state.padding3 = 0;
+  pipeline_create_info.multisample_state = multisample_state;
+  SDL_GPUDepthStencilState depth_stencil_state;
+  depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+  SDL_GPUStencilOpState depth_stencil_op;
+  depth_stencil_op.fail_op = SDL_GPU_STENCILOP_KEEP;
+  depth_stencil_op.pass_op = SDL_GPU_STENCILOP_REPLACE;
+  depth_stencil_op.depth_fail_op = SDL_GPU_STENCILOP_KEEP;
+  depth_stencil_op.compare_op = SDL_GPU_COMPAREOP_NEVER;
+  depth_stencil_state.back_stencil_state = depth_stencil_op;
+  depth_stencil_state.front_stencil_state = depth_stencil_op;
+  depth_stencil_state.compare_mask = 0b0;
+  depth_stencil_state.write_mask = 0b0;
+  depth_stencil_state.enable_depth_test = false;
+  depth_stencil_state.enable_depth_write = false;
+  depth_stencil_state.enable_stencil_test = false;
+  depth_stencil_state.padding1 = 0;
+  depth_stencil_state.padding2 = 0;
+  depth_stencil_state.padding3 = 0;
+  pipeline_create_info.depth_stencil_state = depth_stencil_state;
+  SDL_GPUGraphicsPipelineTargetInfo target_info;
+  SDL_GPUColorTargetDescription color_target_description;
+  color_target_description.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+  SDL_GPUColorTargetBlendState color_target_blend_state;
+  color_target_blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+  color_target_blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+  color_target_blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+  color_target_blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+  color_target_blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+  color_target_blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+  color_target_blend_state.color_write_mask =
+      SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G |
+      SDL_GPU_COLORCOMPONENT_B | SDL_GPU_COLORCOMPONENT_A;
+  color_target_blend_state.enable_blend = false;
+  color_target_blend_state.enable_color_write_mask = false;
+  color_target_blend_state.padding1 = 0;
+  color_target_blend_state.padding2 = 0;
+  color_target_description.blend_state = color_target_blend_state;
+  target_info.color_target_descriptions = &color_target_description;
+  target_info.num_color_targets = 1;
+  target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UINT;
+  target_info.has_depth_stencil_target = false;
+  target_info.padding1 = 0;
+  target_info.padding2 = 0;
+  target_info.padding3 = 0;
+  pipeline_create_info.target_info = target_info;
+  pipeline_create_info.props = 0;
+
+  pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_create_info);
+  if (pipeline == nullptr) {
+    spdlog::error("Failed to create graphics pipeline: {}", SDL_GetError());
     return SDL_APP_FAILURE;
   }
 
@@ -220,30 +306,50 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppIterate(void *appstate) {
-
-  ImGui_ImplSDLGPU3_NewFrame();
-  ImGui_ImplSDL3_NewFrame();
-  ImGui::NewFrame();
-
-  ImGui::ShowDemoWindow();
-
-  ImGui::Render();
-  ImDrawData *draw_data = ImGui::GetDrawData();
-  const bool is_minimized =
-      (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
-
+void renderRaster() {
   SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
-
   SDL_GPUTexture *swapchain_texture;
   SDL_WaitAndAcquireGPUSwapchainTexture(command_buffer, window,
                                         &swapchain_texture, nullptr, nullptr);
+  if (swapchain_texture != nullptr) {
 
-  if (swapchain_texture != nullptr && !is_minimized) {
-    // Upload vertex/index buffers
-    ImGui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
+    SDL_GPUBufferBinding buffer_binding;
+    SDL_GPUBufferCreateInfo buffer_create_info;
+    buffer_create_info.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+    buffer_create_info.size = 3 * 4;
+    buffer_create_info.props = 0;
+    index_buffer = SDL_CreateGPUBuffer(device, &buffer_create_info);
+    if (index_buffer == nullptr) {
+      spdlog::error("Failed to create index buffer!");
+    }
+    SDL_GPUTransferBufferCreateInfo gpu_transfer_buffer_create_info;
+    gpu_transfer_buffer_create_info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    gpu_transfer_buffer_create_info.size = 3 * 4;
+    SDL_GPUTransferBuffer *transfer_buffer =
+        SDL_CreateGPUTransferBuffer(device, &gpu_transfer_buffer_create_info);
+    void *transfer_buffer_pointer =
+        SDL_MapGPUTransferBuffer(device, transfer_buffer, false);
+    int *index_buffer_data = reinterpret_cast<int *>(transfer_buffer_pointer);
+    index_buffer_data[0] = 0;
+    index_buffer_data[1] = 1;
+    index_buffer_data[2] = 2;
+    buffer_binding.buffer = index_buffer;
+    buffer_binding.offset = 0;
+    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
 
-    // Setup render pass
+    SDL_GPUTransferBufferLocation gpu_transfer_buffer_location;
+    gpu_transfer_buffer_location.transfer_buffer = transfer_buffer;
+    gpu_transfer_buffer_location.offset = 0;
+    SDL_GPUBufferRegion gpu_buffer_region;
+    gpu_buffer_region.buffer = index_buffer;
+    gpu_buffer_region.offset = 0;
+    gpu_buffer_region.size = 3 * 4;
+    SDL_UploadToGPUBuffer(copy_pass, &gpu_transfer_buffer_location,
+                          &gpu_buffer_region, false);
+    SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
+
+    SDL_EndGPUCopyPass(copy_pass);
+
     SDL_GPUColorTargetInfo target_info = {};
     target_info.texture = swapchain_texture;
     target_info.clear_color =
@@ -255,21 +361,70 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     target_info.cycle = false;
     SDL_GPURenderPass *render_pass =
         SDL_BeginGPURenderPass(command_buffer, &target_info, 1, nullptr);
-
-    // Render imgui pass
-    ImGui_ImplSDLGPU3_RenderDrawData(draw_data, command_buffer, render_pass);
-
+    SDL_BindGPUGraphicsPipeline(render_pass, pipeline);
+    SDL_BindGPUIndexBuffer(render_pass, &buffer_binding,
+                           SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    SDL_DrawGPUIndexedPrimitives(render_pass, 3, 1, 0, 0, 0);
     SDL_EndGPURenderPass(render_pass);
+
+    SDL_ReleaseGPUBuffer(device, index_buffer);
+    SDL_ReleaseGPUTransferBuffer(device, transfer_buffer);
+
+    // imgui
+    ImGui_ImplSDLGPU3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow();
+
+    ImGui::Render();
+    ImDrawData *draw_data = ImGui::GetDrawData();
+    const bool is_minimized =
+        (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
+
+    if (!is_minimized) {
+      // Upload vertex/index buffers
+      ImGui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
+
+      // Setup render pass
+      target_info = {};
+      target_info.texture = swapchain_texture;
+      target_info.clear_color =
+          SDL_FColor{clear_color.x, clear_color.y, clear_color.z, 0.0f};
+      target_info.load_op = SDL_GPU_LOADOP_LOAD;
+      target_info.store_op = SDL_GPU_STOREOP_STORE;
+      target_info.mip_level = 0;
+      target_info.layer_or_depth_plane = 0;
+      target_info.cycle = false;
+      render_pass =
+          SDL_BeginGPURenderPass(command_buffer, &target_info, 1, nullptr);
+
+      // Render imgui pass
+      ImGui_ImplSDLGPU3_RenderDrawData(draw_data, command_buffer, render_pass);
+
+      SDL_EndGPURenderPass(render_pass);
+    }
+    SDL_SubmitGPUCommandBuffer(command_buffer);
   }
+}
+
+SDL_AppResult SDL_AppIterate(void *appstate) {
+  renderRaster();
 
   // Submit command buffer
-  SDL_SubmitGPUCommandBuffer(command_buffer);
 
   return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   spdlog::info("Quitting SDL");
+  if (index_buffer != nullptr) {
+  }
+
+  if (pipeline != nullptr) {
+    SDL_ReleaseGPUGraphicsPipeline(device, pipeline);
+  }
+
   if (vertex_shader != nullptr) {
     delete vertex_shader;
   }

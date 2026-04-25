@@ -43,7 +43,7 @@ auto read_file(std::string_view path) -> std::optional<std::string> {
 bool Shader::loadShaderFromFile(const char *path, const char *name,
                                 Shader_Type type,
                                 const ShaderAttribs *attribs) {
-  spdlog::debug("Compiling shader '{}'", name);
+  spdlog::debug("Loading shader '{}'", name);
 
   if (this->shader != nullptr) {
     spdlog::error("Shader '{}' already loaded!");
@@ -88,11 +88,11 @@ bool Shader::loadShaderFromFile(const char *path, const char *name,
 
   SDL_GPUShader *sh = SDL_CreateGPUShader(this->device, &create_info);
   if (sh == nullptr) {
-    spdlog::error("Couldn't compile shader '{}': {}", name, SDL_GetError());
+    spdlog::error("Couldn't load shader '{}': {}", name, SDL_GetError());
     return false;
   }
   this->shader = sh;
-  spdlog::debug("Successfully compiled shader '{}'", name);
+  spdlog::debug("Successfully loaded shader '{}'", name);
   return true;
 }
 
