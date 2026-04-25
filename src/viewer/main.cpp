@@ -1,3 +1,5 @@
+#include "shader.h"
+#include "spdlog/common.h"
 #include <SDL3/SDL_error.h>
 #include <cstdint>
 #include <string.h>
@@ -27,6 +29,7 @@
 
 ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
           "gpu driver to use");
+ABSL_FLAG(std::string, log_level, "info", "logging level");
 
 static SDL_Window *window = nullptr;
 static SDL_GPUDevice *device = nullptr;
@@ -65,6 +68,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   absl::SetProgramUsageMessage("Simple pathtracer for volumetric shaders\n"
                                "Usage: viewer [options]");
   absl::ParseCommandLine(argc, argv);
+
+  const std::string fll = absl::GetFlag(FLAGS_log_level);
+  if (strcmp(fll.c_str(), "info") == 0) {
+    spdlog::set_level(spdlog::level::info);
+  } else if (strcmp(fll.c_str(), "debug") == 0) {
+    spdlog::set_level(spdlog::level::debug);
+  } else {
+    spdlog::error("Log level '{}' not recognized. Defaulting to 'info'.", fll);
+    spdlog::set_level(spdlog::level::info);
+  }
 
   // SDL Setup
   spdlog::info("Setting up SDL");
@@ -125,32 +138,47 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   SDL_ShowWindow(window);
 
   spdlog::info("Compiling shaders");
-  std::string vertex_code = "#version 450 \n\
-\n\
-layout(location = 0) in vec3 inPosition; \n\
-\n\
-void main() { \n\
-  gl_Position = vec4(inPosition, 1.0); \n\
-} ";
-  spdlog::info("Vertex shader code:\n {}", vertex_code);
-  std::vector<uint32_t> vertex_spv =
-      compileGLSLToSpv(vertex_code, shaderc_vertex_shader, "./shader/def.vert");
-  SDL_GPUShaderCreateInfo vertex_shader_create_info;
-  vertex_shader_create_info.code_size = vertex_spv.size() * sizeof(uint32_t);
-  vertex_shader_create_info.code =
-      reinterpret_cast<const uint8_t *>(vertex_spv.data());
-  vertex_shader_create_info.entrypoint = "main";
-  vertex_shader_create_info.format = shader_format;
-  vertex_shader_create_info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-  vertex_shader_create_info.num_samplers = 0;
-  vertex_shader_create_info.num_storage_textures = 0;
-  vertex_shader_create_info.num_storage_buffers = 0;
-  vertex_shader_create_info.num_uniform_buffers = 1;
-  vertex_shader_create_info.props = 0;
-  SDL_GPUShader *vertex_shader =
-      SDL_CreateGPUShader(device, &vertex_shader_create_info);
-  if (vertex_shader == nullptr) {
-    spdlog::error("Couldn't compile shaders: {}", SDL_GetError());
+  //   std::string vertex_code = "#version 450 \n\
+  // \n\
+  // layout(location = 0) in vec3 inPosition; \n\
+  // \n\
+  // void main() { \n\
+  //   gl_Position = vec4(inPosition, 1.0); \n\
+  // } ";
+  //   spdlog::info("Vertex shader code:\n {}", vertex_code);
+  //   std::vector<uint32_t> vertex_spv =
+  //       compileGLSLToSpv(vertex_code, shaderc_vertex_shader,
+  //       "./shader/def.vert");
+  //   SDL_GPUShaderCreateInfo vertex_shader_create_info;
+  //   vertex_shader_create_info.code_size = vertex_spv.size() *
+  //   sizeof(uint32_t); vertex_shader_create_info.code =
+  //       reinterpret_cast<const uint8_t *>(vertex_spv.data());
+  //   vertex_shader_create_info.entrypoint = "main";
+  //   vertex_shader_create_info.format = shader_format;
+  //   vertex_shader_create_info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+  //   vertex_shader_create_info.num_samplers = 0;
+  //   vertex_shader_create_info.num_storage_textures = 0;
+  //   vertex_shader_create_info.num_storage_buffers = 0;
+  //   vertex_shader_create_info.num_uniform_buffers = 1;
+  //   vertex_shader_create_info.props = 0;
+  //   SDL_GPUShader *vertex_shader =
+  //       SDL_CreateGPUShader(device, &vertex_shader_create_info);
+  //   if (vertex_shader == nullptr) {
+  //     spdlog::error("Couldn't compile shaders: {}", SDL_GetError());
+  //     return SDL_APP_FAILURE;
+  //   }
+
+  ntg::viz::Shader vertex_shader;
+  ntg::viz::Shader::ShaderAttribs vertex_shader_attribs;
+  vertex_shader_attribs.num_samplers = 0;
+  vertex_shader_attribs.num_storage_textures = 0;
+  vertex_shader_attribs.num_storage_buffers = 0;
+  vertex_shader_attribs.num_uniform_buffers = 0;
+  vertex_shader_attribs.props = 0;
+  if (!vertex_shader.loadShaderFromFile(device, "./src/viewer/shader/def.vert",
+                                        "def.vert", ntg::viz::SPIRV_VERTEX,
+                                        &vertex_shader_attribs)) {
+    spdlog::error("An error occured whilst compiling shaders!");
     return SDL_APP_FAILURE;
   }
 
