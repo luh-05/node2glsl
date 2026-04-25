@@ -59,6 +59,16 @@ target_include_directories(imgui PUBLIC
 # spdlog
 add_subdirectory(deps/spdlog)
 
+# lw-ecs
+add_library(lw-ecs INTERFACE)
+target_include_directories(lw-ecs INTERFACE
+  deps/lw-ecs/src/include/ECS
+)
+target_link_libraries(lw-ecs INTERFACE
+  absl::flat_hash_set
+  absl::container_common
+)
+
 # sdl3-shadercross
 # find_package(SDL3_shadercross REQUIRED)
 find_package(PkgConfig REQUIRED)

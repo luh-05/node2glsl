@@ -7,3 +7,6 @@
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "deps/lw-ecs"]
+	path = deps/lw-ecs
+	url = https://github.com/luh-05/lw-ecs.git
