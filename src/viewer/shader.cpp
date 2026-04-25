@@ -40,10 +40,16 @@ auto read_file(std::string_view path) -> std::optional<std::string> {
   return std::optional<std::string>{out};
 }
 
-bool Shader::loadShaderFromFile(SDL_GPUDevice *device, const char *path,
-                                const char *name, Shader_Type type,
+bool Shader::loadShaderFromFile(const char *path, const char *name,
+                                Shader_Type type,
                                 const ShaderAttribs *attribs) {
   spdlog::debug("Compiling shader '{}'", name);
+
+  if (this->shader != nullptr) {
+    spdlog::error("Shader '{}' already loaded!");
+    return false;
+  }
+
   this->name = name;
   auto code = read_file(path);
   if (!code.has_value()) {
@@ -57,7 +63,7 @@ bool Shader::loadShaderFromFile(SDL_GPUDevice *device, const char *path,
   std::vector<uint32_t> data;
   switch (type) {
   case SPIRV_VERTEX:
-    data = compileGLSLToSpv(code.value(), shaderc_vertex_shader, path);
+    data = compileGLSLToSpv(code.value(), shaderc_vertex_shader, name);
     create_info.format = SDL_GPU_SHADERFORMAT_SPIRV;
     create_info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
     break;
@@ -80,7 +86,7 @@ bool Shader::loadShaderFromFile(SDL_GPUDevice *device, const char *path,
   create_info.num_storage_buffers = attribs->num_storage_buffers;
   create_info.num_uniform_buffers = attribs->num_uniform_buffers;
 
-  SDL_GPUShader *sh = SDL_CreateGPUShader(device, &create_info);
+  SDL_GPUShader *sh = SDL_CreateGPUShader(this->device, &create_info);
   if (sh == nullptr) {
     spdlog::error("Couldn't compile shader '{}': {}", name, SDL_GetError());
     return false;

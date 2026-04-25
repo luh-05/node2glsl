@@ -35,6 +35,8 @@ static SDL_Window *window = nullptr;
 static SDL_GPUDevice *device = nullptr;
 static ImGuiIO *io = nullptr;
 static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+static ntg::viz::Shader *vertex_shader = nullptr;
+static ntg::viz::Shader *fragment_shader = nullptr;
 
 void logSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
 
@@ -138,46 +140,31 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   SDL_ShowWindow(window);
 
   spdlog::info("Compiling shaders");
-  //   std::string vertex_code = "#version 450 \n\
-  // \n\
-  // layout(location = 0) in vec3 inPosition; \n\
-  // \n\
-  // void main() { \n\
-  //   gl_Position = vec4(inPosition, 1.0); \n\
-  // } ";
-  //   spdlog::info("Vertex shader code:\n {}", vertex_code);
-  //   std::vector<uint32_t> vertex_spv =
-  //       compileGLSLToSpv(vertex_code, shaderc_vertex_shader,
-  //       "./shader/def.vert");
-  //   SDL_GPUShaderCreateInfo vertex_shader_create_info;
-  //   vertex_shader_create_info.code_size = vertex_spv.size() *
-  //   sizeof(uint32_t); vertex_shader_create_info.code =
-  //       reinterpret_cast<const uint8_t *>(vertex_spv.data());
-  //   vertex_shader_create_info.entrypoint = "main";
-  //   vertex_shader_create_info.format = shader_format;
-  //   vertex_shader_create_info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-  //   vertex_shader_create_info.num_samplers = 0;
-  //   vertex_shader_create_info.num_storage_textures = 0;
-  //   vertex_shader_create_info.num_storage_buffers = 0;
-  //   vertex_shader_create_info.num_uniform_buffers = 1;
-  //   vertex_shader_create_info.props = 0;
-  //   SDL_GPUShader *vertex_shader =
-  //       SDL_CreateGPUShader(device, &vertex_shader_create_info);
-  //   if (vertex_shader == nullptr) {
-  //     spdlog::error("Couldn't compile shaders: {}", SDL_GetError());
-  //     return SDL_APP_FAILURE;
-  //   }
 
-  ntg::viz::Shader vertex_shader;
+  vertex_shader = new ntg::viz::Shader(device);
   ntg::viz::Shader::ShaderAttribs vertex_shader_attribs;
   vertex_shader_attribs.num_samplers = 0;
   vertex_shader_attribs.num_storage_textures = 0;
   vertex_shader_attribs.num_storage_buffers = 0;
   vertex_shader_attribs.num_uniform_buffers = 0;
   vertex_shader_attribs.props = 0;
-  if (!vertex_shader.loadShaderFromFile(device, "./src/viewer/shader/def.vert",
-                                        "def.vert", ntg::viz::SPIRV_VERTEX,
-                                        &vertex_shader_attribs)) {
+  if (!vertex_shader->loadShaderFromFile("./src/viewer/shader/def.vert",
+                                         "def.vert", ntg::viz::SPIRV_VERTEX,
+                                         &vertex_shader_attribs)) {
+    spdlog::error("An error occured whilst compiling shaders!");
+    return SDL_APP_FAILURE;
+  }
+
+  fragment_shader = new ntg::viz::Shader(device);
+  ntg::viz::Shader::ShaderAttribs fragment_shader_attribs;
+  fragment_shader_attribs.num_samplers = 0;
+  fragment_shader_attribs.num_storage_textures = 0;
+  fragment_shader_attribs.num_storage_buffers = 0;
+  fragment_shader_attribs.num_uniform_buffers = 0;
+  fragment_shader_attribs.props = 0;
+  if (!fragment_shader->loadShaderFromFile("./src/viewer/shader/def.frag",
+                                           "def.frag", ntg::viz::SPIRV_FRAGMENT,
+                                           &fragment_shader_attribs)) {
     spdlog::error("An error occured whilst compiling shaders!");
     return SDL_APP_FAILURE;
   }
@@ -283,6 +270,13 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   spdlog::info("Quitting SDL");
+  if (vertex_shader != nullptr) {
+    delete vertex_shader;
+  }
+  if (fragment_shader != nullptr) {
+    delete fragment_shader;
+  }
+
   if (device != nullptr) {
     SDL_WaitForGPUIdle(device);
     ImGui_ImplSDL3_Shutdown();

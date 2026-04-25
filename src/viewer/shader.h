@@ -12,8 +12,9 @@ enum Shader_Type { SPIRV_VERTEX, SPIRV_FRAGMENT };
 
 class Shader {
 private:
+  SDL_GPUDevice *device;
   const char *name;
-  SDL_GPUShader *shader;
+  SDL_GPUShader *shader = nullptr;
 
   std::vector<uint32_t> compileGLSLToSpv(const std::string &source,
                                          shaderc_shader_kind kind,
@@ -28,9 +29,16 @@ public:
     uint32_t props;
   };
 
-  SDL_GPUShader *getShader();
-  bool loadShaderFromFile(SDL_GPUDevice *device, const char *path,
-                          const char *name, Shader_Type type,
+  Shader(SDL_GPUDevice *device) { this->device = device; }
+
+  SDL_GPUShader *getShader() { return this->shader; }
+  bool loadShaderFromFile(const char *path, const char *name, Shader_Type type,
                           const ShaderAttribs *attribs);
+
+  ~Shader() {
+    if (this->shader != nullptr) {
+      SDL_ReleaseGPUShader(this->device, this->shader);
+    }
+  }
 };
 } // namespace ntg::viz
