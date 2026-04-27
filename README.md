@@ -5,7 +5,7 @@ Utility to convert a shader node-graph to glsl
 **Prerequisites**:
  - git
  - gcc
- - shaderc
+ - shadercmarkdown
  - sdl3 (not on windows)
 
 > [!TIP]
@@ -39,8 +39,8 @@ cmake --build --preset debug
 ```
 
 > [!IMPORTANT]
-> On Unix SDL3 is assumed to be installed to the system.
-> On Windows SDL3 is compiled locally.
+> On Unix SDL3 is assumed to be installed to the system.  
+> On Windows SDL3 is compiled locally. Though the SDL3.dll may need to be in the same directory as the binary you run. SDL3.dll should be in /bin/debug/ so if you want to run something in /bin/debug/demo/ just copy it there.
 
 > [!TIP]
 > It's possible to compile locally on linux too using `-DCOMPILE_SDL_LOCALLY=ON`.
