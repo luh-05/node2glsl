@@ -67,6 +67,7 @@ target_include_directories(lw-ecs INTERFACE
 target_link_libraries(lw-ecs INTERFACE
   absl::flat_hash_set
   absl::container_common
+  spdlog
 )
 
 # sdl3-shadercross

@@ -28,6 +28,8 @@
 #include <shaderc/shaderc.hpp>
 #include <shaderc/status.h>
 
+// #include <ecs_base.hpp>
+
 ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
           "gpu driver to use");
 ABSL_FLAG(std::string, log_level, "info", "logging level");

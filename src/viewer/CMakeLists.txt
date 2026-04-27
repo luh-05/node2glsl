@@ -12,7 +12,7 @@ target_link_libraries(viewer PRIVATE
   absl::flags
   absl::flags_parse
   absl::flags_usage
-  lw-ecs
+  # lw-ecs
 )
 
 target_include_directories(viewer PRIVATE
