@@ -4,7 +4,9 @@ Utility to convert a shader node-graph to glsl
 ## Installation
 **Prerequisites**:
  - git
- - gcc
+ - gcc (and g++)
+ - ninja
+ - cmake
  - shaderc
  - sdl3 (not on windows)
 
