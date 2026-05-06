@@ -30,6 +30,13 @@
           pkg-config
           lazygit
           cloc
+
+          # documentation
+          doxygen
+          python314
+          python314Packages.breathe
+          python314Packages.sphinx
+          python314Packages.sphinx-rtd-theme
         ];
       in
       {

@@ -16,6 +16,12 @@ private:
   const char *name;
   SDL_GPUShader *shader = nullptr;
 
+  /**
+   * @brief Compiles GLSL to SPIR-V
+   * @param source Shader source code
+   * @param kind Shader type
+   * @param filename The name of the shader for debug output
+   */
   std::vector<uint32_t> compileGLSLToSpv(const std::string &source,
                                          shaderc_shader_kind kind,
                                          const char *filename);
