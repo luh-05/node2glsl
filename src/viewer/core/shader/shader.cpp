@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "shader.hpp"
 #include "spdlog/spdlog.h"
 #include <fstream>
 namespace ntg::viz {
