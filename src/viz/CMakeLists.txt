@@ -20,6 +20,7 @@ target_link_libraries(viz
 
 target_include_directories(viz PRIVATE
   ABSL_COMMON_INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/src/viz
 )
 
 add_subdirectory(core)

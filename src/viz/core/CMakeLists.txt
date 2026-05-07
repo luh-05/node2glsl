@@ -1,14 +1,19 @@
-add_library(viz_core INTERFACE)
+add_library(viz_core)
 add_library(viz::core ALIAS viz_core)
 
 target_include_directories(viz_core
-  INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/viz
 )
 
 target_link_libraries(viz_core
-  INTERFACE
+  PRIVATE
+    spdlog
+
+    # Modules
     viz::core::shader
 )
+
+target_sources(viz_core PRIVATE gpu.cpp)
 
 add_subdirectory(shader)

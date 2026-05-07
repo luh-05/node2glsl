@@ -1,20 +1,8 @@
-#include "./core/shader/shader.hpp"
+#include "core/core.hpp"
 #include "spdlog/common.h"
-#include <SDL3/SDL_error.h>
-#include <SDL3/SDL_pixels.h>
-#include <cstdint>
 #include <string.h>
 
-#include <SDL3/SDL_gpu.h>
 #include <spdlog/spdlog.h>
-#include <vector>
-
-#define SDL_MAIN_USE_CALLBACKS 1
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_gpu.h>
-#include <SDL3/SDL_init.h>
-#include <SDL3/SDL_main.h>
-#include <SDL3/SDL_video.h>
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -42,33 +30,6 @@ static ntg::viz::Shader *vertex_shader = nullptr;
 static ntg::viz::Shader *fragment_shader = nullptr;
 static SDL_GPUGraphicsPipeline *pipeline = nullptr;
 static SDL_GPUBuffer *index_buffer = nullptr;
-
-void logSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
-
-#define TRY_SDL(func)                                                          \
-  if (!func) {                                                                 \
-    logSDLError();                                                             \
-    return SDL_APP_FAILURE;                                                    \
-  }
-
-std::vector<uint32_t> compileGLSLToSpv(const std::string &source,
-                                       shaderc_shader_kind kind,
-                                       const char *filename) {
-  shaderc::Compiler compiler;
-  shaderc::CompileOptions options;
-
-  options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-  shaderc::SpvCompilationResult module =
-      compiler.CompileGlslToSpv(source, kind, filename, options);
-
-  if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
-    spdlog::error("Shaderc error: {}", module.GetErrorMessage());
-    return std::vector<uint32_t>();
-  }
-
-  return {module.cbegin(), module.cend()};
-}
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   // Abseil flags setup
@@ -99,7 +60,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
       static_cast<int>(600 * main_scale),
       SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
   if (window == nullptr) {
-    logSDLError();
+    LogSDLError();
     return SDL_APP_FAILURE;
   }
 
@@ -127,7 +88,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   device = SDL_CreateGPUDevice(shader_format, true, driver);
   if (device == nullptr) {
-    logSDLError();
+    LogSDLError();
     return SDL_APP_FAILURE;
   }
 
