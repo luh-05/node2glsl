@@ -14,6 +14,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_SOURCE_DIR}/bin/debug/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release/lib)
 
+find_package(Doxygen REQUIRED)
+
+set(DOXYGEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/docs/doxygen)
+
+configure_file(
+  ${CMAKE_SOURCE_DIR}/Doxyfile.in
+  ${CMAKE_BINARY_DIR}/Doxyfile
+  @ONLY
+)
+
+add_custom_target(doc_doxygen
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOXYGEN_OUTPUT_DIR}
+  COMMAND ${CMAKE_COMMAND} ${CMAKE_BINARY_DIR/Doxyfile}
+  COMMENT "Generating Doxygen docs"
+)
+
 # set(COMPILE_SDL_LOCALLY OFF)
 
 option(COMPILE_SDL_LOCALLY "Should SDL be compiled locally when on UNIX? (Not recommended, requried wayland/x11 libraries to be present on linux)" OFF)
