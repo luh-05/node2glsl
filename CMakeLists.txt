@@ -53,9 +53,14 @@ pkg_check_modules(SHADERC REQUIRED IMPORTED_TARGET shaderc)
 add_library(shaderc ALIAS PkgConfig::SHADERC)
 
 # abseil
+if (UNIX)
 set(ABSL_PROPAGATE_CXX_STD ON)
 set(ABSL_BUILD_TESTING OFF)
 add_subdirectory(deps/abseil-cpp)
+else ()
+find_package(abseil-cpp REQUIRED)
+add_library(abseil ALIAS abseil-cpp)
+endif ()
 
 # imgui
 add_library(imgui STATIC

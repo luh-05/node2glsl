@@ -30,6 +30,7 @@
           pkg-config
           lazygit
           cloc
+          abseil-cpp
 
           # documentation
           doxygen
