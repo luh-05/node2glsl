@@ -63,7 +63,3 @@ cmake --build --preset debug
 
 > [!IMPORTANT]
 > On Windows you might need to disable "Smart App Control" to run viz.exe
-
-> [!TIP]
-> It's possible to compile locally on linux too using `-DCOMPILE_SDL_LOCALLY=ON`.
-> This requires the dev libraries of wayland/x11 to be installed (not included in the nix flake).
