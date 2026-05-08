@@ -9,7 +9,7 @@ target_include_directories(viz_core_shader
 target_link_libraries(viz_core_shader
   PRIVATE
     spdlog
-    PkgConfig::SHADERC
+    shaderc
     absl::status
 )
 

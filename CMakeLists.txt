@@ -35,7 +35,8 @@ add_custom_target(doc_doxygen
 option(COMPILE_SDL_LOCALLY "Should SDL be compiled locally when on UNIX? (Not recommended, requried wayland/x11 libraries to be present on linux)" OFF)
 
 if (UNIX AND (NOT COMPILE_SDL_LOCALLY)) 
-  find_package(SDL3 REQUIRED)
+ find_package(SDL3 REQUIRED)
+
 else ()
   FetchContent_Declare(
     SDL3
@@ -44,6 +45,14 @@ else ()
   )
   FetchContent_MakeAvailable(SDL3)
 endif (UNIX AND (NOT COMPILE_SDL_LOCALLY))
+
+if (UNIX)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(SHADERC REQUIRED IMPORTED_TARGET shaderc)
+  add_library(shaderc ALIAS PkgConfig::SHADERC)
+else ()
+  find_package(shaderc CONFIG REQURIED)
+endif ()
 
 # abseil
 set(ABSL_PROPAGATE_CXX_STD ON)
@@ -88,8 +97,7 @@ target_link_libraries(lw-ecs INTERFACE
 
 # sdl3-shadercross
 # find_package(SDL3_shadercross REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SHADERC REQUIRED IMPORTED_TARGET shaderc)
+
 
 # demos
 add_subdirectory(demos)

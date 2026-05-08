@@ -8,7 +8,7 @@ target_link_libraries(viz
     SDL3::SDL3
     imgui
     # SDL3_shadercross
-    PkgConfig::SHADERC
+    shaderc 
     absl::flags
     absl::flags_parse
     absl::flags_usage

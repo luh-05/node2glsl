@@ -80,7 +80,7 @@ static auto ToSDLSwapchainComposition(SwapchainComposition comp)
   // FIXME: Currently defaulting to SDR quietly
   return SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
 }
-static auto ToSDLPresentMode(PresentMode mode) {
+static auto ToSDLPresentMode(PresentMode mode) -> SDL_GPUPresentMode {
   switch (mode) {
   case PresentMode::VSync:
     return SDL_GPU_PRESENTMODE_VSYNC;
