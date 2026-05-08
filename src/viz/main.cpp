@@ -1,5 +1,8 @@
 #include "core/core.hpp"
+#include "core/sdl.hpp"
+#include "core/shader/shader.hpp"
 #include "spdlog/common.h"
+#include <memory>
 #include <string.h>
 
 #include <spdlog/spdlog.h>
@@ -16,6 +19,15 @@
 #include <shaderc/shaderc.hpp>
 #include <shaderc/status.h>
 
+#define SDL_MAIN_USE_CALLBACKS 1
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_gpu.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_video.h>
+
 // #include <ecs_base.hpp>
 
 ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
@@ -23,13 +35,27 @@ ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
 ABSL_FLAG(std::string, log_level, "info", "logging level");
 
 static SDL_Window *window = nullptr;
-static SDL_GPUDevice *device = nullptr;
+static std::shared_ptr<ntg::viz::Context> context = nullptr;
 static ImGuiIO *io = nullptr;
 static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 static ntg::viz::Shader *vertex_shader = nullptr;
 static ntg::viz::Shader *fragment_shader = nullptr;
 static SDL_GPUGraphicsPipeline *pipeline = nullptr;
 static SDL_GPUBuffer *index_buffer = nullptr;
+
+void LogSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
+
+#define TRY_SDL(func)                                                          \
+  if (!func) {                                                                 \
+    LogSDLError();                                                             \
+    return SDL_APP_FAILURE;                                                    \
+  }
+
+#define EXIT_IF_ERROR(expr)                                                    \
+  if (absl::Status s = (expr); !s.ok()) {                                      \
+    spdlog::error(s.message());                                                \
+    return SDL_APP_FAILURE;                                                    \
+  }
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   // Abseil flags setup
@@ -46,6 +72,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     spdlog::error("Log level '{}' not recognized. Defaulting to 'info'.", fll);
     spdlog::set_level(spdlog::level::info);
   }
+
+  context = std::make_shared<ntg::viz::Context>();
 
   // SDL Setup
   spdlog::info("Setting up SDL");
@@ -68,60 +96,62 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   spdlog::info("Setting up GPU Device");
 
   char *driver = nullptr;
-  SDL_GPUShaderFormat shader_format =
-      SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL |
-      SDL_GPU_SHADERFORMAT_MSL | SDL_GPU_SHADERFORMAT_METALLIB;
+  ntg::viz::ShaderFormat shader_format = ntg::viz::ShaderFormat::SpirV;
   if (absl::GetFlag(FLAGS_gpu_driver).has_value()) {
     std::string driver_flag = absl::GetFlag(FLAGS_gpu_driver).value();
     driver = driver_flag.data();
     if (strcmp(driver, "vulkan") == 0) {
-      shader_format = SDL_GPU_SHADERFORMAT_SPIRV;
+      shader_format = ntg::viz::ShaderFormat::SpirV;
     } else if (strcmp(driver, "metal") == 0) {
-      shader_format = SDL_GPU_SHADERFORMAT_METALLIB | SDL_GPU_SHADERFORMAT_MSL;
+      shader_format = ntg::viz::ShaderFormat::Metal;
     } else if (strcmp(driver, "direct3d12") == 0) {
-      shader_format = SDL_GPU_SHADERFORMAT_DXIL;
+      shader_format = ntg::viz::ShaderFormat::Dxil;
     } else {
       spdlog::error("Driver '{}' is not valid", driver);
       return SDL_APP_FAILURE;
     }
   }
 
-  device = SDL_CreateGPUDevice(shader_format, true, driver);
-  if (device == nullptr) {
-    LogSDLError();
-    return SDL_APP_FAILURE;
-  }
+  EXIT_IF_ERROR(context->gpu->CreateGPUDevice(shader_format, driver));
 
   if (!absl::GetFlag(FLAGS_gpu_driver).has_value()) {
     spdlog::warn("No driver provided!");
   }
-  spdlog::info("Using driver '{}'", SDL_GetGPUDeviceDriver(device));
+  {
+    auto driver_name = context->gpu->GetDriverName();
+    if (driver_name.ok()) {
+      spdlog::info("Using driver '{}'", driver_name.value());
+    } else {
+      spdlog::warn(driver_name.status().message());
+    }
+  }
 
-  TRY_SDL(SDL_ClaimWindowForGPUDevice(device, window));
-  SDL_SetGPUSwapchainParameters(device, window,
-                                SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
-                                SDL_GPU_PRESENTMODE_VSYNC);
+  EXIT_IF_ERROR(
+      context->gpu->ClaimWindow(reinterpret_cast<ntg::viz::Window>(window)));
+  EXIT_IF_ERROR(context->gpu->SetSwapchainParameters(
+      reinterpret_cast<ntg::viz::Window>(window),
+      ntg::viz::SwapchainComposition::Sdr, ntg::viz::PresentMode::VSync));
 
   SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
   SDL_ShowWindow(window);
 
   spdlog::info("Compiling shaders");
 
-  vertex_shader = new ntg::viz::Shader(device);
+  vertex_shader = new ntg::viz::Shader(context);
   ntg::viz::Shader::ShaderAttribs vertex_shader_attribs;
   vertex_shader_attribs.num_samplers = 0;
   vertex_shader_attribs.num_storage_textures = 0;
   vertex_shader_attribs.num_storage_buffers = 0;
   vertex_shader_attribs.num_uniform_buffers = 0;
   vertex_shader_attribs.props = 0;
-  if (!vertex_shader->loadShaderFromFile(
-          "./src/viewer/core/shader/glsl/def.vert", "def.vert",
-          ntg::viz::SPIRV_VERTEX, &vertex_shader_attribs)) {
+  if (!vertex_shader->loadShaderFromFile("./src/viz/core/shader/glsl/def.vert",
+                                         "def.vert", ntg::viz::SPIRV_VERTEX,
+                                         &vertex_shader_attribs)) {
     spdlog::error("An error occured whilst loading shaders!");
     return SDL_APP_FAILURE;
   }
 
-  fragment_shader = new ntg::viz::Shader(device);
+  fragment_shader = new ntg::viz::Shader(context);
   ntg::viz::Shader::ShaderAttribs fragment_shader_attribs;
   fragment_shader_attribs.num_samplers = 0;
   fragment_shader_attribs.num_storage_textures = 0;
@@ -129,7 +159,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   fragment_shader_attribs.num_uniform_buffers = 0;
   fragment_shader_attribs.props = 0;
   if (!fragment_shader->loadShaderFromFile(
-          "./src/viewer/core/shader/glsl/def.frag", "def.frag",
+          "./src/viz/core/shader/glsl/def.frag", "def.frag",
           ntg::viz::SPIRV_FRAGMENT, &fragment_shader_attribs)) {
     spdlog::error("An error occured whilst loading shaders!");
     return SDL_APP_FAILURE;
@@ -212,7 +242,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   pipeline_create_info.target_info = target_info;
   pipeline_create_info.props = 0;
 
-  pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_create_info);
+  // TODO: Decouple SDL_CreateGPUGraphicsPipeline
+  pipeline = SDL_CreateGPUGraphicsPipeline(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+      &pipeline_create_info);
   if (pipeline == nullptr) {
     spdlog::error("Failed to create graphics pipeline: {}", SDL_GetError());
     return SDL_APP_FAILURE;
@@ -247,9 +280,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   // Setup Platform/Renderer backends
   ImGui_ImplSDL3_InitForSDLGPU(window);
   ImGui_ImplSDLGPU3_InitInfo init_info = {};
-  init_info.Device = device;
-  init_info.ColorTargetFormat =
-      SDL_GetGPUSwapchainTextureFormat(device, window);
+  init_info.Device =
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice());
+  // TODO: Decouple SDL_GetGPUSwapchainTextureFormat
+  init_info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()), window);
   init_info.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
   init_info.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
   init_info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
@@ -270,7 +305,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 }
 
 void renderRaster() {
-  SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
+  // TODO: Decouple SDL_AcquireGPUCommandBuffer
+  SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
   SDL_GPUTexture *swapchain_texture;
   SDL_WaitAndAcquireGPUSwapchainTexture(command_buffer, window,
                                         &swapchain_texture, nullptr, nullptr);
@@ -281,17 +318,24 @@ void renderRaster() {
     buffer_create_info.usage = SDL_GPU_BUFFERUSAGE_INDEX;
     buffer_create_info.size = 3 * 4;
     buffer_create_info.props = 0;
-    index_buffer = SDL_CreateGPUBuffer(device, &buffer_create_info);
+    // TODO: Decouple SDL_CreateGPUBuffer
+    index_buffer = SDL_CreateGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &buffer_create_info);
     if (index_buffer == nullptr) {
       spdlog::error("Failed to create index buffer!");
     }
     SDL_GPUTransferBufferCreateInfo gpu_transfer_buffer_create_info;
     gpu_transfer_buffer_create_info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
     gpu_transfer_buffer_create_info.size = 3 * 4;
-    SDL_GPUTransferBuffer *transfer_buffer =
-        SDL_CreateGPUTransferBuffer(device, &gpu_transfer_buffer_create_info);
-    void *transfer_buffer_pointer =
-        SDL_MapGPUTransferBuffer(device, transfer_buffer, false);
+    // TODO: Decouple SDL_CreateGPUTransferBuffer
+    SDL_GPUTransferBuffer *transfer_buffer = SDL_CreateGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &gpu_transfer_buffer_create_info);
+    // TODO: Decouple SDL_MapGPUTransferBuffer
+    void *transfer_buffer_pointer = SDL_MapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        transfer_buffer, false);
     int *index_buffer_data = reinterpret_cast<int *>(transfer_buffer_pointer);
     index_buffer_data[0] = 0;
     index_buffer_data[1] = 1;
@@ -309,7 +353,10 @@ void renderRaster() {
     gpu_buffer_region.size = 3 * 4;
     SDL_UploadToGPUBuffer(copy_pass, &gpu_transfer_buffer_location,
                           &gpu_buffer_region, false);
-    SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
+    // TODO: Decouple SDL_UnmapGPUTransferBuffer
+    SDL_UnmapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        transfer_buffer);
 
     SDL_EndGPUCopyPass(copy_pass);
 
@@ -330,8 +377,14 @@ void renderRaster() {
     SDL_DrawGPUIndexedPrimitives(render_pass, 3, 1, 0, 0, 0);
     SDL_EndGPURenderPass(render_pass);
 
-    SDL_ReleaseGPUBuffer(device, index_buffer);
-    SDL_ReleaseGPUTransferBuffer(device, transfer_buffer);
+    // TODO: Decouple SDL_ReleaseGPUBuffer
+    SDL_ReleaseGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_buffer);
+    // TODO: Decouple SDL_ReleaseGPUTransferBuffer
+    SDL_ReleaseGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        transfer_buffer);
 
     // imgui
     ImGui_ImplSDLGPU3_NewFrame();
@@ -385,7 +438,10 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
   }
 
   if (pipeline != nullptr) {
-    SDL_ReleaseGPUGraphicsPipeline(device, pipeline);
+    // TODO: Decouple SDL_ReleaseGPUGraphicsPipeline
+    SDL_ReleaseGPUGraphicsPipeline(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        pipeline);
   }
 
   if (vertex_shader != nullptr) {
@@ -395,14 +451,19 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result) {
     delete fragment_shader;
   }
 
-  if (device != nullptr) {
-    SDL_WaitForGPUIdle(device);
+  if (reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()) !=
+      nullptr) {
+    SDL_WaitForGPUIdle(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
     ImGui_ImplSDL3_Shutdown();
     ImGui_ImplSDLGPU3_Shutdown();
     ImGui::DestroyContext();
 
-    SDL_ReleaseWindowFromGPUDevice(device, window);
-    SDL_DestroyGPUDevice(device);
+    SDL_ReleaseWindowFromGPUDevice(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        window);
+    SDL_DestroyGPUDevice(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
   }
   if (window != nullptr) {
     SDL_DestroyWindow(window);

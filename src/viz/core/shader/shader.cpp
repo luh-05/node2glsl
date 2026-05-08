@@ -1,6 +1,8 @@
 #include "shader.hpp"
+#include "../core.hpp"
 #include "spdlog/spdlog.h"
 #include <fstream>
+#include <memory>
 namespace ntg::viz {
 
 std::vector<uint32_t> Shader::compileGLSLToSpv(const std::string &source,
@@ -45,7 +47,7 @@ bool Shader::loadShaderFromFile(const char *path, const char *name,
                                 const ShaderAttribs *attribs) {
   spdlog::debug("Loading shader '{}'", name);
 
-  if (this->shader != nullptr) {
+  if (this->shader_) {
     spdlog::error("Shader '{}' already loaded!");
     return false;
   }
@@ -86,14 +88,25 @@ bool Shader::loadShaderFromFile(const char *path, const char *name,
   create_info.num_storage_buffers = attribs->num_storage_buffers;
   create_info.num_uniform_buffers = attribs->num_uniform_buffers;
 
-  SDL_GPUShader *sh = SDL_CreateGPUShader(this->device, &create_info);
+  SDL_GPUShader *sh = SDL_CreateGPUShader(
+      reinterpret_cast<SDL_GPUDevice *>(context_->gpu->RawGetDevice()),
+      &create_info);
   if (sh == nullptr) {
     spdlog::error("Couldn't load shader '{}': {}", name, SDL_GetError());
     return false;
   }
-  this->shader = sh;
+  std::unique_ptr<SDL_GPUShader, GPUShaderDeleter> temp_ptr(sh);
+
+  shader_ = std::move(temp_ptr);
   spdlog::debug("Successfully loaded shader '{}'", name);
   return true;
+}
+
+Shader::~Shader() {
+  if (this->shader_) {
+    // TODO: Release Shader
+    // context_->gpu->ReleaseShader();
+  }
 }
 
 } // namespace ntg::viz

@@ -9,6 +9,7 @@ target_include_directories(viz_core
 target_link_libraries(viz_core
   PRIVATE
     spdlog
+    absl::status
 
     # Modules
     viz::core::shader

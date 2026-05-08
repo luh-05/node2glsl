@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <shaderc/shaderc.h>
 
 #include <SDL3/SDL_error.h>
@@ -10,11 +11,16 @@
 namespace ntg::viz {
 enum Shader_Type { SPIRV_VERTEX, SPIRV_FRAGMENT };
 
+class Context;
+class GPUWrapper;
 class Shader {
 private:
-  SDL_GPUDevice *device;
+  std::shared_ptr<Context> context_;
   const char *name;
-  SDL_GPUShader *shader = nullptr;
+  struct GPUShaderDeleter {
+    void operator()(SDL_GPUShader *shader) const {}
+  };
+  std::unique_ptr<SDL_GPUShader, GPUShaderDeleter> shader_;
 
   /**
    * @brief Compiles GLSL to SPIR-V
@@ -35,16 +41,11 @@ public:
     uint32_t props;
   };
 
-  Shader(SDL_GPUDevice *device) { this->device = device; }
+  Shader(std::shared_ptr<Context> context) : context_(context) {}
+  ~Shader();
 
-  SDL_GPUShader *getShader() { return this->shader; }
+  SDL_GPUShader *getShader() { return this->shader_.get(); }
   bool loadShaderFromFile(const char *path, const char *name, Shader_Type type,
                           const ShaderAttribs *attribs);
-
-  ~Shader() {
-    if (this->shader != nullptr) {
-      SDL_ReleaseGPUShader(this->device, this->shader);
-    }
-  }
 };
 } // namespace ntg::viz

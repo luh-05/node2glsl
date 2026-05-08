@@ -10,6 +10,7 @@ target_link_libraries(viz_core_shader
   PRIVATE
     spdlog
     PkgConfig::SHADERC
+    absl::status
 )
 
 target_sources(viz_core_shader PRIVATE shader.cpp)
