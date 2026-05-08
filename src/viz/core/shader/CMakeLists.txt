@@ -11,6 +11,7 @@ target_link_libraries(viz_core_shader
     spdlog
     shaderc
     absl::status
+    absl::statusor
 )
 
 target_sources(viz_core_shader PRIVATE shader.cpp)

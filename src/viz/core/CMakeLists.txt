@@ -10,6 +10,7 @@ target_link_libraries(viz_core
   PRIVATE
     spdlog
     absl::status
+    absl::statusor
 
     # Modules
     viz::core::shader
