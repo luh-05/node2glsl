@@ -3,7 +3,7 @@ add_library(viz::core ALIAS viz_core)
 
 target_include_directories(viz_core
   PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/viz
+  ${APPS_DIR}/viz
 )
 
 target_link_libraries(viz_core

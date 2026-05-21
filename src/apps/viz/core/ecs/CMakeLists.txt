@@ -3,7 +3,7 @@ add_library(viz::core::ecs ALIAS viz_core_ecs)
 
 target_include_directories(viz_core_ecs
   PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/viz
+  ${APPS_DIR}/viz
 )
 
 target_link_libraries(viz_core_ecs

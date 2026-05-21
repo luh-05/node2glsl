@@ -3,7 +3,7 @@ add_library(viz::core::geo ALIAS viz_core_geo)
 
 target_include_directories(viz_core_geo
   PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/viz
+  ${APPS_DIR}/viz
 )
 
 target_link_libraries(viz_core_geo

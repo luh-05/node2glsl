@@ -3,7 +3,7 @@ add_library(viz::core::shader ALIAS viz_core_shader)
 
 target_include_directories(viz_core_shader
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/src/viz
+  ${APPS_DIR}/viz
 )
 
 target_link_libraries(viz_core_shader
