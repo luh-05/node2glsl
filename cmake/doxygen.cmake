@@ -8,8 +8,14 @@ configure_file(
   @ONLY
 )
 
+# add_custom_target(doc_doxygen
+#   COMMAND ${CMAKE_COMMAND} -E make_directory ${DOXYGEN_OUTPUT_DIR}
+#   COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+#   COMMENT "Generating Doxygen docs"
+# )
 add_custom_target(doc_doxygen
   COMMAND ${CMAKE_COMMAND} -E make_directory ${DOXYGEN_OUTPUT_DIR}
-  COMMAND ${CMAKE_COMMAND} ${CMAKE_BINARY_DIR/Doxyfile}
+  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMENT "Generating Doxygen docs"
 )
