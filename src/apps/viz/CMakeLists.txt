@@ -2,6 +2,8 @@ add_executable(viz
   main.cpp
 )
 
+# ---EXTERNAL DEPS---
+
 target_link_libraries(viz
   PRIVATE
     spdlog
@@ -20,7 +22,7 @@ target_link_libraries(viz
 
 target_include_directories(viz PRIVATE
   ABSL_COMMON_INCLUDE_DIRS
-  ${CMAKE_SOURCE_DIR}/src/viz
+  ${APPS_DIR}/viz
 )
 
 add_subdirectory(core)
