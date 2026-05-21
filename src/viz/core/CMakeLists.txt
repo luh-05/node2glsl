@@ -11,11 +11,16 @@ target_link_libraries(viz_core
     spdlog
     absl::status
     absl::statusor
+    glm
 
     # Modules
     viz::core::shader
+    viz::core::geo
+    viz::core::ecs
 )
 
 target_sources(viz_core PRIVATE gpu.cpp)
 
 add_subdirectory(shader)
+add_subdirectory(geometry)
+add_subdirectory(ecs)

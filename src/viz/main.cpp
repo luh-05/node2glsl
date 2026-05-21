@@ -28,6 +28,8 @@
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_video.h>
 
+#include "core/ecs/impl/demo.hpp"
+
 // #include <ecs_base.hpp>
 
 ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
@@ -74,6 +76,17 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   }
 
   context = std::make_shared<ntg::viz::Context>();
+
+  // ECS Testing
+  ntg::viz::Coordinator crd{};
+  crd.init();
+  crd.registerComponent<ntg::viz::TestComponent>();
+  crd.registerSystem<ntg::viz::TestSystem>();
+  ntg::viz::signature_t test_system_signature;
+  test_system_signature.set(crd.getComponentType<ntg::viz::TestComponent>());
+  crd.setSystemSignature<ntg::viz::TestSystem>(test_system_signature);
+  auto e = crd.createEntity();
+  crd.addComponent(e, ntg::viz::TestComponent{});
 
   // SDL Setup
   spdlog::info("Setting up SDL");

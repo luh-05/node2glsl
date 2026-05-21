@@ -1,5 +1,6 @@
 #pragma ONCE
 #include "absl/status/statusor.h"
+#include "pipeline.hpp"
 #include <absl/status/status.h>
 #include <memory>
 
@@ -16,7 +17,6 @@ enum class PresentMode { VSync, Immediate, Mailbox };
 // TODO: Remove this later once SDL is decoupled
 typedef uint32_t *Window;
 
-class Shader;
 class GPUWrapper {
 public:
   GPUWrapper();
@@ -28,7 +28,6 @@ public:
   auto SetSwapchainParameters(Window window, SwapchainComposition composition,
                               PresentMode presentMode) -> absl::Status;
   auto ReleaseShader(std::shared_ptr<Shader> shader) -> void;
-
   // TODO: Remove later
   auto RawGetDevice() -> void *;
 

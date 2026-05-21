@@ -31,6 +31,7 @@
           lazygit
           cloc
           abseil-cpp
+          glm
 
           # documentation
           doxygen

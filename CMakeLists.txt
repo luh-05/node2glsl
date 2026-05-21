@@ -100,6 +100,8 @@ target_link_libraries(lw-ecs INTERFACE
 # sdl3-shadercross
 # find_package(SDL3_shadercross REQUIRED)
 
+# glm
+find_package(glm CONFIG REQUIRED)
 
 # demos
 add_subdirectory(demos)
