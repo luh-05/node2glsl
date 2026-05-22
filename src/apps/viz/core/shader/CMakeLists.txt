@@ -5,7 +5,6 @@ add_library(viz::core::shader ALIAS viz_core_shader)
 target_link_libraries(viz_core_shader
   PRIVATE
     viz_internal_includes
-    spdlog::spdlog
 
     shaderc
 )

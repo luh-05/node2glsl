@@ -4,7 +4,6 @@ add_library(viz::core ALIAS viz_core)
 target_link_libraries(viz_core
   PRIVATE
     viz_internal_includes
-    spdlog::spdlog
     
     SDL3::SDL3
 

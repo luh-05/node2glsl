@@ -4,7 +4,6 @@ add_library(viz::core::geo ALIAS viz_core_geo)
 target_link_libraries(viz_core_geo
   PRIVATE
     viz_internal_includes
-    spdlog::spdlog
 
     glm::glm
 )

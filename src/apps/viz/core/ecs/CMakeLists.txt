@@ -4,7 +4,6 @@ add_library(viz::core::ecs ALIAS viz_core_ecs)
 target_link_libraries(viz_core_ecs
   PRIVATE
     viz_internal_includes
-    spdlog::spdlog
 
     absl::flat_hash_map
 )
