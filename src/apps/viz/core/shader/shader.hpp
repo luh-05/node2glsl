@@ -2,10 +2,10 @@
 #include <memory>
 #include <shaderc/shaderc.h>
 
+#include "spdlog/common.h"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_gpu.h>
 #include <shaderc/shaderc.hpp>
-#include <spdlog/spdlog.h>
 #include <vector>
 
 namespace ntg::viz {

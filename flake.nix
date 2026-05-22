@@ -19,6 +19,13 @@
         nativeBuildInputs = with pkgs; [
           pkg-config
         ];
+        # imgui = 
+        #   pkgs.imgui.overrideAttrs (old: {
+        #     IMGUI_BUILD_VULKAN_BINDING = true;
+        #     IMGUI_BUILD_SDL3_BINDING = true;
+        #     IMGUI_BUILD_SDL3_RENDERER_BINDING = true;
+        #     IMGUI_BUILD_SDLGPU3_BINDING = true;
+        #   });
         buildInputs = with pkgs; [
           gcc
           clang-tools
@@ -32,6 +39,7 @@
           cloc
           abseil-cpp
           glm
+          spdlog
 
           # documentation
           doxygen

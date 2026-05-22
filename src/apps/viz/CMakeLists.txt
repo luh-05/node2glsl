@@ -2,27 +2,30 @@ add_executable(viz
   main.cpp
 )
 
-# ---EXTERNAL DEPS---
+add_library(viz_internal_includes INTERFACE)
+target_include_directories(viz_internal_includes INTERFACE
+  ${APPS_DIR}
+)
+target_link_libraries(viz_internal_includes INTERFACE  
+  absl::status
+  absl::statusor
+)
 
 target_link_libraries(viz
   PRIVATE
-    spdlog
+    viz_internal_includes
+    
+    spdlog::spdlog
     SDL3::SDL3
-    imgui
-    # SDL3_shadercross
-    shaderc 
+    
     absl::flags
     absl::flags_parse
     absl::flags_usage
-    # lw-ecs
+    
+    imgui
 
     # Modules
     viz::core
-)
-
-target_include_directories(viz PRIVATE
-  ABSL_COMMON_INCLUDE_DIRS
-  ${APPS_DIR}/viz
 )
 
 add_subdirectory(core)

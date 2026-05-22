@@ -1,8 +1,8 @@
 #pragma ONCE
 #include "absl/status/statusor.h"
-#include "pipeline.hpp"
 #include <absl/status/status.h>
 #include <memory>
+#include <viz/core/pipeline.hpp>
 
 namespace ntg::viz {
 enum class ShaderFormat { SpirV, Dxil, Metal };

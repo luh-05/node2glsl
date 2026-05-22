@@ -1,6 +1,6 @@
 find_package(Doxygen REQUIRED)
 
-set(DOXYGEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/docs/doxygen)
+set(DOXYGEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/build/docs/doxygen)
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/Doxyfile.in

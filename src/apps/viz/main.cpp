@@ -1,9 +1,9 @@
-#include "core/core.hpp"
-#include "core/sdl.hpp"
-#include "core/shader/shader.hpp"
-#include "spdlog/common.h"
 #include <memory>
+#include <spdlog/spdlog.h>
 #include <string.h>
+#include <viz/core/core.hpp>
+#include <viz/core/sdl.hpp>
+#include <viz/core/shader/shader.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -157,9 +157,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   vertex_shader_attribs.num_storage_buffers = 0;
   vertex_shader_attribs.num_uniform_buffers = 0;
   vertex_shader_attribs.props = 0;
-  if (!vertex_shader->loadShaderFromFile("./src/viz/core/shader/glsl/def.vert",
-                                         "def.vert", ntg::viz::SPIRV_VERTEX,
-                                         &vertex_shader_attribs)) {
+  if (!vertex_shader->loadShaderFromFile(
+          "./src/apps/viz/core/shader/glsl/def.vert", "def.vert",
+          ntg::viz::SPIRV_VERTEX, &vertex_shader_attribs)) {
     spdlog::error("An error occured whilst loading shaders!");
     return SDL_APP_FAILURE;
   }
@@ -172,7 +172,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   fragment_shader_attribs.num_uniform_buffers = 0;
   fragment_shader_attribs.props = 0;
   if (!fragment_shader->loadShaderFromFile(
-          "./src/viz/core/shader/glsl/def.frag", "def.frag",
+          "./src/apps/viz/core/shader/glsl/def.frag", "def.frag",
           ntg::viz::SPIRV_FRAGMENT, &fragment_shader_attribs)) {
     spdlog::error("An error occured whilst loading shaders!");
     return SDL_APP_FAILURE;

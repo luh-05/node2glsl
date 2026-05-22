@@ -1,6 +1,6 @@
 #pragma ONCE
-#include "pch.hpp"
 #include <vector>
+#include <viz/core/geometry/pch.hpp>
 
 namespace ntg::viz {
 struct Vertex {

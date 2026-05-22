@@ -1,6 +1,7 @@
 find_package(PkgConfig REQUIRED)
 
-add_subdirectory(${DEPS_DIR}/spdlog)
+# add_subdirectory(${DEPS_DIR}/spdlog)
+find_package(spdlog REQUIRED)
 
 find_package(SDL3 REQUIRED)
 
@@ -9,6 +10,7 @@ add_library(shaderc ALIAS PkgConfig::SHADERC)
 
 find_package(absl CONFIG REQUIRED)
 
+# find_package(imgui REQUIRED)
 add_library(imgui STATIC
   ${DEPS_DIR}/imgui/imgui.cpp
   ${DEPS_DIR}/imgui/imgui_draw.cpp

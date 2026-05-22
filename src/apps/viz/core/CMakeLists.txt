@@ -1,17 +1,12 @@
 add_library(viz_core)
 add_library(viz::core ALIAS viz_core)
 
-target_include_directories(viz_core
-  PRIVATE
-  ${APPS_DIR}/viz
-)
-
 target_link_libraries(viz_core
   PRIVATE
-    spdlog
-    absl::status
-    absl::statusor
-    glm
+    viz_internal_includes
+    spdlog::spdlog
+    
+    SDL3::SDL3
 
     # Modules
     viz::core::shader
