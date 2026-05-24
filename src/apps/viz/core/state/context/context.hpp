@@ -1,6 +1,6 @@
 #pragma ONCE
-#include <viz/core/gpu.hpp>
-#include <viz/core/shader/shader.hpp>
+#include <viz/core/util/gpu/gpu.hpp>
+#include <viz/core/util/shader/shader.hpp>
 
 namespace ntg::viz {
 class Context {

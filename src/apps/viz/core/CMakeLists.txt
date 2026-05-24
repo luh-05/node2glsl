@@ -1,20 +1,18 @@
-add_library(viz_core)
+add_library(viz_core INTERFACE)
 add_library(viz::core ALIAS viz_core)
 
 target_link_libraries(viz_core
-  PRIVATE
+  INTERFACE
     viz_internal_includes
-    
-    SDL3::SDL3
 
     # Modules
-    viz::core::shader
-    viz::core::geo
-    viz::core::ecs
+    # viz::core::data
+    # viz::core::render
+    # viz::core::state
+    # viz::core::util
 )
 
-target_sources(viz_core PRIVATE gpu.cpp)
+# target_sources(viz_core PRIVATE gpu.cpp)
 
-add_subdirectory(shader)
-add_subdirectory(geometry)
-add_subdirectory(ecs)
+add_subdirectory(util)
+add_subdirectory(state)

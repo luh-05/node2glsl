@@ -28,7 +28,10 @@ target_link_libraries(viz
     imgui
 
     # Modules
-    viz::core
+    viz::core::util::gpu
+    viz::core::util::shader
+    viz::ecs
 )
 
 add_subdirectory(core)
+add_subdirectory(ecs)

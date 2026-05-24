@@ -1,8 +1,8 @@
+#include "shader.hpp"
 #include "spdlog/spdlog.h"
 #include <fstream>
 #include <memory>
-#include <viz/core/core.hpp>
-#include <viz/core/shader/shader.hpp>
+#include <viz/core/state/context/context.hpp>
 namespace ntg::viz {
 
 std::vector<uint32_t> Shader::compileGLSLToSpv(const std::string &source,

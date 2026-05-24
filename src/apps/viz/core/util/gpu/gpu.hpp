@@ -2,7 +2,7 @@
 #include "absl/status/statusor.h"
 #include <absl/status/status.h>
 #include <memory>
-#include <viz/core/pipeline.hpp>
+#include <viz/core/util/gpu/pipeline.hpp>
 
 namespace ntg::viz {
 enum class ShaderFormat { SpirV, Dxil, Metal };

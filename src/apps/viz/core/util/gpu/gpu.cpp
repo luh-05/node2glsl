@@ -1,8 +1,7 @@
 #include "gpu.hpp"
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
-#include "sdl.hpp"
-#include "shader/shader.hpp"
+// #include "sdl.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_gpu.h>
@@ -10,6 +9,7 @@
 #include <cassert>
 #include <memory>
 #include <string_view>
+#include <viz/core/util/shader/shader.hpp>
 
 namespace ntg::viz {
 
