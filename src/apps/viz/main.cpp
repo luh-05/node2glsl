@@ -87,6 +87,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   ntg::viz::signature_t test_system_signature;
   test_system_signature.set(crd.getComponentType<ntg::viz::TestComponent>());
   crd.setSystemSignature<ntg::viz::TestSystem>(test_system_signature);
+
   auto e = crd.createEntity();
   crd.addComponent(e, ntg::viz::TestComponent{});
 
