@@ -15,5 +15,6 @@ public:
 
 public:
   std::vector<Vertex> vertices;
+  std::vector<uint32_t> indices;
 };
 } // namespace ntg::viz

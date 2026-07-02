@@ -3,6 +3,7 @@
 #include <string.h>
 #include <viz/core/util/gpu/core.hpp>
 // #include <viz/core/util/gpu/sdl.hpp>
+#include <viz/core/data/mesh/mesh.hpp>
 #include <viz/core/util/shader/shader.hpp>
 
 #include <spdlog/spdlog.h>
@@ -45,6 +46,7 @@ static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 static ntg::viz::Shader *vertex_shader = nullptr;
 static ntg::viz::Shader *fragment_shader = nullptr;
 static SDL_GPUGraphicsPipeline *pipeline = nullptr;
+static SDL_GPUBuffer *vertex_buffer = nullptr;
 static SDL_GPUBuffer *index_buffer = nullptr;
 
 void LogSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
@@ -186,7 +188,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   pipeline_create_info.vertex_shader = vertex_shader->getShader();
   pipeline_create_info.fragment_shader = fragment_shader->getShader();
   SDL_GPUVertexInputState vertex_input_state;
-  vertex_input_state.vertex_buffer_descriptions = nullptr;
+  SDL_GPUVertexBufferDescription vertex_buffer_description;
+  // FIXME: continue here
+  vertex_buffer_description.vertex_input_state.;
+  vertex_buffer_descriptions = nullptr;
   vertex_input_state.num_vertex_buffers = 0;
   vertex_input_state.vertex_attributes = nullptr;
   vertex_input_state.num_vertex_attributes = 0;
@@ -328,51 +333,98 @@ void renderRaster() {
   SDL_WaitAndAcquireGPUSwapchainTexture(command_buffer, window,
                                         &swapchain_texture, nullptr, nullptr);
   if (swapchain_texture != nullptr) {
+    // vertex buffer
+    SDL_GPUBufferBinding vertex_binding;
+    SDL_GPUBufferCreateInfo vertex_bco;
+    vertex_bco.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+    vertex_bco.size = 3 * 4;
+    vertex_bco.props = 0;
+    // TODO: Decouple SDL_CreateGPUBuffer
+    vertex_buffer = SDL_CreateGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &vertex_bco);
+    if (vertex_buffer == nullptr) {
+      spdlog::error("Failed to create vertex buffer!");
+    }
+    SDL_GPUTransferBufferCreateInfo vertex_gpu_trans_bco;
+    vertex_gpu_trans_bco.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    vertex_gpu_trans_bco.size = 3 * 4;
+    // TODO: Decouple SDL_CreateGPUTransferBuffer
+    SDL_GPUTransferBuffer *vertex_trans_b = SDL_CreateGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &vertex_gpu_trans_bco);
+    // TODO: Decouple SDL_MapGPUTransferBuffer
+    void *vertex_tbp = SDL_MapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        vertex_trans_b, false);
+    ntg::viz::Vertex *vertex_buffer_data = reinterpret_cast<int *>(vertex_tbp);
+    vertex_buffer_data[0] = 0;
+    vertex_buffer_data[1] = 1;
+    vertex_buffer_data[2] = 2;
+    vertex_binding.buffer = vertex_buffer;
+    vertex_binding.offset = 0;
 
-    SDL_GPUBufferBinding buffer_binding;
-    SDL_GPUBufferCreateInfo buffer_create_info;
-    buffer_create_info.usage = SDL_GPU_BUFFERUSAGE_INDEX;
-    buffer_create_info.size = 3 * 4;
-    buffer_create_info.props = 0;
+    // index buffer
+    SDL_GPUBufferBinding index_binding;
+    SDL_GPUBufferCreateInfo index_bco;
+    index_bco.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+    index_bco.size = 3 * 4;
+    index_bco.props = 0;
     // TODO: Decouple SDL_CreateGPUBuffer
     index_buffer = SDL_CreateGPUBuffer(
         reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
-        &buffer_create_info);
+        &index_bco);
     if (index_buffer == nullptr) {
       spdlog::error("Failed to create index buffer!");
     }
-    SDL_GPUTransferBufferCreateInfo gpu_transfer_buffer_create_info;
-    gpu_transfer_buffer_create_info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-    gpu_transfer_buffer_create_info.size = 3 * 4;
+    SDL_GPUTransferBufferCreateInfo index_gpu_trans_bco;
+    index_gpu_trans_bco.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    index_gpu_trans_bco.size = 3 * 4;
     // TODO: Decouple SDL_CreateGPUTransferBuffer
-    SDL_GPUTransferBuffer *transfer_buffer = SDL_CreateGPUTransferBuffer(
+    SDL_GPUTransferBuffer *index_trans_b = SDL_CreateGPUTransferBuffer(
         reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
-        &gpu_transfer_buffer_create_info);
+        &index_gpu_trans_bco);
     // TODO: Decouple SDL_MapGPUTransferBuffer
-    void *transfer_buffer_pointer = SDL_MapGPUTransferBuffer(
+    void *index_tbp = SDL_MapGPUTransferBuffer(
         reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
-        transfer_buffer, false);
-    int *index_buffer_data = reinterpret_cast<int *>(transfer_buffer_pointer);
+        index_trans_b, false);
+    int *index_buffer_data = reinterpret_cast<int *>(index_tbp);
     index_buffer_data[0] = 0;
     index_buffer_data[1] = 1;
     index_buffer_data[2] = 2;
-    buffer_binding.buffer = index_buffer;
-    buffer_binding.offset = 0;
-    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
+    index_binding.buffer = index_buffer;
+    index_binding.offset = 0;
 
-    SDL_GPUTransferBufferLocation gpu_transfer_buffer_location;
-    gpu_transfer_buffer_location.transfer_buffer = transfer_buffer;
-    gpu_transfer_buffer_location.offset = 0;
+    // Copy pass
+    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
+    // vertex
+    SDL_GPUTransferBufferLocation vertex_gpu_tbl;
+    vertex_gpu_tbl.transfer_buffer = vertex_trans_b;
+    vertex_gpu_tbl.offset = 0;
+    SDL_GPUBufferRegion gpu_buffer_region;
+    gpu_buffer_region.buffer = vertex_buffer;
+    gpu_buffer_region.offset = 0;
+    gpu_buffer_region.size = 3 * 4;
+    SDL_UploadToGPUBuffer(copy_pass, &vertex_gpu_tbl, &gpu_buffer_region,
+                          false);
+    // TODO: Decouple SDL_UnmapGPUTransferBuffer
+    SDL_UnmapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_trans_b);
+
+    // index
+    SDL_GPUTransferBufferLocation index_gpu_tbl;
+    index_gpu_tbl.transfer_buffer = index_trans_b;
+    index_gpu_tbl.offset = 0;
     SDL_GPUBufferRegion gpu_buffer_region;
     gpu_buffer_region.buffer = index_buffer;
     gpu_buffer_region.offset = 0;
     gpu_buffer_region.size = 3 * 4;
-    SDL_UploadToGPUBuffer(copy_pass, &gpu_transfer_buffer_location,
-                          &gpu_buffer_region, false);
+    SDL_UploadToGPUBuffer(copy_pass, &index_gpu_tbl, &gpu_buffer_region, false);
     // TODO: Decouple SDL_UnmapGPUTransferBuffer
     SDL_UnmapGPUTransferBuffer(
         reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
-        transfer_buffer);
+        index_trans_b);
 
     SDL_EndGPUCopyPass(copy_pass);
 
@@ -388,7 +440,7 @@ void renderRaster() {
     SDL_GPURenderPass *render_pass =
         SDL_BeginGPURenderPass(command_buffer, &target_info, 1, nullptr);
     SDL_BindGPUGraphicsPipeline(render_pass, pipeline);
-    SDL_BindGPUIndexBuffer(render_pass, &buffer_binding,
+    SDL_BindGPUIndexBuffer(render_pass, &index_binding,
                            SDL_GPU_INDEXELEMENTSIZE_32BIT);
     SDL_DrawGPUIndexedPrimitives(render_pass, 3, 1, 0, 0, 0);
     SDL_EndGPURenderPass(render_pass);
@@ -400,7 +452,7 @@ void renderRaster() {
     // TODO: Decouple SDL_ReleaseGPUTransferBuffer
     SDL_ReleaseGPUTransferBuffer(
         reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
-        transfer_buffer);
+        index_trans_b);
 
     // imgui
     ImGui_ImplSDLGPU3_NewFrame();
