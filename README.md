@@ -1,4 +1,4 @@
-# node2glsl
+# Mollusk
 Utility to convert a shader node-graph to glsl
 
 ## Installation

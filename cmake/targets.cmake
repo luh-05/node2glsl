@@ -1,5 +1,10 @@
 if(${BUILD_TARGET_NTG_LIB})
-  add_subdirectory(${LIBS_DIR}/ntg)
+  set(BUILD_TARGET_NTG_IR TRUE)
+  add_subdirectory(${LIBS_DIR}/core)
+endif()
+
+if(${BUILD_TARGET_NTG_IR})
+  add_subdirectory(${LIBS_DIR}/ir)
 endif()
 
 if(${BUILD_TARGET_NTG_CLI})

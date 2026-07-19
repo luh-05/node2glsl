@@ -1,5 +1,5 @@
 {
-  description = "node2glsl flake";
+  description = "mollusk flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -19,7 +19,7 @@
         nativeBuildInputs = with pkgs; [
           pkg-config
         ];
-        # imgui = 
+        # imgui =
         #   pkgs.imgui.overrideAttrs (old: {
         #     IMGUI_BUILD_VULKAN_BINDING = true;
         #     IMGUI_BUILD_SDL3_BINDING = true;

@@ -9,7 +9,7 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'node2glsl'
+project = 'mollusk'
 copyright = '2026, Vincent Antoni, Laurin Von Bergmann, Helena Hummel, Tom Schäfer, Lasse Hüffler'
 author = 'Vincent Antoni, Laurin Von Bergmann, Helena Hummel, Tom Schäfer, Lasse Hüffler'
 
@@ -21,9 +21,9 @@ extensions = [
 ]
 
 breathe_projects = {
-    "node2glsl": "../build/docs/doxygen/xml/"
+    "mollusk": "../build/docs/doxygen/xml/"
 }
-breathe_default_project = "node2glsl"
+breathe_default_project = "mollusk"
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
