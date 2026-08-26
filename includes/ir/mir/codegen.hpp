@@ -4,7 +4,7 @@
 #pragma ONCE
 
 namespace msk::ir {
-struct IRConnection;
+struct Connection; // pimpl - definition in src
 
 /**
  * @brief Abstract Token basetype for codegen
@@ -23,6 +23,7 @@ private:
 
 public:
   TextToken(std::string text) : text(text) {}
+  std::string GetString();
 } TextToken;
 
 /**
@@ -30,6 +31,9 @@ public:
  */
 typedef class WildcardToken : CodegenToken {
 private:
-  std::unique_ptr<IRConnection> connection;
+  std::unique_ptr<Connection> connection;
+
+public:
+  std::string GetString();
 } WildcardToken;
 } // namespace msk::ir

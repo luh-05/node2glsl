@@ -21,4 +21,7 @@ target_link_libraries(ir_deps
 target_link_libraries(ir
   PRIVATE
     ir_deps
+    mir::codegen
 )
+
+add_subdirectory(codegen)
