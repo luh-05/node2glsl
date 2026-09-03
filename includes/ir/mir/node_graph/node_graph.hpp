@@ -69,7 +69,7 @@ public:
  */
 typedef struct Connection : Identifiable<Connection> {
   // Left and right port of the connection
-  std::unique_ptr<Port> left_port;
-  std::unique_ptr<Port> right_port;
+  std::weak_ptr<Port> left_port;
+  std::weak_ptr<Port> right_port;
 } Connection;
 } // namespace msk::ir
