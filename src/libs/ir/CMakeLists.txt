@@ -16,6 +16,7 @@ target_link_libraries(ir_deps
 
     absl::status
     absl::statusor
+    absl::strings
 )
 
 target_link_libraries(ir

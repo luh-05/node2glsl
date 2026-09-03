@@ -1,43 +1,57 @@
+#include "../utils.hpp"
+#include <absl/status/status.h>
+#include <absl/status/statusor.h>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #pragma ONCE
 
 namespace msk::ir {
-typedef struct Slot {
-  uint32_t id;
+class Connection;
+typedef struct Port : Identifiable<Port> {
   // TODO: change to enum
-  char *dataType;
+  std::string dataType; // Data type of Port
+
+  std::shared_ptr<Connection> connection;
+
+  Port(std::string dataType) : dataType(dataType) {};
 } Slot;
 
-class CodegenToken;
+class CodegenToken; // pimpl
 /**
  * @brief Node representation in Graph
  */
-typedef class Node {
-  virtual std::vector<std::unique_ptr<CodegenToken>> GenerateTokenString() = 0;
+typedef class Node : Identifiable<Node> {
+private:
+  // Left and right ports, maps name to port
+  std::map<std::string, Port> leftPorts;
+  std::map<std::string, Port> rightPorts;
 } Node;
 
+class GraphContext; // pimpl
 /**
- * @brief Information on used definitions in a Module
- * @param constants vector of used constants
- * @param input_ports vector of used ports for input
- * @param output_ports vector of used ports for output
- *
- *
+ * @brief Connecter between internal GraphContext and interface for Module
+ * specification
  */
-typedef struct FetchInfo {
-  const std::vector<std::string> constants;
-  const std::vector<std::string> input_ports;
-  const std::vector<std::string> output_ports;
-} FetchInfo;
+typedef class ContextProvider {
+private:
+  std::unique_ptr<GraphContext> context;
+
+public:
+  // Gets the named constant of the provided node
+  template <typename T>
+  auto GetConstant(Node *n, std::string name) -> absl::StatusOr<T>;
+} ContextProvider;
 
 /**
  * @brief Specification of Node for Modules
  */
 typedef class Module : Node {
-  virtual FetchInfo GetFetchInfo();
+  // Generates a CodegenToken vector
+  virtual std::vector<std::unique_ptr<CodegenToken>>
+  GenerateTokenString(ContextProvider context) = 0;
 } Module;
 
 /**
@@ -45,7 +59,7 @@ typedef class Module : Node {
  */
 typedef class Graph : Node {
 private:
-  std::vector<std::unique_ptr<Node>> subnodes();
+  std::vector<std::unique_ptr<Node>> subnodes;
 
 public:
 } Graph;
@@ -53,16 +67,9 @@ public:
 /**
  * @brief Graph Connection
  */
-typedef struct Connection {
-  std::unique_ptr<Slot> from_slot;
-  std::unique_ptr<Slot> to_slot;
+typedef struct Connection : Identifiable<Connection> {
+  // Left and right port of the connection
+  std::unique_ptr<Port> left_port;
+  std::unique_ptr<Port> right_port;
 } Connection;
-
-/**
- * @brief OO Graph representation
- */
-typedef class NodeGraph {
-private:
-  std::unique_ptr<Graph> graph();
-} NodeGraph;
 } // namespace msk::ir

@@ -1,10 +1,9 @@
-#include <cstdint>
 #include <memory>
 #include <string>
 #pragma ONCE
 
 namespace msk::ir {
-struct Connection; // pimpl - definition in src
+struct Port; // pimpl - definition in node_graph.hpp
 
 /**
  * @brief Abstract Token basetype for codegen
@@ -31,9 +30,10 @@ public:
  */
 typedef class WildcardToken : CodegenToken {
 private:
-  std::unique_ptr<Connection> connection;
+  std::weak_ptr<Port> port;
 
 public:
+  WildcardToken(std::weak_ptr<Port> port) : port(port) {};
   std::string GetString();
 } WildcardToken;
 } // namespace msk::ir
