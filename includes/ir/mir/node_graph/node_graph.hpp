@@ -24,10 +24,10 @@ class CodegenToken; // pimpl
  * @brief Node representation in Graph
  */
 typedef class Node : Identifiable<Node> {
-private:
+public:
   // Left and right ports, maps name to port
-  std::map<std::string, Port> leftPorts;
-  std::map<std::string, Port> rightPorts;
+  std::map<std::string, std::unique_ptr<Port>> leftPorts;
+  std::map<std::string, std::unique_ptr<Port>> rightPorts;
 } Node;
 
 class GraphContext; // pimpl
@@ -48,16 +48,16 @@ public:
 /**
  * @brief Specification of Node for Modules
  */
-typedef class Module : Node {
+typedef class Module : public Node {
   // Generates a CodegenToken vector
-  virtual std::vector<std::unique_ptr<CodegenToken>>
+  virtual absl::StatusOr<std::vector<std::unique_ptr<CodegenToken>>>
   GenerateTokenString(ContextProvider context) = 0;
 } Module;
 
 /**
  * @brief Graph Node
  */
-typedef class Graph : Node {
+typedef class Graph : public Node {
 private:
   std::vector<std::unique_ptr<Node>> subnodes;
 
@@ -69,7 +69,7 @@ public:
  */
 typedef struct Connection : Identifiable<Connection> {
   // Left and right port of the connection
-  std::weak_ptr<Port> left_port;
-  std::weak_ptr<Port> right_port;
+  Port *left_port;
+  Port *right_port;
 } Connection;
 } // namespace msk::ir

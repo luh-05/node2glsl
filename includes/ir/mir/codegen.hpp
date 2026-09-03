@@ -11,12 +11,15 @@ struct Port; // pimpl - definition in node_graph.hpp
 typedef class CodegenToken {
 private:
   virtual std::string GetString() = 0;
+
+public:
+  virtual ~CodegenToken() = default;
 } CodegenToken;
 
 /**
  * @brief CodegenToken specification for text
  */
-typedef class TextToken : CodegenToken {
+typedef class TextToken : public CodegenToken {
 private:
   std::string text;
 
@@ -28,12 +31,12 @@ public:
 /**
  * @brief CodegenToken specification for a connection
  */
-typedef class WildcardToken : CodegenToken {
+typedef class WildcardToken : public CodegenToken {
 private:
-  std::weak_ptr<Port> port;
+  Port *port;
 
 public:
-  WildcardToken(std::weak_ptr<Port> port) : port(port) {};
+  WildcardToken(Port *port) : port(port) {};
   std::string GetString();
 } WildcardToken;
 } // namespace msk::ir

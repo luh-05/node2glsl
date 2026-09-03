@@ -7,6 +7,10 @@ if(${BUILD_TARGET_NTG_IR})
   add_subdirectory(${LIBS_DIR}/ir)
 endif()
 
+if(${BUILD_TARGET_BLENDER})
+  add_subdirectory(${LIBS_DIR}/blender)
+endif()
+
 if(${BUILD_TARGET_NTG_CLI})
   add_subdirectory(${APPS_DIR}/cli)
 endif()
