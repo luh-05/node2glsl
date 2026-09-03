@@ -1,4 +1,4 @@
-# node2glsl
+# Mollusk
 Utility to convert a shader node-graph to glsl
 
 ## Installation
@@ -8,11 +8,27 @@ Utility to convert a shader node-graph to glsl
  - ninja
  - cmake
  - shaderc
- - sdl3 (not on windows)
+ - sdl3
+ - doxygen
+ - sphinx
+ - breathe
 
 > [!TIP]
 > A **Nix flake** containing all dependencies is provided.
 > Open the dev shell with `nix develop`
+
+### Windows Prerequisites Installation Guide (except git)
+**Step 1:** Install MSYS2 https://www.msys2.org/  
+**Step 2:** Add the path of the "MSYS2 UCRT64" shell (should be "C:\msys64\ucrt64\bin") to your PATH environment variable.
+- **DE guide:** Windows Suche "Systemumgebungsvariablen bearbeiten" -> Umgebungsvariablen (ganz unten) -> In der Liste "Path" auswählen -> Bearbeiten -> Neu -> C:\msys64\ucrt64\bin hinzufügen
+  
+**Step 3:** Open "MSYS2 UCRT64" shell and install the required packages with the following command:
+```sh
+pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-doxygen mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-shaderc mingw-w64-ucrt-x86_64-sdl3 mingw-w64-ucrt-x86_64-abseil-cpp
+```
+**Step 4:** Download ninja https://github.com/ninja-build/ninja/releases. Put the .exe in a place you like (for this example "C:\Program Files\ninja") **and add that path to the PATH environment variable too**  
+**Step 5:** In the UCRT64 shell you can now navigate to where you want to install this project. To get to your C:/ drive use `cd /c/`  
+**(optional Step6:)** You may additionally install cmake via the msi installer https://cmake.org/download/. With this you can build this project in a normal terminal via cmake commands.
 
 ### Step 1 (Clone)
 **Clone (ssh)**:
@@ -29,7 +45,7 @@ cd node2glsl
 git submodule update --init --recursive
 ```
 ### Step 2 (Compile)
-**On Linux**:
+**On Linux or Windows with MSYS2 UCRT64 shell**:
 ```sh
 ./build-debug.sh
 ```
@@ -40,10 +56,10 @@ cmake --preset debug
 cmake --build --preset debug
 ```
 
-> [!IMPORTANT]
-> On Unix SDL3 is assumed to be installed to the system.  
-> On Windows SDL3 is compiled locally. Though the SDL3.dll may need to be in the same directory as the binary you run. SDL3.dll should be in /bin/debug/ so if you want to run something in /bin/debug/demo/ just copy it there.
+### Step 3 (Run)
+```sh
+./bin/debug/viz.exe --gpu_driver vulkan
+```
 
-> [!TIP]
-> It's possible to compile locally on linux too using `-DCOMPILE_SDL_LOCALLY=ON`.
-> This requires the dev libraries of wayland/x11 to be installed (not included in the nix flake).
+> [!IMPORTANT]
+> On Windows you might need to disable "Smart App Control" to run viz.exe

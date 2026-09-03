@@ -1,12 +1,3 @@
-[submodule "deps/abseil-cpp"]
-	path = deps/abseil-cpp
-	url = https://github.com/abseil/abseil-cpp.git
-[submodule "deps/spdlog"]
-	path = deps/spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "deps/lw-ecs"]
-	path = deps/lw-ecs
-	url = https://github.com/luh-05/lw-ecs.git

@@ -7,3 +7,4 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release/dem
 
 add_subdirectory(sdl3)
 add_subdirectory(sdl3gpu)
+add_subdirectory(ir_test)

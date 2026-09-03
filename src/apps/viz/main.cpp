@@ -1,0 +1,540 @@
+#include <memory>
+#include <spdlog/spdlog.h>
+#include <string.h>
+#include <viz/core/util/gpu/core.hpp>
+// #include <viz/core/util/gpu/sdl.hpp>
+#include <viz/core/data/mesh/mesh.hpp>
+#include <viz/core/util/shader/shader.hpp>
+
+#include <spdlog/spdlog.h>
+
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlgpu3.h>
+
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/flags/usage.h"
+
+#include <shaderc/shaderc.h>
+#include <shaderc/shaderc.hpp>
+#include <shaderc/status.h>
+
+#include <viz/ecs/impl/demo.hpp>
+
+#define SDL_MAIN_USE_CALLBACKS 1
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_gpu.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_video.h>
+
+// #include "core/ecs/impl/demo.hpp"
+
+// #include <ecs_base.hpp>
+
+ABSL_FLAG(std::optional<std::string>, gpu_driver, std::nullopt,
+          "gpu driver to use");
+ABSL_FLAG(std::string, log_level, "info", "logging level");
+
+static SDL_Window *window = nullptr;
+static std::shared_ptr<ntg::viz::Context> context = nullptr;
+static ImGuiIO *io = nullptr;
+static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+static ntg::viz::Shader *vertex_shader = nullptr;
+static ntg::viz::Shader *fragment_shader = nullptr;
+static SDL_GPUGraphicsPipeline *pipeline = nullptr;
+static SDL_GPUBuffer *vertex_buffer = nullptr;
+static SDL_GPUBuffer *index_buffer = nullptr;
+
+void LogSDLError() { spdlog::error("SDL Error: {}", SDL_GetError()); }
+
+#define TRY_SDL(func)                                                          \
+  if (!func) {                                                                 \
+    LogSDLError();                                                             \
+    return SDL_APP_FAILURE;                                                    \
+  }
+
+#define EXIT_IF_ERROR(expr)                                                    \
+  if (absl::Status s = (expr); !s.ok()) {                                      \
+    spdlog::error(s.message());                                                \
+    return SDL_APP_FAILURE;                                                    \
+  }
+
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+  // Abseil flags setup
+  absl::SetProgramUsageMessage("Simple pathtracer for volumetric shaders\n"
+                               "Usage: viewer [options]");
+  absl::ParseCommandLine(argc, argv);
+
+  const std::string fll = absl::GetFlag(FLAGS_log_level);
+  if (strcmp(fll.c_str(), "info") == 0) {
+    spdlog::set_level(spdlog::level::info);
+  } else if (strcmp(fll.c_str(), "debug") == 0) {
+    spdlog::set_level(spdlog::level::debug);
+  } else {
+    spdlog::error("Log level '{}' not recognized. Defaulting to 'info'.", fll);
+    spdlog::set_level(spdlog::level::info);
+  }
+
+  context = std::make_shared<ntg::viz::Context>();
+
+  // ECS Testing
+  ntg::viz::Coordinator crd{};
+  crd.init();
+  crd.registerComponent<ntg::viz::TestComponent>();
+  crd.registerSystem<ntg::viz::TestSystem>();
+  ntg::viz::signature_t test_system_signature;
+  test_system_signature.set(crd.getComponentType<ntg::viz::TestComponent>());
+  crd.setSystemSignature<ntg::viz::TestSystem>(test_system_signature);
+
+  auto e = crd.createEntity();
+  crd.addComponent(e, ntg::viz::TestComponent{});
+
+  // SDL Setup
+  spdlog::info("Setting up SDL");
+  SDL_SetAppMetadata("sdl3gpu", "1.0", "node2glsl.demos.sdl3gpu");
+
+  TRY_SDL(SDL_Init(SDL_INIT_VIDEO));
+
+  spdlog::info("Creating Window");
+  float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+  window = SDL_CreateWindow(
+      "sdl3gpu", static_cast<int>(800 * main_scale),
+      static_cast<int>(600 * main_scale),
+      SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
+  if (window == nullptr) {
+    LogSDLError();
+    return SDL_APP_FAILURE;
+  }
+
+  // Set up GPU device
+  spdlog::info("Setting up GPU Device");
+
+  char *driver = nullptr;
+  ntg::viz::ShaderFormat shader_format = ntg::viz::ShaderFormat::SpirV;
+  if (absl::GetFlag(FLAGS_gpu_driver).has_value()) {
+    std::string driver_flag = absl::GetFlag(FLAGS_gpu_driver).value();
+    driver = driver_flag.data();
+    if (strcmp(driver, "vulkan") == 0) {
+      shader_format = ntg::viz::ShaderFormat::SpirV;
+    } else if (strcmp(driver, "metal") == 0) {
+      shader_format = ntg::viz::ShaderFormat::Metal;
+    } else if (strcmp(driver, "direct3d12") == 0) {
+      shader_format = ntg::viz::ShaderFormat::Dxil;
+    } else {
+      spdlog::error("Driver '{}' is not valid", driver);
+      return SDL_APP_FAILURE;
+    }
+  }
+
+  EXIT_IF_ERROR(context->gpu->CreateGPUDevice(shader_format, driver));
+
+  if (!absl::GetFlag(FLAGS_gpu_driver).has_value()) {
+    spdlog::warn("No driver provided!");
+  }
+  {
+    auto driver_name = context->gpu->GetDriverName();
+    if (driver_name.ok()) {
+      spdlog::info("Using driver '{}'", driver_name.value());
+    } else {
+      spdlog::warn(driver_name.status().message());
+    }
+  }
+
+  EXIT_IF_ERROR(
+      context->gpu->ClaimWindow(reinterpret_cast<ntg::viz::Window>(window)));
+  EXIT_IF_ERROR(context->gpu->SetSwapchainParameters(
+      reinterpret_cast<ntg::viz::Window>(window),
+      ntg::viz::SwapchainComposition::Sdr, ntg::viz::PresentMode::VSync));
+
+  SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+  SDL_ShowWindow(window);
+
+  spdlog::info("Compiling shaders");
+
+  vertex_shader = new ntg::viz::Shader(context);
+  ntg::viz::Shader::ShaderAttribs vertex_shader_attribs;
+  vertex_shader_attribs.num_samplers = 0;
+  vertex_shader_attribs.num_storage_textures = 0;
+  vertex_shader_attribs.num_storage_buffers = 0;
+  vertex_shader_attribs.num_uniform_buffers = 0;
+  vertex_shader_attribs.props = 0;
+  if (!vertex_shader->loadShaderFromFile(
+          "./src/apps/viz/core/data/glsl/def.vert", "def.vert",
+          ntg::viz::SPIRV_VERTEX, &vertex_shader_attribs)) {
+    spdlog::error("An error occured whilst loading shaders!");
+    return SDL_APP_FAILURE;
+  }
+
+  fragment_shader = new ntg::viz::Shader(context);
+  ntg::viz::Shader::ShaderAttribs fragment_shader_attribs;
+  fragment_shader_attribs.num_samplers = 0;
+  fragment_shader_attribs.num_storage_textures = 0;
+  fragment_shader_attribs.num_storage_buffers = 0;
+  fragment_shader_attribs.num_uniform_buffers = 0;
+  fragment_shader_attribs.props = 0;
+  if (!fragment_shader->loadShaderFromFile(
+          "./src/apps/viz/core/data/glsl/def.frag", "def.frag",
+          ntg::viz::SPIRV_FRAGMENT, &fragment_shader_attribs)) {
+    spdlog::error("An error occured whilst loading shaders!");
+    return SDL_APP_FAILURE;
+  }
+
+  spdlog::info("Creating graphics pipeline");
+  SDL_GPUGraphicsPipelineCreateInfo pipeline_create_info;
+  pipeline_create_info.vertex_shader = vertex_shader->getShader();
+  pipeline_create_info.fragment_shader = fragment_shader->getShader();
+  SDL_GPUVertexInputState vertex_input_state;
+  SDL_GPUVertexBufferDescription vertex_buffer_description;
+  // FIXME: continue here
+  vertex_buffer_description.vertex_input_state.;
+  vertex_buffer_descriptions = nullptr;
+  vertex_input_state.num_vertex_buffers = 0;
+  vertex_input_state.vertex_attributes = nullptr;
+  vertex_input_state.num_vertex_attributes = 0;
+  pipeline_create_info.vertex_input_state = vertex_input_state;
+  pipeline_create_info.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+  SDL_GPURasterizerState rasterizer_state;
+  rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+  rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+  rasterizer_state.front_face = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE;
+  rasterizer_state.depth_bias_constant_factor = 1.0f;
+  rasterizer_state.depth_bias_clamp = 0.0f;
+  rasterizer_state.depth_bias_slope_factor = 1.0f;
+  rasterizer_state.enable_depth_bias = false;
+  rasterizer_state.enable_depth_clip = false;
+  rasterizer_state.padding1 = 0;
+  rasterizer_state.padding2 = 0;
+  pipeline_create_info.rasterizer_state = rasterizer_state;
+  SDL_GPUMultisampleState multisample_state;
+  multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+  multisample_state.sample_mask = 0;
+  multisample_state.enable_mask = false;
+  multisample_state.enable_alpha_to_coverage = false;
+  multisample_state.padding2 = 0;
+  multisample_state.padding3 = 0;
+  pipeline_create_info.multisample_state = multisample_state;
+  SDL_GPUDepthStencilState depth_stencil_state;
+  depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+  SDL_GPUStencilOpState depth_stencil_op;
+  depth_stencil_op.fail_op = SDL_GPU_STENCILOP_KEEP;
+  depth_stencil_op.pass_op = SDL_GPU_STENCILOP_REPLACE;
+  depth_stencil_op.depth_fail_op = SDL_GPU_STENCILOP_KEEP;
+  depth_stencil_op.compare_op = SDL_GPU_COMPAREOP_NEVER;
+  depth_stencil_state.back_stencil_state = depth_stencil_op;
+  depth_stencil_state.front_stencil_state = depth_stencil_op;
+  depth_stencil_state.compare_mask = 0b0;
+  depth_stencil_state.write_mask = 0b0;
+  depth_stencil_state.enable_depth_test = false;
+  depth_stencil_state.enable_depth_write = false;
+  depth_stencil_state.enable_stencil_test = false;
+  depth_stencil_state.padding1 = 0;
+  depth_stencil_state.padding2 = 0;
+  depth_stencil_state.padding3 = 0;
+  pipeline_create_info.depth_stencil_state = depth_stencil_state;
+  SDL_GPUGraphicsPipelineTargetInfo target_info;
+  SDL_GPUColorTargetDescription color_target_description;
+  color_target_description.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+  SDL_GPUColorTargetBlendState color_target_blend_state;
+  color_target_blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+  color_target_blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+  color_target_blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+  color_target_blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+  color_target_blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+  color_target_blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+  color_target_blend_state.color_write_mask =
+      SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G |
+      SDL_GPU_COLORCOMPONENT_B | SDL_GPU_COLORCOMPONENT_A;
+  color_target_blend_state.enable_blend = false;
+  color_target_blend_state.enable_color_write_mask = false;
+  color_target_blend_state.padding1 = 0;
+  color_target_blend_state.padding2 = 0;
+  color_target_description.blend_state = color_target_blend_state;
+  target_info.color_target_descriptions = &color_target_description;
+  target_info.num_color_targets = 1;
+  target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UINT;
+  target_info.has_depth_stencil_target = false;
+  target_info.padding1 = 0;
+  target_info.padding2 = 0;
+  target_info.padding3 = 0;
+  pipeline_create_info.target_info = target_info;
+  pipeline_create_info.props = 0;
+
+  // TODO: Decouple SDL_CreateGPUGraphicsPipeline
+  pipeline = SDL_CreateGPUGraphicsPipeline(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+      &pipeline_create_info);
+  if (pipeline == nullptr) {
+    spdlog::error("Failed to create graphics pipeline: {}", SDL_GetError());
+    return SDL_APP_FAILURE;
+  }
+
+  spdlog::info("Setting up imgui");
+  // Setup Dear ImGui context
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  io = &ImGui::GetIO();
+  (void)io;
+  io->ConfigFlags |=
+      ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+  io->ConfigFlags |=
+      ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
+  // ImGui::StyleColorsLight();
+
+  // Setup scaling
+  ImGuiStyle &style = ImGui::GetStyle();
+  style.ScaleAllSizes(
+      main_scale); // Bake a fixed style scale. (until we have a solution for
+                   // dynamic style scaling, changing this requires resetting
+                   // Style + calling this again)
+  style.FontScaleDpi =
+      main_scale; // Set initial font scale. (in docking branch: using
+                  // io.ConfigDpiScaleFonts=true automatically overrides this
+                  // for every window depending on the current monitor)
+
+  // Setup Platform/Renderer backends
+  ImGui_ImplSDL3_InitForSDLGPU(window);
+  ImGui_ImplSDLGPU3_InitInfo init_info = {};
+  init_info.Device =
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice());
+  // TODO: Decouple SDL_GetGPUSwapchainTextureFormat
+  init_info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()), window);
+  init_info.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
+  init_info.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
+  init_info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
+  ImGui_ImplSDLGPU3_Init(&init_info);
+
+  spdlog::info("Starting render & event loop");
+
+  return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
+  if (event->type == SDL_EVENT_QUIT) {
+    return SDL_APP_SUCCESS;
+  }
+
+  ImGui_ImplSDL3_ProcessEvent(event);
+  return SDL_APP_CONTINUE;
+}
+
+void renderRaster() {
+  // TODO: Decouple SDL_AcquireGPUCommandBuffer
+  SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(
+      reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
+  SDL_GPUTexture *swapchain_texture;
+  SDL_WaitAndAcquireGPUSwapchainTexture(command_buffer, window,
+                                        &swapchain_texture, nullptr, nullptr);
+  if (swapchain_texture != nullptr) {
+    // vertex buffer
+    SDL_GPUBufferBinding vertex_binding;
+    SDL_GPUBufferCreateInfo vertex_bco;
+    vertex_bco.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+    vertex_bco.size = 3 * 4;
+    vertex_bco.props = 0;
+    // TODO: Decouple SDL_CreateGPUBuffer
+    vertex_buffer = SDL_CreateGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &vertex_bco);
+    if (vertex_buffer == nullptr) {
+      spdlog::error("Failed to create vertex buffer!");
+    }
+    SDL_GPUTransferBufferCreateInfo vertex_gpu_trans_bco;
+    vertex_gpu_trans_bco.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    vertex_gpu_trans_bco.size = 3 * 4;
+    // TODO: Decouple SDL_CreateGPUTransferBuffer
+    SDL_GPUTransferBuffer *vertex_trans_b = SDL_CreateGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &vertex_gpu_trans_bco);
+    // TODO: Decouple SDL_MapGPUTransferBuffer
+    void *vertex_tbp = SDL_MapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        vertex_trans_b, false);
+    ntg::viz::Vertex *vertex_buffer_data = reinterpret_cast<int *>(vertex_tbp);
+    vertex_buffer_data[0] = 0;
+    vertex_buffer_data[1] = 1;
+    vertex_buffer_data[2] = 2;
+    vertex_binding.buffer = vertex_buffer;
+    vertex_binding.offset = 0;
+
+    // index buffer
+    SDL_GPUBufferBinding index_binding;
+    SDL_GPUBufferCreateInfo index_bco;
+    index_bco.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+    index_bco.size = 3 * 4;
+    index_bco.props = 0;
+    // TODO: Decouple SDL_CreateGPUBuffer
+    index_buffer = SDL_CreateGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &index_bco);
+    if (index_buffer == nullptr) {
+      spdlog::error("Failed to create index buffer!");
+    }
+    SDL_GPUTransferBufferCreateInfo index_gpu_trans_bco;
+    index_gpu_trans_bco.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    index_gpu_trans_bco.size = 3 * 4;
+    // TODO: Decouple SDL_CreateGPUTransferBuffer
+    SDL_GPUTransferBuffer *index_trans_b = SDL_CreateGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        &index_gpu_trans_bco);
+    // TODO: Decouple SDL_MapGPUTransferBuffer
+    void *index_tbp = SDL_MapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_trans_b, false);
+    int *index_buffer_data = reinterpret_cast<int *>(index_tbp);
+    index_buffer_data[0] = 0;
+    index_buffer_data[1] = 1;
+    index_buffer_data[2] = 2;
+    index_binding.buffer = index_buffer;
+    index_binding.offset = 0;
+
+    // Copy pass
+    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
+    // vertex
+    SDL_GPUTransferBufferLocation vertex_gpu_tbl;
+    vertex_gpu_tbl.transfer_buffer = vertex_trans_b;
+    vertex_gpu_tbl.offset = 0;
+    SDL_GPUBufferRegion gpu_buffer_region;
+    gpu_buffer_region.buffer = vertex_buffer;
+    gpu_buffer_region.offset = 0;
+    gpu_buffer_region.size = 3 * 4;
+    SDL_UploadToGPUBuffer(copy_pass, &vertex_gpu_tbl, &gpu_buffer_region,
+                          false);
+    // TODO: Decouple SDL_UnmapGPUTransferBuffer
+    SDL_UnmapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_trans_b);
+
+    // index
+    SDL_GPUTransferBufferLocation index_gpu_tbl;
+    index_gpu_tbl.transfer_buffer = index_trans_b;
+    index_gpu_tbl.offset = 0;
+    SDL_GPUBufferRegion gpu_buffer_region;
+    gpu_buffer_region.buffer = index_buffer;
+    gpu_buffer_region.offset = 0;
+    gpu_buffer_region.size = 3 * 4;
+    SDL_UploadToGPUBuffer(copy_pass, &index_gpu_tbl, &gpu_buffer_region, false);
+    // TODO: Decouple SDL_UnmapGPUTransferBuffer
+    SDL_UnmapGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_trans_b);
+
+    SDL_EndGPUCopyPass(copy_pass);
+
+    SDL_GPUColorTargetInfo target_info = {};
+    target_info.texture = swapchain_texture;
+    target_info.clear_color =
+        SDL_FColor{clear_color.x, clear_color.y, clear_color.z, clear_color.w};
+    target_info.load_op = SDL_GPU_LOADOP_CLEAR;
+    target_info.store_op = SDL_GPU_STOREOP_STORE;
+    target_info.mip_level = 0;
+    target_info.layer_or_depth_plane = 0;
+    target_info.cycle = false;
+    SDL_GPURenderPass *render_pass =
+        SDL_BeginGPURenderPass(command_buffer, &target_info, 1, nullptr);
+    SDL_BindGPUGraphicsPipeline(render_pass, pipeline);
+    SDL_BindGPUIndexBuffer(render_pass, &index_binding,
+                           SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    SDL_DrawGPUIndexedPrimitives(render_pass, 3, 1, 0, 0, 0);
+    SDL_EndGPURenderPass(render_pass);
+
+    // TODO: Decouple SDL_ReleaseGPUBuffer
+    SDL_ReleaseGPUBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_buffer);
+    // TODO: Decouple SDL_ReleaseGPUTransferBuffer
+    SDL_ReleaseGPUTransferBuffer(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        index_trans_b);
+
+    // imgui
+    ImGui_ImplSDLGPU3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow();
+
+    ImGui::Render();
+    ImDrawData *draw_data = ImGui::GetDrawData();
+    const bool is_minimized =
+        (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
+
+    if (!is_minimized) {
+      // Upload vertex/index buffers
+      ImGui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer);
+
+      // Setup render pass
+      target_info = {};
+      target_info.texture = swapchain_texture;
+      target_info.clear_color =
+          SDL_FColor{clear_color.x, clear_color.y, clear_color.z, 0.0f};
+      target_info.load_op = SDL_GPU_LOADOP_LOAD;
+      target_info.store_op = SDL_GPU_STOREOP_STORE;
+      target_info.mip_level = 0;
+      target_info.layer_or_depth_plane = 0;
+      target_info.cycle = false;
+      render_pass =
+          SDL_BeginGPURenderPass(command_buffer, &target_info, 1, nullptr);
+
+      // Render imgui pass
+      ImGui_ImplSDLGPU3_RenderDrawData(draw_data, command_buffer, render_pass);
+
+      SDL_EndGPURenderPass(render_pass);
+    }
+    SDL_SubmitGPUCommandBuffer(command_buffer);
+  }
+}
+
+SDL_AppResult SDL_AppIterate(void *appstate) {
+  renderRaster();
+
+  // Submit command buffer
+
+  return SDL_APP_CONTINUE;
+}
+
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+  spdlog::info("Quitting SDL");
+  if (index_buffer != nullptr) {
+  }
+
+  if (pipeline != nullptr) {
+    // TODO: Decouple SDL_ReleaseGPUGraphicsPipeline
+    SDL_ReleaseGPUGraphicsPipeline(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        pipeline);
+  }
+
+  if (vertex_shader != nullptr) {
+    delete vertex_shader;
+  }
+  if (fragment_shader != nullptr) {
+    delete fragment_shader;
+  }
+
+  if (reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()) !=
+      nullptr) {
+    SDL_WaitForGPUIdle(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
+    ImGui_ImplSDL3_Shutdown();
+    ImGui_ImplSDLGPU3_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_ReleaseWindowFromGPUDevice(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()),
+        window);
+    SDL_DestroyGPUDevice(
+        reinterpret_cast<SDL_GPUDevice *>(context->gpu->RawGetDevice()));
+  }
+  if (window != nullptr) {
+    SDL_DestroyWindow(window);
+  }
+  SDL_Quit();
+}
