@@ -24,6 +24,8 @@ typedef class Node {
  * @param constants vector of used constants
  * @param input_ports vector of used ports for input
  * @param output_ports vector of used ports for output
+ *
+ *
  */
 typedef struct FetchInfo {
   const std::vector<std::string> constants;
