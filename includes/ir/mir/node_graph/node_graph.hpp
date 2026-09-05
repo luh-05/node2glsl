@@ -2,6 +2,7 @@
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <mir/utils.hpp>
@@ -48,11 +49,15 @@ public:
 /**
  * @brief Specification of Node for Modules
  */
+// template <std::output_iterator<Token> Out>
 typedef class Module : public Node {
 public:
-  // Generates a CodegenToken vector
-  virtual absl::StatusOr<std::vector<std::unique_ptr<CodegenToken>>>
-  GenerateTokenString(ContextProvider *context) = 0;
+  using Token = std::unique_ptr<CodegenToken>;
+  using Out = std::back_insert_iterator<std::vector<Token>>;
+
+  // Generates CodegenTokens
+  virtual auto GenerateTokenString(ContextProvider *context, Out out)
+      -> absl::Status = 0;
 } Module;
 
 /**

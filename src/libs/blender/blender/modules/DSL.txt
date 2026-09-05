@@ -1,9 +1,20 @@
+=== VERSION 2 ===
 
-V_CREATE; // generates the vector
+auto a = context->GetConstant<uint32_t>("a"); // a = 5
 
-auto a = V_GET_CONST(uint32_t, "a"); // automatically returns absl::NotFoundError when 'a' does not exist
-auto b = V_GET_STRING("b"); // Same as V_GET_CONST but always const char* cast to a std::string
+vec.AddLines({
+  "Demo Module:",
+  "beep boop... "
+}, false);
+vec.Add("Testing DSL\n");
+vec.AddLine();
 
-V_APPEND("Constant 'a' is: ", a, "\nLeft port 'value0' resolves to: ", V_PORT_LEFT("value0"), "\n");
+vec.AddLinesF({
+  {"Constant 'a' is: {}", a},
+  {"Constant 'a' == 4: {}, a == 4 ? "true" : "false"},
+  {"Left port 'value0' resolves to: {}", this->GetLeftPort("value0")}
+});
 
-V_RETURN;
+if (context->GetConstant<bool>("b")) {
+  vec.AddLineF({"Constant 'b' is {}!", true});
+}

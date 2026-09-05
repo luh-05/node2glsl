@@ -1,5 +1,8 @@
+#include "mir/codegen.hpp"
+#include "mir/node_graph/node_graph.hpp"
 #include <blender/modules/modules.hpp>
 #include <ir/graph/graph.hpp>
+#include <iterator>
 #include <memory>
 #include <mir/mollusk_ir.hpp>
 #include <spdlog/spdlog.h>
@@ -13,16 +16,17 @@ int main() {
   spdlog::warn(dummy.id);
 
   auto context_provider = std::make_unique<msk::ir::ContextProvider>();
-  auto token_string = dummy.GenerateTokenString(context_provider.get());
-  if (auto status = token_string.status(); !status.ok()) {
+  auto token_string = std::vector<msk::ir::Module::Token>();
+  if (auto status = dummy.GenerateTokenString(context_provider.get(),
+                                              std::back_inserter(token_string));
+      !status.ok()) {
     spdlog::error(status.message());
   }
 
-  spdlog::warn("DummyModule generated {} tokens:", token_string.value().size());
-  for (auto it = token_string.value().begin(); it != token_string.value().end();
-       it++) {
+  spdlog::warn("DummyModule generated {} tokens:", token_string.size());
+  for (auto it = token_string.begin(); it != token_string.end(); it++) {
     static int i = 0;
-    spdlog::warn("Token {}: '{}'", ++i, it->get()->GetString());
+    spdlog::warn("Token {}: {:?}", ++i, it->get()->GetString());
   }
 
   return 0;
