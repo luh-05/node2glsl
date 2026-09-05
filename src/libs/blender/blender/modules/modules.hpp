@@ -11,7 +11,5 @@ typedef class DummyModule : public ir::Module {
 public:
   auto GenerateTokenString(ir::ContextProvider *context, Out out)
       -> absl::Status;
-  // auto GenerateTokenString(ir::ContextProvider *context)
-  //     -> absl::StatusOr<std::vector<std::unique_ptr<ir::CodegenToken>>>;
 } DummyModule;
 } // namespace msk::blender

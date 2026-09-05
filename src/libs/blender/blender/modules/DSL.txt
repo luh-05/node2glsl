@@ -12,7 +12,7 @@ vec.AddLine();
 vec.AddLinesF({
   {"Constant 'a' is: {}", a},
   {"Constant 'a' == 4: {}, a == 4 ? "true" : "false"},
-  {"Left port 'value0' resolves to: {}", this->GetLeftPort("value0")}
+  {false, "Left port 'value0' resolves to: "}, {this->GetLeftPort("value0")}
 });
 
 if (context->GetConstant<bool>("b")) {

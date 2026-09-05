@@ -12,6 +12,12 @@ auto ContextProvider::GetConstant<const char *>(Node *n, std::string name)
 }
 
 template <>
+auto ContextProvider::GetConstant<const bool>(Node *n, std::string name)
+    -> absl::StatusOr<const bool> {
+  return true;
+}
+
+template <>
 auto ContextProvider::GetConstant<const uint32_t>(Node *n, std::string name)
     -> absl::StatusOr<const uint32_t> {
   return 4;
