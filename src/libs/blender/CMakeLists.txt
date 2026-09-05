@@ -1,16 +1,17 @@
-add_library(mollusk_blender
-  root.cpp
+add_library(blender
+  blender/root.cpp
 )
-add_library(msk::blender ALIAS mollusk_blender)
+add_library(msk::blender ALIAS blender)
 
-target_include_directories(mollusk_blender
+target_include_directories(blender
   PUBLIC
   ${INCLUDES_DIR}/ir
-  PRIVATE
-  ${LIBS_DIR}
+  ${LIBS_DIR}/blender
 )
 
-add_library(mollusk_blender_deps
+add_library(blender_deps INTERFACE)
+
+target_link_libraries(blender_deps
   INTERFACE
     spdlog::spdlog
 
@@ -18,8 +19,11 @@ add_library(mollusk_blender_deps
     absl::statusor
 )
 
-target_link_libraries(mollusk_blender
+target_link_libraries(blender
   PRIVATE
-    mollusk_blender_deps
+    blender_deps
+  PUBLIC
     msk::blender::modules
 )
+
+add_subdirectory(blender/modules)

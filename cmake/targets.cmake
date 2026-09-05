@@ -7,7 +7,7 @@ if(${BUILD_TARGET_NTG_IR})
   add_subdirectory(${LIBS_DIR}/ir)
 endif()
 
-if(${BUILD_TARGET_BLENDER})
+if(${BUILD_TARGET_NTG_BLENDER})
   add_subdirectory(${LIBS_DIR}/blender)
 endif()
 

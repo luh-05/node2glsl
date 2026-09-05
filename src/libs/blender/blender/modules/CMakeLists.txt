@@ -8,7 +8,7 @@ target_include_directories(blender_modules
 
 target_link_libraries(blender_modules
   PRIVATE
-    mollusk_blender_deps
+    blender_deps
 )
 
-target_sources(blender_modules PRIVATE TextToken.cpp WildcardToken.cpp)
+target_sources(blender_modules PRIVATE DummyModule.cpp)

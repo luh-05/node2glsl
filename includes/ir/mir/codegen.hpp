@@ -1,6 +1,5 @@
-#include <memory>
 #include <string>
-#pragma ONCE
+#pragma once
 
 namespace msk::ir {
 struct Port; // pimpl - definition in node_graph.hpp
@@ -9,11 +8,10 @@ struct Port; // pimpl - definition in node_graph.hpp
  * @brief Abstract Token basetype for codegen
  */
 typedef class CodegenToken {
-private:
-  virtual std::string GetString() = 0;
 
 public:
-  virtual ~CodegenToken() = default;
+  virtual std::string GetString() = 0;
+  virtual ~CodegenToken() {};
 } CodegenToken;
 
 /**
@@ -25,6 +23,7 @@ private:
 
 public:
   TextToken(std::string text) : text(text) {}
+  ~TextToken() {}
   std::string GetString();
 } TextToken;
 
@@ -37,6 +36,7 @@ private:
 
 public:
   WildcardToken(Port *port) : port(port) {};
+  ~WildcardToken() {}
   std::string GetString();
 } WildcardToken;
 } // namespace msk::ir

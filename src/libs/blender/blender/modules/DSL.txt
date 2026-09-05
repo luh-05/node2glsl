@@ -1,0 +1,9 @@
+
+V_CREATE; // generates the vector
+
+auto a = V_GET_CONST(uint32_t, "a"); // automatically returns absl::NotFoundError when 'a' does not exist
+auto b = V_GET_STRING("b"); // Same as V_GET_CONST but always const char* cast to a std::string
+
+V_APPEND("Constant 'a' is: ", a, "\nLeft port 'value0' resolves to: ", V_PORT_LEFT("value0"), "\n");
+
+V_RETURN;

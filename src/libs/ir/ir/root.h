@@ -1,3 +1,3 @@
-#pragma ONCE
+#pragma once
 
 namespace msk::ir {}

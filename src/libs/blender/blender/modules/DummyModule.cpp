@@ -6,12 +6,12 @@
 #include <vector>
 
 namespace msk::blender {
-auto DummyModule::GenerateTokenString(ir::ContextProvider context)
+auto DummyModule::GenerateTokenString(ir::ContextProvider *context)
     -> absl::StatusOr<std::vector<std::unique_ptr<ir::CodegenToken>>> {
   auto v = std::vector<std::unique_ptr<ir::CodegenToken>>();
 
   v.push_back(std::make_unique<ir::TextToken>("Constant 'a' is: "));
-  auto a = context.GetConstant<const char *>(this, "a");
+  auto a = context->GetConstant<const char *>(this, "a");
   if (!a.ok()) {
     return absl::NotFoundError("Constant not found!");
   }

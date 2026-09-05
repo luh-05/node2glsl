@@ -1,5 +1,5 @@
 #include <cstdint>
-#pragma ONCE
+#pragma once
 
 namespace msk::ir {
 template <typename T> class Identifiable {

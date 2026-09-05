@@ -1,16 +1,16 @@
-#include "../utils.hpp"
+#pragma once
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <mir/utils.hpp>
 #include <string>
 #include <vector>
-#pragma ONCE
 
 namespace msk::ir {
 class Connection;
-typedef struct Port : Identifiable<Port> {
+typedef struct Port : public Identifiable<Port> {
   // TODO: change to enum
   std::string dataType; // Data type of Port
 
@@ -23,7 +23,7 @@ class CodegenToken; // pimpl
 /**
  * @brief Node representation in Graph
  */
-typedef class Node : Identifiable<Node> {
+typedef class Node : public Identifiable<Node> {
 public:
   // Left and right ports, maps name to port
   std::map<std::string, std::unique_ptr<Port>> leftPorts;
@@ -32,7 +32,7 @@ public:
 
 class GraphContext; // pimpl
 /**
- * @brief Connecter between internal GraphContext and interface for Module
+ * @brief Connector between internal GraphContext and interface for Module
  * specification
  */
 typedef class ContextProvider {
@@ -49,9 +49,10 @@ public:
  * @brief Specification of Node for Modules
  */
 typedef class Module : public Node {
+public:
   // Generates a CodegenToken vector
   virtual absl::StatusOr<std::vector<std::unique_ptr<CodegenToken>>>
-  GenerateTokenString(ContextProvider context) = 0;
+  GenerateTokenString(ContextProvider *context) = 0;
 } Module;
 
 /**
@@ -67,7 +68,7 @@ public:
 /**
  * @brief Graph Connection
  */
-typedef struct Connection : Identifiable<Connection> {
+typedef struct Connection : public Identifiable<Connection> {
   // Left and right port of the connection
   Port *left_port;
   Port *right_port;
