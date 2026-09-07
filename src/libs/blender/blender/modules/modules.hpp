@@ -9,7 +9,7 @@ namespace msk::blender {
  */
 typedef class DummyModule : public ir::Module {
 public:
-  auto GenerateTokenString(ir::ContextProvider *context, Out out)
+  auto GenerateTokenString(ir::ContextProvider *context, Out &&out)
       -> absl::Status;
 } DummyModule;
 } // namespace msk::blender

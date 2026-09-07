@@ -2,15 +2,12 @@
 #include "mir/codegen.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
-#include <concepts>
 #include <cstdint>
 #include <format>
-#include <initializer_list>
 #include <iterator>
 #include <map>
 #include <memory>
 #include <mir/utils.hpp>
-#include <spdlog/spdlog.h>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -61,26 +58,37 @@ public:
   using Token = std::unique_ptr<CodegenToken>;
 
   class Out {
+  private:
+    absl::Status status = absl::OkStatus();
+    std::string text_buff;
+
   public:
     using Inserter = std::back_insert_iterator<std::vector<Token>>;
-    Inserter &it;
+    Inserter it;
     Module &parent;
 
-    Out(Inserter &&it, Module &parent) : it(it), parent(parent) {};
-    ~Out() {
-      if (!cur_line.empty())
-        flushLine();
+    Out(Inserter it, Module &parent) : it(it), parent(parent) {};
+    ~Out() noexcept {
+      try {
+        if (!text_buff.empty())
+          FlushBuffer();
+      } catch (...) {
+      }
     }
 
-    enum class Polarity { LEFT = 0x0, RIGHT = 0x1 };
-    using PortFetch = std::tuple<Polarity, std::string_view &>;
+    [[nodiscard]] auto GetStatus() -> absl::Status { return this->status; }
 
-    std::string cur_line;
-    template <class T> void appendLine(T s) { this->cur_line += s; }
+    enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
+    using PortFetch = std::tuple<Polarity, std::string_view>;
 
-    void flushLine() {
-      *this->it = std::make_unique<TextToken>(cur_line);
-      cur_line = "";
+    template <class T> void appendToBuffer(T s) {
+      if (status == absl::OkStatus())
+        this->text_buff += s;
+    }
+
+    void FlushBuffer() {
+      *this->it = std::make_unique<TextToken>(text_buff);
+      text_buff = "";
     }
 
     Out &operator+(PortFetch fetch) {
@@ -91,26 +99,29 @@ public:
         map = &this->parent.rightPorts;
 
       if (!map->contains(name)) {
-        // TODO: implement ErrorToken
+        // FIXME: Ports not implemented correctly yet, so this will always throw
+        // this->status = absl::NotFoundError(
+        //     std::format("Cound not find {} token '{}'",
+        //                 p == RIGHT ? "right" : "left", name));
         // return *this;
       }
-      flushLine();
+      FlushBuffer();
       *(this->it) =
           std::make_unique<WildcardToken>(map->operator[](name).get());
 
       return *this;
     }
 
-    template <class... Args>
-      requires(std::formattable<Args, char> && ...)
-    Out &operator+(Args &&...args) {
-      (this->AddFormatted("{}", args) && ...);
+    template <class T>
+      requires(std::formattable<T, char>)
+    Out &operator+(T &&arg) {
+      this->AddFormatted("{}", std::forward<T>(arg));
       return *this;
     }
 
-    template <class... Args> Out &operator=(uint32_t count) {
+    Out &operator=(uint32_t count) {
       for (size_t i = 0; i < count; i++) {
-        appendLine("\n");
+        appendToBuffer("\n");
       }
       return *this;
     }
@@ -118,29 +129,15 @@ public:
     template <class... Args>
       requires(std::formattable<Args, char> && ...)
     void AddFormatted(std::format_string<Args...> fmt, Args &&...args) {
-      this->appendLine(std::format(fmt, std::forward<Args>(args)...));
+      this->appendToBuffer(std::format(fmt, std::forward<Args>(args)...));
     }
-
-    // Out &operator-(std::string_view &&wildcard) {
-    //   flushLine();
-    //   *(this->it) = std::make_unique<WildcardToken>(
-    //       this->parent.leftPorts[wildcard].get());
-    //   return *this;
-    // }
-
-    // auto AddLeftPort(Module &self, std::string_view key) -> absl::Status {
-    //   if (self.leftPorts.contains(key))
-    //     return absl::NotFoundError(std::format("Port '{}' not found!", key));
-    //   *this->it = std::make_unique<WildcardToken>(self.leftPorts[key].get());
-    //   return absl::OkStatus();
-    // }
   };
 
   // Generates CodegenTokens
-  virtual auto GenerateTokenString(ContextProvider *context, Out out)
+  virtual auto GenerateTokenString(ContextProvider *context, Out &&out)
       -> absl::Status = 0;
 };
-inline auto operator/(Module::Out::Polarity pol, std::string_view &&name)
+inline auto operator/(Module::Out::Polarity pol, std::string_view name)
     -> Module::Out::PortFetch {
   return {pol, name};
 }
