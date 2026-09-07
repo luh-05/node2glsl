@@ -1,5 +1,5 @@
 #pragma once
-#include "mir/codegen.hpp"
+// #include "mir/codegen.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -64,6 +64,10 @@ public:
 
   using Token = std::unique_ptr<CodegenToken>;
 
+  /**
+   *  @brief Helper Class for specifying Module::GenerateTokenString(), provides
+   * a mini DSL
+   */
   class Out {
   private:
     absl::Status status = absl::OkStatus();
@@ -83,8 +87,17 @@ public:
       }
     }
 
+    /**
+     *  @brief Gets the stored status, supposed to be used as the return value
+     * for Module::GenerateTokenString()
+     */
     [[nodiscard]] auto GetStatus() -> absl::Status { return this->status; }
 
+    /**
+     *  @brief Gets a Constant from the GraphContext
+     *  @throw When a constant is not found, the internal status will be set and
+     * no further codegen will be possible from this object
+     */
     template <class T> const T GetConstant(std::string_view name) {
       if (auto s = parent.cxt->GetConstant<const T>(&parent, name); !s.ok()) {
         if (this->status.ok())
@@ -94,59 +107,55 @@ public:
         return s.value();
     }
 
+    // Specifies port polarity
     enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
     using PortFetch = std::tuple<Polarity, std::string_view>;
 
-    template <class T> void appendToBuffer(T s) {
+    /**
+     *  @brief Helper for appending something to the buffer
+     */
+    template <class T> inline void appendToBuffer(T s) {
       if (status == absl::OkStatus())
         this->text_buff += s;
     }
 
-    void FlushBuffer() {
-      *this->it = std::make_unique<TextToken>(text_buff);
-      text_buff = "";
-    }
+    /**
+     *  @brief Flushes the buffer into a TextToken
+     */
+    void FlushBuffer();
 
-    Out &operator+(PortFetch fetch) {
-      auto [p, name] = fetch;
+    /**
+     *  @brief Creates a WildcardToken - automatically flushes
+     */
+    Out &operator+(PortFetch fetch);
 
-      auto *map = &this->parent.leftPorts;
-      if (Polarity::RIGHT == p)
-        map = &this->parent.rightPorts;
-
-      if (!map->contains(name)) {
-        // FIXME: Ports not implemented correctly yet, so this will always throw
-        // if (this->status.ok()) {
-        //   this->status = absl::NotFoundError(
-        //       std::format("Cound not find {} token '{}'",
-        //                   p == RIGHT ? "right" : "left", name));
-        // }
-        // return *this;
-      }
-      FlushBuffer();
-      *(this->it) =
-          std::make_unique<WildcardToken>(map->operator[](name).get());
-
-      return *this;
-    }
-
+    /**
+     *  @brief Adds someting to the current buffer
+     */
     template <class T>
       requires(std::formattable<T, char>)
-    Out &operator+(T &&arg) {
+    inline Out &operator+(T &&arg) {
       this->AddFormatted("{}", std::forward<T>(arg));
       return *this;
     }
 
-    Out &operator=(uint32_t count) {
+    /**
+     *  @brief Appends the specified amount of newlines, also ends statement due
+     * to operator precedence
+     */
+    inline Out &operator=(uint32_t count) {
       for (size_t i = 0; i < count; i++) {
         appendToBuffer("\n");
       }
       return *this;
     }
 
+    /**
+     *  @brief Appends a formatted string to the buffer
+     */
     template <class... Args>
       requires(std::formattable<Args, char> && ...)
-    void AddFormatted(std::format_string<Args...> fmt, Args &&...args) {
+    inline void AddFormatted(std::format_string<Args...> fmt, Args &&...args) {
       this->appendToBuffer(std::format(fmt, std::forward<Args>(args)...));
     }
   };

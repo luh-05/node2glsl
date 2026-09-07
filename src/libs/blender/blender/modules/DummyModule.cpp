@@ -3,7 +3,6 @@
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <mir/codegen.hpp>
-#include <mir/codegen_utils.hpp>
 
 namespace msk::blender {
 auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
