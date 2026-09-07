@@ -17,8 +17,8 @@ int main() {
 
   auto context_provider = std::make_unique<msk::ir::ContextProvider>();
   auto token_string = std::vector<msk::ir::Module::Token>();
-  if (auto status = dummy.GenerateTokenString(context_provider.get(),
-                                              std::back_inserter(token_string));
+  if (auto status = dummy.GenerateTokenString(
+          context_provider.get(), {std::back_inserter(token_string), dummy});
       !status.ok()) {
     spdlog::error(status.message());
   }

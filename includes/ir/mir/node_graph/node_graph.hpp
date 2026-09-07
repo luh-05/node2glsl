@@ -10,7 +10,10 @@
 #include <map>
 #include <memory>
 #include <mir/utils.hpp>
+#include <spdlog/spdlog.h>
 #include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 namespace msk::ir {
@@ -61,81 +64,86 @@ public:
   public:
     using Inserter = std::back_insert_iterator<std::vector<Token>>;
     Inserter &it;
+    Module &parent;
 
-    Out(Inserter &&it) : it(it) {};
-
-    void Add(std::string s) { *(this->it) = std::make_unique<TextToken>(s); }
-
-    template <class... Args>
-    void AddF(std::format_string<Args...> fmt, Args &&...args) {
-      this->Add(std::format(fmt, args...));
+    Out(Inserter &&it, Module &parent) : it(it), parent(parent) {};
+    ~Out() {
+      if (!cur_line.empty())
+        flushLine();
     }
 
-    void AddLine(std::string s) { this->AddF("{}\n", s); }
-    void AddLine() { this->AddLine(""); }
+    enum class Polarity { LEFT = 0x0, RIGHT = 0x1 };
+    using PortFetch = std::tuple<Polarity, std::string_view &>;
+
+    std::string cur_line;
+    template <class T> void appendLine(T s) { this->cur_line += s; }
+
+    void flushLine() {
+      *this->it = std::make_unique<TextToken>(cur_line);
+      cur_line = "";
+    }
+
+    Out &operator+(PortFetch fetch) {
+      auto [p, name] = fetch;
+
+      auto *map = &this->parent.leftPorts;
+      if (Polarity::RIGHT == p)
+        map = &this->parent.rightPorts;
+
+      if (!map->contains(name)) {
+        // TODO: implement ErrorToken
+        // return *this;
+      }
+      flushLine();
+      *(this->it) =
+          std::make_unique<WildcardToken>(map->operator[](name).get());
+
+      return *this;
+    }
 
     template <class... Args>
       requires(std::formattable<Args, char> && ...)
-    void AddLineF(std::format_string<Args...> fmt, Args &&...args) {
-      auto s = std::format(fmt, args...);
-      this->Add(std::format("{}\n", s));
+    Out &operator+(Args &&...args) {
+      (this->AddFormatted("{}", args) && ...);
+      return *this;
+    }
+
+    template <class... Args> Out &operator=(uint32_t count) {
+      for (size_t i = 0; i < count; i++) {
+        appendLine("\n");
+      }
+      return *this;
     }
 
     template <class... Args>
-    // requires(std::same_as<std::string, Args> && ...)
-    void AddLines(std::string &&s, Args &&...strings) {
-      this->AddLine(s);
-      AddLines(strings...);
-    }
-    void AddLines(std::string &&s) { this->AddLine(s); }
-
-    class FormattingLine {
-    public:
-      template <class... Args>
-        requires(std::formattable<Args, char> && ...)
-      FormattingLine(bool linebreak, std::format_string<Args...> fmt,
-                     Args &&...args)
-          : invoke_([fmt, ... args = args, linebreak](Out &self) mutable {
-              if (linebreak)
-                self.AddLineF<Args...>(fmt, args...);
-              else
-                self.AddF<Args...>(fmt, args...);
-            }) {}
-      template <class... Args>
-        requires(std::formattable<Args, char> && ...)
-      FormattingLine(std::format_string<Args...> fmt, Args &&...args)
-          : invoke_([fmt, ... args = args](Out &self) mutable {
-              self.AddLineF<Args...>(fmt, args...);
-            }) {}
-
-      void operator()(Out &self) const { invoke_(self); }
-
-    private:
-      std::function<void(Out &)> invoke_;
-    };
-    void AddLinesF(std::initializer_list<FormattingLine> lines) {
-      for (auto &l : lines)
-        l(*this);
+      requires(std::formattable<Args, char> && ...)
+    void AddFormatted(std::format_string<Args...> fmt, Args &&...args) {
+      this->appendLine(std::format(fmt, std::forward<Args>(args)...));
     }
 
-    auto AddLeftPort(Module &self, std::string_view key) -> absl::Status {
-      if (self.leftPorts.contains(key))
-        return absl::NotFoundError(std::format("Port '{}' not found!", key));
-      *this->it = std::make_unique<WildcardToken>(self.leftPorts[key].get());
-      return absl::OkStatus();
-    }
-    auto AddRightPort(Module &self, std::string_view key) -> absl::Status {
-      if (self.rightPorts.contains(key))
-        return absl::NotFoundError(std::format("Port '{}' not found!", key));
-      *this->it = std::make_unique<WildcardToken>(self.rightPorts[key].get());
-      return absl::OkStatus();
-    }
+    // Out &operator-(std::string_view &&wildcard) {
+    //   flushLine();
+    //   *(this->it) = std::make_unique<WildcardToken>(
+    //       this->parent.leftPorts[wildcard].get());
+    //   return *this;
+    // }
+
+    // auto AddLeftPort(Module &self, std::string_view key) -> absl::Status {
+    //   if (self.leftPorts.contains(key))
+    //     return absl::NotFoundError(std::format("Port '{}' not found!", key));
+    //   *this->it = std::make_unique<WildcardToken>(self.leftPorts[key].get());
+    //   return absl::OkStatus();
+    // }
   };
 
   // Generates CodegenTokens
   virtual auto GenerateTokenString(ContextProvider *context, Out out)
       -> absl::Status = 0;
 };
+inline auto operator/(Module::Out::Polarity pol, std::string_view &&name)
+    -> Module::Out::PortFetch {
+  return {pol, name};
+}
 
 /**
  * @brief Graph Node

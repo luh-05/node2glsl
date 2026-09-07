@@ -10,37 +10,30 @@
 namespace msk::blender {
 auto DummyModule::GenerateTokenString(ir::ContextProvider *context, Out out)
     -> absl::Status {
+  // NICHT FINAL
   uint32_t a;
   if (auto status = context->GetConstant<const uint32_t>(this, "a");
       !status.ok())
     return status.status();
   else
     a = status.value();
-
-  out.AddLines("Demo Module: ", "beep boop... ");
-  out.Add("Testing DSL");
-  out.AddLine();
-
-  out.AddLinesF({
-      {"Constant 'a' is: {}", a},
-      // {"bla {}", "f"},
-      // {"Constant 'a' == 4: {}", a == 4 ? "true" : "false"},
-      {false, "Left port 'value0' resolves to: "},
-  });
-  if (auto status = out.AddLeftPort(*this, "value0"); !status.ok()) {
-    return status;
-  }
-  out.AddLine();
-
+  // -----------
+  // NICHT FINAL
   bool b;
   if (auto status = context->GetConstant<const bool>(this, "b"); !status.ok())
     return status.status();
   else
     b = status.value();
+  // -----------
 
-  if (b) {
-    out.AddLineF("Constant 'b' is {}!", "true");
-  }
+  out + "Constant 'a' is: " + a = 1;
+  out + "bla "
+        "f" = 1;
+  out + "Constant 'a' == 4: " + (a == 4) = 1;
+  out + "Left port 'value0' resolves to: " + Out::Polarity::LEFT / "value0" = 1;
+  out + "I'm not flushed!" = 2;
+
+  out + "Constant 'b' is " + b = 1;
 
   return absl::OkStatus();
 }
