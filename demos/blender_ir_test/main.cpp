@@ -10,15 +10,15 @@
 
 int main() {
   msk::ir::test();
-  auto dummy = msk::blender::DummyModule();
+  auto context_provider = std::make_shared<msk::ir::ContextProvider>();
+  auto dummy = msk::blender::DummyModule(context_provider);
   spdlog::warn(dummy.id);
-  dummy = msk::blender::DummyModule();
+  dummy = msk::blender::DummyModule(context_provider);
   spdlog::warn(dummy.id);
 
-  auto context_provider = std::make_unique<msk::ir::ContextProvider>();
   auto token_string = std::vector<msk::ir::Module::Token>();
-  if (auto status = dummy.GenerateTokenString(
-          context_provider.get(), {std::back_inserter(token_string), dummy});
+  if (auto status =
+          dummy.GenerateTokenString({std::back_inserter(token_string), dummy});
       !status.ok()) {
     spdlog::error(status.message());
   }

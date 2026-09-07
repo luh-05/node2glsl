@@ -6,12 +6,10 @@
 #include <mir/codegen_utils.hpp>
 
 namespace msk::blender {
-auto DummyModule::GenerateTokenString(ir::ContextProvider *context, Out &&out)
-    -> absl::Status {
-  uint32_t a;
-  GET_CONSTANT("a", a, context);
-  bool b;
-  GET_CONSTANT("b", b, context);
+auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
+  auto a = out.GetConstant<uint32_t>("a");
+  auto b = out.GetConstant<bool>("b");
+  // auto c = out.GetConstant<uint32_t>("foo");
 
   out + "Constant 'a' is: " + a = 1;
   out + "bla" = 1;
@@ -21,7 +19,6 @@ auto DummyModule::GenerateTokenString(ir::ContextProvider *context, Out &&out)
 
   out + "Constant 'b' is " + b = 1;
 
-  out.FlushBuffer();
   return out.GetStatus();
 }
 } // namespace msk::blender

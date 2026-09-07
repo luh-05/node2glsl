@@ -47,14 +47,21 @@ private:
 public:
   // Gets the named constant of the provided node
   template <typename T>
-  auto GetConstant(Node *n, std::string name) -> absl::StatusOr<T>;
+  auto GetConstant(Node *n, std::string_view name) -> absl::StatusOr<T>;
 };
 
 /**
  * @brief Specification of Node for Modules
  */
 class Module : public Node {
+private:
+  std::shared_ptr<ContextProvider> cxt;
+
 public:
+  ContextProvider *GetContext() { return cxt.get(); };
+
+  Module(std::shared_ptr<ContextProvider> cxt) : cxt(cxt) {}
+
   using Token = std::unique_ptr<CodegenToken>;
 
   class Out {
@@ -78,6 +85,15 @@ public:
 
     [[nodiscard]] auto GetStatus() -> absl::Status { return this->status; }
 
+    template <class T> const T GetConstant(std::string_view name) {
+      if (auto s = parent.cxt->GetConstant<const T>(&parent, name); !s.ok()) {
+        if (this->status.ok())
+          this->status = s.status();
+        return 0;
+      } else
+        return s.value();
+    }
+
     enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
     using PortFetch = std::tuple<Polarity, std::string_view>;
 
@@ -100,9 +116,11 @@ public:
 
       if (!map->contains(name)) {
         // FIXME: Ports not implemented correctly yet, so this will always throw
-        // this->status = absl::NotFoundError(
-        //     std::format("Cound not find {} token '{}'",
-        //                 p == RIGHT ? "right" : "left", name));
+        // if (this->status.ok()) {
+        //   this->status = absl::NotFoundError(
+        //       std::format("Cound not find {} token '{}'",
+        //                   p == RIGHT ? "right" : "left", name));
+        // }
         // return *this;
       }
       FlushBuffer();
@@ -134,8 +152,7 @@ public:
   };
 
   // Generates CodegenTokens
-  virtual auto GenerateTokenString(ContextProvider *context, Out &&out)
-      -> absl::Status = 0;
+  virtual auto GenerateTokenString(Out &&out) -> absl::Status = 0;
 };
 inline auto operator/(Module::Out::Polarity pol, std::string_view name)
     -> Module::Out::PortFetch {
