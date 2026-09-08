@@ -29,6 +29,8 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
   out.legacy->AddTokenVector(
       {TextToken("bla"), WildcardToken(Out::LEFT, "value0")});
 
+#undef TextToken
+#undef WildcardToken
   return out.GetStatus();
 }
 } // namespace msk::blender
