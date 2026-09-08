@@ -2,5 +2,5 @@
 #include <mir/node_graph/node_graph.hpp>
 
 namespace msk::ir {
-std::string WildcardToken::GetString() { return "Lorem Ipsum"; }
+std::string WildcardToken::GetString() { return "<Port>"; }
 } // namespace msk::ir

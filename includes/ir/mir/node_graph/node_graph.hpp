@@ -1,4 +1,5 @@
 #pragma once
+#include "mir/codegen.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -7,6 +8,8 @@
 #include <map>
 #include <memory>
 #include <mir/utils.hpp>
+#include <ranges>
+#include <span>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -29,9 +32,10 @@ class CodegenToken; // pimpl
  */
 class Node : public Identifiable<Node> {
 public:
+  using MapType = std::map<std::string, std::unique_ptr<Port>>;
   // Left and right ports, maps name to port
-  std::map<std::string_view, std::unique_ptr<Port>> leftPorts;
-  std::map<std::string_view, std::unique_ptr<Port>> rightPorts;
+  MapType leftPorts;
+  MapType rightPorts;
 };
 
 class GraphContext; // pimpl
@@ -68,16 +72,30 @@ public:
    * a mini DSL
    */
   class Out {
+  public:
+    class Legacy;
+    friend Legacy;
+
+    // Specifies port polarity
+    enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
+
   private:
     absl::Status status = absl::OkStatus();
     std::string text_buff;
+
+    bool checkPort(Polarity p, std::string name, Node::MapType *&map);
+    auto createWildcardToken(std::string_view name, Node::MapType *&map)
+        -> std::unique_ptr<CodegenToken>;
 
   public:
     using Inserter = std::back_insert_iterator<std::vector<Token>>;
     Inserter it;
     Module &parent;
+    std::unique_ptr<Legacy> legacy;
 
-    Out(Inserter it, Module &parent) : it(it), parent(parent) {};
+    Out(Inserter it, Module &parent) : it(it), parent(parent) {
+      this->legacy = std::make_unique<Legacy>(*this);
+    };
     ~Out() noexcept {
       try {
         if (!text_buff.empty())
@@ -106,8 +124,7 @@ public:
         return s.value();
     }
 
-    // Specifies port polarity
-    enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
+    // Fetch tuple
     using PortFetch = std::tuple<Polarity, std::string_view>;
 
     /**
@@ -157,6 +174,50 @@ public:
     inline void AddFormatted(std::format_string<Args...> fmt, Args &&...args) {
       this->appendToBuffer(std::format(fmt, std::forward<Args>(args)...));
     }
+
+    // Legacy compatibility API - usage NOT recommended
+    // Use overload DSL instead
+    class Legacy {
+    private:
+      Out &self;
+
+      class MockToken {
+      public:
+        virtual ~MockToken() = default;
+      };
+      class MTextToken : public MockToken {
+      public:
+        std::string text;
+        MTextToken(std::string text) : text(text) {}
+      };
+      class MWildcardToken : public MockToken {
+      public:
+        Polarity p;
+        std::string name;
+        MWildcardToken(Polarity p, std::string name) : p(p), name(name) {}
+      };
+
+    public:
+      Legacy(Out &self) : self(self) {}
+
+      /**
+       * @brief Convert MockTokens to real Tokens
+       */
+      void AddTokenVector(std::vector<std::shared_ptr<MockToken>> &&s);
+      /**
+       * @brief Create MTextToken
+       */
+      auto CreateMTT(std::string text) -> std::shared_ptr<MTextToken> {
+        return std::make_shared<MTextToken>(text);
+      }
+      /**
+       * @brief Create MWildcardToken
+       */
+      auto CreateMWT(Polarity p, std::string name)
+          -> std::shared_ptr<MWildcardToken> {
+        return std::make_shared<MWildcardToken>(p, name);
+      }
+    };
   };
 
   // Generates CodegenTokens

@@ -2,6 +2,8 @@
 #include "modules.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
+#include <array>
+#include <memory>
 #include <mir/codegen.hpp>
 
 namespace msk::blender {
@@ -20,9 +22,12 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
 
   out + Out::RIGHT / "value2" + "=" + Out::LEFT / "value0" + "+" +
       Out::LEFT / "value1" + ";" = 1;
-  // out.AddFormatted("{} = {} + {};", Out::RIGHT / "value2", Out::LEFT /
-  // "value0",
-  //                  Out::LEFT / "value1");
+
+#define TextToken(text) out.legacy->CreateMTT(text)
+#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
+
+  out.legacy->AddTokenVector(
+      {TextToken("bla"), WildcardToken(Out::LEFT, "value0")});
 
   return out.GetStatus();
 }
