@@ -21,11 +21,15 @@ int main() {
     spdlog::error(status.message());
   }
 
+  std::string c;
   spdlog::warn("DummyModule generated {} tokens:", token_string.size());
   for (auto it = token_string.begin(); it != token_string.end(); it++) {
     static int i = 0;
     spdlog::warn("Token {}: {:?}", ++i, it->get()->GetString());
+    c += it->get()->GetString();
   }
+
+  spdlog::warn(std::format("Output: \n{}\n", c));
 
   return 0;
 }

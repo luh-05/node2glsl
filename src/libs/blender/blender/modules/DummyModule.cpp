@@ -18,6 +18,12 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
 
   out + "Constant 'b' is " + b = 1;
 
+  out + Out::RIGHT / "value2" + "=" + Out::LEFT / "value0" + "+" +
+      Out::LEFT / "value1" + ";" = 1;
+  // out.AddFormatted("{} = {} + {};", Out::RIGHT / "value2", Out::LEFT /
+  // "value0",
+  //                  Out::LEFT / "value1");
+
   return out.GetStatus();
 }
 } // namespace msk::blender
