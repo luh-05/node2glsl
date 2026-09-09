@@ -11,20 +11,33 @@
 #include <ranges>
 #include <span>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 namespace msk::ir {
 class Connection;
-typedef struct Port : public Identifiable<Port> {
+class Port : public Identifiable<Port> {
+public:
   // TODO: change to enum
   std::string dataType; // Data type of Port
 
   std::shared_ptr<Connection> connection;
 
   Port(std::string dataType) : dataType(dataType) {};
-} Slot;
+
+  /**
+   * @brief Establishes connection with another port
+   *
+   * @return absl::AlreadyExistsError - payload url:
+   * "mollusk.ir/AlreadyExistsReason" ("this" meaning this port already has a
+   * connection and "other for the other")
+   * @return absl::InvalidArgumentError when port datatypes are incompatible
+   * @return absl::OkStatus() if success
+   */
+  auto EstablishConnection(Port &other) -> absl::Status;
+};
 
 class CodegenToken; // pimpl
 /**
@@ -32,10 +45,18 @@ class CodegenToken; // pimpl
  */
 class Node : public Identifiable<Node> {
 public:
-  using MapType = std::map<std::string, std::unique_ptr<Port>>;
+  using MapType = std::map<std::string, std::unique_ptr<Port>, std::less<>>;
   // Left and right ports, maps name to port
   MapType leftPorts;
   MapType rightPorts;
+
+  auto AddLeftPort(std::string_view name, std::string_view dataType)
+      -> absl::StatusOr<Port *>;
+  auto AddRightPort(std::string_view name, std::string_view dataType)
+      -> absl::StatusOr<Port *>;
+
+  auto GetLeftPort(std::string_view name) -> absl::StatusOr<Port *>;
+  auto GetRightPort(std::string_view name) -> absl::StatusOr<Port *>;
 };
 
 class GraphContext; // pimpl
@@ -58,13 +79,7 @@ public:
  */
 class Module : public Node {
 private:
-  std::shared_ptr<ContextProvider> cxt;
-
 public:
-  ContextProvider *GetContext() { return cxt.get(); };
-
-  Module(std::shared_ptr<ContextProvider> cxt) : cxt(cxt) {}
-
   using Token = std::unique_ptr<CodegenToken>;
 
   /**
@@ -80,6 +95,10 @@ public:
     enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
 
   private:
+    std::shared_ptr<ContextProvider> cxt;
+
+    ContextProvider *GetContext() { return cxt.get(); };
+
     absl::Status status = absl::OkStatus();
     std::string text_buff;
 
@@ -93,7 +112,8 @@ public:
     Module &parent;
     std::unique_ptr<Legacy> legacy;
 
-    Out(Inserter it, Module &parent) : it(it), parent(parent) {
+    Out(std::shared_ptr<ContextProvider> cxt, Inserter it, Module &parent)
+        : cxt(cxt), it(it), parent(parent) {
       this->legacy = std::make_unique<Legacy>(*this);
     };
     ~Out() noexcept {
@@ -116,7 +136,7 @@ public:
      * no further codegen will be possible from this object
      */
     template <class T> const T GetConstant(std::string_view name) {
-      if (auto s = parent.cxt->GetConstant<const T>(&parent, name); !s.ok()) {
+      if (auto s = cxt->GetConstant<const T>(&parent, name); !s.ok()) {
         if (this->status.ok())
           this->status = s.status();
         return 0;
@@ -221,7 +241,9 @@ public:
   };
 
   // Generates CodegenTokens
-  virtual auto GenerateTokenString(Out &&out) -> absl::Status = 0;
+  virtual auto GenerateTokenString(Out &&out) -> absl::Status {
+    return absl::NotFoundError("GenerateTokenString not implemented!");
+  }
 };
 inline auto operator/(Module::Out::Polarity pol, std::string_view name)
     -> Module::Out::PortFetch {
@@ -232,18 +254,36 @@ inline auto operator/(Module::Out::Polarity pol, std::string_view name)
  * @brief Graph Node
  */
 class Graph : public Node {
+public:
+  using VariantType =
+      std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
+  using MapType = std::map<std::string, VariantType, std::less<>>;
+
 private:
-  std::vector<std::unique_ptr<Node>> subnodes;
+  MapType subnodes;
+
+  template <class T> auto addNode(std::string_view name) -> absl::StatusOr<T *>;
 
 public:
+  inline auto AddModule(std::string_view name) -> absl::StatusOr<Module *> {
+    return this->addNode<Module>(name);
+  }
+  inline auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *> {
+    return this->addNode<Graph>(name);
+  }
+  template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;
 };
 
 /**
  * @brief Graph Connection
  */
-typedef struct Connection : public Identifiable<Connection> {
+class Connection : public Identifiable<Connection> {
+public:
   // Left and right port of the connection
   Port *left_port;
   Port *right_port;
-} Connection;
+
+  Connection(Port *left_port, Port *right_port)
+      : left_port(left_port), right_port(right_port) {}
+};
 } // namespace msk::ir

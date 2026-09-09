@@ -7,6 +7,9 @@
 #include <mir/codegen.hpp>
 
 namespace msk::blender {
+
+#define TextToken(text) out.legacy->CreateMTT(text)
+#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
 auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto a = out.GetConstant<uint32_t>("a");
   auto b = out.GetConstant<bool>("b");
@@ -23,14 +26,11 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
   out + Out::RIGHT / "value2" + "=" + Out::LEFT / "value0" + "+" +
       Out::LEFT / "value1" + ";" = 1;
 
-#define TextToken(text) out.legacy->CreateMTT(text)
-#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-
   out.legacy->AddTokenVector(
       {TextToken("bla"), WildcardToken(Out::LEFT, "value0")});
 
-#undef TextToken
-#undef WildcardToken
   return out.GetStatus();
 }
+#undef TextToken
+#undef WildcardToken
 } // namespace msk::blender
