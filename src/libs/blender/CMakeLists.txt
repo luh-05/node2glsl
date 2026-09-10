@@ -29,6 +29,8 @@ target_link_libraries(blender
     blender_deps
   PUBLIC
     msk::blender::modules
+    msk::blender::ir_shim
 )
 
 add_subdirectory(blender/modules)
+add_subdirectory(blender/ir_shim)
