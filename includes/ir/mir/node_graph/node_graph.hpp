@@ -4,6 +4,7 @@
 #include <absl/status/statusor.h>
 #include <cstdint>
 #include <format>
+#include <initializer_list>
 #include <iterator>
 #include <map>
 #include <memory>
@@ -78,9 +79,12 @@ public:
  * @brief Specification of Node for Modules
  */
 class Module : public Node {
-private:
 public:
+  std::string type;
+
   using Token = std::unique_ptr<CodegenToken>;
+
+  Module(std::string type) : type(type) {}
 
   /**
    *  @brief Helper Class for specifying Module::GenerateTokenString(), provides
@@ -262,15 +266,13 @@ public:
 private:
   MapType subnodes;
 
-  template <class T> auto addNode(std::string_view name) -> absl::StatusOr<T *>;
+  template <class T, class... Args>
+  auto addNode(std::string_view name, Args... args) -> absl::StatusOr<T *>;
 
 public:
-  inline auto AddModule(std::string_view name) -> absl::StatusOr<Module *> {
-    return this->addNode<Module>(name);
-  }
-  inline auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *> {
-    return this->addNode<Graph>(name);
-  }
+  auto AddModule(std::string_view name, std::string_view type)
+      -> absl::StatusOr<Module *>;
+  auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;
 };
 

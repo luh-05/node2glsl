@@ -1,5 +1,3 @@
-#pragma once
-
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
@@ -85,22 +83,31 @@ auto Node::GetRightPort(std::string_view name) -> absl::StatusOr<Port *> {
 
 // --- GRAPH ---
 
-template <class T>
-auto Graph::addNode(std::string_view name) -> absl::StatusOr<T *> {
+template <class T, class... Args>
+auto Graph::addNode(std::string_view name, Args... args)
+    -> absl::StatusOr<T *> {
   if (this->subnodes.contains(name)) {
-    return absl::AlreadyExistsError("Graph already exists!");
+    return absl::AlreadyExistsError("Node already exists!");
   }
 
-  this->subnodes[std::string(name)] = std::make_unique<T>();
-  // return absl::OkStatus();
+  this->subnodes[std::string(name)] = std::make_unique<T>(args...);
 
-  auto node_status = this->GetNode<Module>(name);
+  auto node_status = this->GetNode<T>(name);
 
   if (!node_status.ok()) {
-    return node_status.status();
+    return absl::InternalError(node_status.status().ToString());
   }
 
   return node_status.value();
+}
+
+auto Graph::AddModule(std::string_view name, std::string_view type)
+    -> absl::StatusOr<Module *> {
+  return this->addNode<Module>(name, std::string(type));
+}
+
+auto Graph::AddGraph(std::string_view name) -> absl::StatusOr<Graph *> {
+  return this->addNode<Graph>(name);
 }
 
 template <class T>

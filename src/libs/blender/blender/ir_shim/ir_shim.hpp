@@ -13,6 +13,9 @@ class ModuleHandle {
 
 private:
   ir::Module *module;
+
+public:
+  ModuleHandle(ir::Module *module) : module(module) {};
 };
 
 class GraphHandle {
@@ -20,6 +23,9 @@ class GraphHandle {
 
 private:
   ir::Graph *graph;
+
+public:
+  GraphHandle(ir::Graph *graph) : graph(graph) {};
 };
 
 class PortHandle {
@@ -27,34 +33,41 @@ class PortHandle {
 
 private:
   ir::Port *port;
+
+public:
+  PortHandle(ir::Port *port) : port(port) {};
 };
 
 class GraphShim {
 private:
   std::unique_ptr<ir::Graph> graph;
 
-  auto CreateGraph() -> std::unique_ptr<ir::Graph>;
-
 public:
   GraphShim();
+
+  enum Polarity { LEFT, RIGHT };
 
   auto AddModule(const GraphHandle graph, std::string_view name,
                  std::string_view type) -> absl::StatusOr<const ModuleHandle>;
   auto AddSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;
-  auto AddPort(const ModuleHandle module, std::string_view name,
+  auto AddPort(const ModuleHandle module, Polarity p, std::string_view name,
                std::string_view datatype) -> absl::StatusOr<const PortHandle>;
-  auto AddPort(const GraphHandle graph, std::string_view name,
+  auto AddPort(const GraphHandle graph, Polarity p, std::string_view name,
                std::string_view datatype) -> absl::StatusOr<const PortHandle>;
+  auto ConnectPorts(const PortHandle left, const PortHandle right)
+      -> absl::Status;
 
-  auto GetGraph() -> GraphHandle;
+  inline auto GetGraph() -> GraphHandle {
+    return GraphHandle(this->graph.get());
+  }
   auto GetModule(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const ModuleHandle>;
   auto GetSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;
-  auto GetPort(const ModuleHandle module, std::string_view name)
+  auto GetPort(const ModuleHandle module, Polarity p, std::string_view name)
       -> absl::StatusOr<const PortHandle>;
-  auto GetPort(const GraphHandle graph, std::string_view name)
+  auto GetPort(const GraphHandle graph, Polarity p, std::string_view name)
       -> absl::StatusOr<const PortHandle>;
 };
 
