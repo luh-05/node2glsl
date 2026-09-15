@@ -1,5 +1,9 @@
 #pragma once
 #include <string>
+#include <pugixml.hpp>
+#include "blender/ir_shim/ir_shim.hpp"
+#include <absl/status/status.h>
+#include <absl/status/statusor.h>
 
 namespace msk::blender {
 
