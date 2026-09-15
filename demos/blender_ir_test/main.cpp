@@ -9,9 +9,7 @@
 int main() {
   msk::ir::test();
   auto context_provider = std::make_shared<msk::ir::ContextProvider>();
-  auto dummy = msk::blender::DummyModule("foo");
-  spdlog::warn(dummy.id);
-  dummy = msk::blender::DummyModule("bar");
+  auto dummy = msk::blender::FunctionIntegerMathModule("foo");
   spdlog::warn(dummy.id);
 
   auto token_string = std::vector<msk::ir::Module::Token>();
