@@ -9,78 +9,75 @@
 
 namespace msk::blender {
 
-#define TextToken(text) out.legacy->CreateMTT(text)
-#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-
 auto FunctionNodeCompareModule::GenerateTokenString(Out &&out) -> absl::Status {
-  auto op = out.GetConstant<std::string>("operation0");
-  auto dt = out.GetConstant<std::string>("data_type0");
+  auto op_c = out.GetConstant<std::string>("operation0");
+  auto data_type = out.GetConstant<std::string>("data_type0");
+  std::string sign;
 
-  // Route correct ports based on data type
-  std::string port_a = "A0";
-  std::string port_b = "B0";
-
-  if (dt == "INT") {
-    port_a = "A1";
-    port_b = "B1";
-  } else if (dt == "VECTOR") {
-    port_a = "A2";
-    port_b = "B2";
-  } else if (dt == "COLOR") {
-    port_a = "A3";
-    port_b = "B3";
-  } else if (dt == "STRING") {
-    port_a = "A4";
-    port_b = "B4";
+  if (op_c == "LESS_THAN") {
+    sign = "<";
+  } else if (op_c == "LESS_EQUAL") {
+    sign = "<=";
+  } else if (op_c == "GREATER_THAN") {
+    sign = ">";
+  } else if (op_c == "GREATER_EQUAL") {
+    sign = ">=";
+  } else if (op_c == "EQUAL") {
+    sign = "==";
+  } else if (op_c == "NOT_EQUAL") {
+    sign = "!=";
+  } else {
+    return absl::InvalidArgumentError(
+      std::format("Illegal value of operand constant: '{}'", op_c));
   }
+  
+  if (data_type == "INT") {
 
-  // Edge case: Blender's Float comparisons for EQUAL / NOT_EQUAL use Epsilon
-  if (dt == "FLOAT" && (op == "EQUAL" || op == "NOT_EQUAL")) {
-    std::string comp_operator = (op == "EQUAL") ? " <= " : " > ";
-
-    out.legacy->AddTokenVector({
-        WildcardToken(Out::RIGHT, "Result0"),
-        TextToken(" = abs("),
-        WildcardToken(Out::LEFT, port_a),
-        TextToken(" - "),
-        WildcardToken(Out::LEFT, port_b),
-        TextToken(")"),
-        TextToken(comp_operator),
-        WildcardToken(Out::LEFT, "Epsilon0"),
-        TextToken(";")
-    });
+    out + Out::RIGHT / "Value0"
+      + "="
+      + Out::LEFT / "A0"
+      + sign
+      + Out::LEFT / "B0"
+      + ";";
 
     return out.GetStatus();
+  } 
+
+
+  if (data_type == "FLOAT") {
+    if (op_c == "EQUAL" || "NOT_EQUAL") {
+      auto epsilon = out.GetConstant<std::string>("Epsilon0");
+      op_c == "EQUAL" ? sign = "==" : sign = "!=";
+
+      out + Out::RIGHT / "Value0"
+        + "= abs("
+        + Out::LEFT / "A0"
+        + "-"
+        + Out::LEFT / "B0"
+        + ")"
+        + "sign"
+        + epsilon
+        + ";";
+
+      return out.GetStatus();
+    }
+
+    out + Out::RIGHT / "Value0"
+      + "="
+      + Out::LEFT / "A0"
+      + sign
+      + Out::LEFT / "B0"
+      + ";";
+
+    return out.GetStatus();
+  } 
+
+  if (data_type == "VECTOR") {
+    auto mode = out.GetConstant<std::string>("mode0");
+
+    //TODO: implement vectors
+
   }
-
-  // Standard operator configuration
-  std::string infix = " == ";
-
-  if (op == "LESS_THAN") {
-    infix = " < ";
-  } else if (op == "LESS_EQUAL") {
-    infix = " <= ";
-  } else if (op == "GREATER_THAN") {
-    infix = " > ";
-  } else if (op == "GREATER_EQUAL") {
-    infix = " >= ";
-  } else if (op == "NOT_EQUAL") {
-    infix = " != ";
-  }
-
-  out.legacy->AddTokenVector({
-      WildcardToken(Out::RIGHT, "Result0"),
-      TextToken(" = "),
-      WildcardToken(Out::LEFT, port_a),
-      TextToken(infix),
-      WildcardToken(Out::LEFT, port_b),
-      TextToken(";")
-  });
-
-  return out.GetStatus();
 }
-
-#undef TextToken
-#undef WildcardToken
 
 } // namespace msk::blender
