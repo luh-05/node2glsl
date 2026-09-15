@@ -28,4 +28,11 @@ auto ContextProvider::GetConstant<const uint32_t>(Node *n,
   return 4;
 }
 
+template <>
+auto ContextProvider::GetConstant<const std::string>(Node *n,
+                                                     std::string_view name)
+    -> absl::StatusOr<const std::string> {
+  return "Hello World!";
+}
+
 } // namespace msk::ir
