@@ -14,44 +14,58 @@ auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {
-    out.legacy->AddTokenVector(
-        {WildcardToken(Out::RIGHT, "Value0"), TextToken(" = ~"),
-         WildcardToken(Out::LEFT, "A0"), TextToken(";")});
+    out + Out::RIGHT / "Value0"
+     + "= ~"
+     + Out::LEFT / "A0"
+     + ";";
 
-  } else if (op_c == "AND" || op_c == "OR" || op_c == "XOR") {
+    return out.GetStatus();
+  }
+
+  if (op_c == "AND" || "OR" || "XOR") {
     std::string sign;
+
     if (op_c == "AND") {
       sign = "&";
     } else if (op_c == "OR") {
       sign = "|";
-    } else {
+    } else if (op_c == "XOR") {
       sign = "^";
     }
 
-    out.legacy->AddTokenVector(
-        {WildcardToken(Out::RIGHT, "Value0"), TextToken(" = "),
-         WildcardToken(Out::LEFT, "A0"), TextToken(" " + sign + " "),
-         WildcardToken(Out::LEFT, "B0"), TextToken(";")});
+    out + Out::RIGHT / "Value0"
+     + "="
+     + Out::LEFT / "A0"
+     + sign
+     + Out::LEFT / "B0"
+     + ";";
 
-  } else if (op_c == "SHIFT") {
-    // TODO: implement Helper Functions
-    out.legacy->AddTokenVector(
-        {WildcardToken(Out::RIGHT, "Value0"), TextToken(" = glsl_shift("),
-         WildcardToken(Out::LEFT, "A0"), TextToken(", "),
-         WildcardToken(Out::LEFT, "Shift0"), TextToken(");")});
-
-  } else if (op_c == "ROTATE") {
-    out.legacy->AddTokenVector(
-        {WildcardToken(Out::RIGHT, "Value0"), TextToken(" = glsl_rotate("),
-         WildcardToken(Out::LEFT, "A0"), TextToken(", "),
-         WildcardToken(Out::LEFT, "Shift0"), TextToken(");")});
-
-  } else {
-    out.legacy->AddTokenVector(
-        {TextToken("/* ERROR: Unknown Bitwise Operation */")});
+    return out.GetStatus();
   }
 
-  return out.GetStatus();
+  if (op_c == "SHIFT" || "ROTATE") {
+
+    std::string function;
+
+    if (op_c == "SHIFT") {
+      function = "glsl_shift(";
+    } else if (op_c == "ROTATE") {
+      function = "glsl_rotate(";
+    }
+
+    out + Out::RIGHT / "Value0" 
+      + "="
+      + function
+      + Out::LEFT / "A0"
+      + ","
+      + Out::LEFT / "Shift0"
+      + ");";
+
+    return out.GetStatus();
+  }
+
+  return absl::InvalidArgumentError(
+      std::format("Illegal value of operand constant: '{}'", op_c));
 }
 #undef TextToken
 #undef WildcardToken
