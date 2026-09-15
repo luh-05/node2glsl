@@ -47,26 +47,36 @@ public:
 
   enum Polarity { LEFT, RIGHT };
 
+  /// Add module
   auto AddModule(const GraphHandle graph, std::string_view name,
                  std::string_view type) -> absl::StatusOr<const ModuleHandle>;
+  /// Add subgraph
   auto AddSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;
+  /// Add port to module
   auto AddPort(const ModuleHandle module, Polarity p, std::string_view name,
                std::string_view datatype) -> absl::StatusOr<const PortHandle>;
+  /// Add port to graph
   auto AddPort(const GraphHandle graph, Polarity p, std::string_view name,
                std::string_view datatype) -> absl::StatusOr<const PortHandle>;
+  /// Connect two ports
   auto ConnectPorts(const PortHandle left, const PortHandle right)
       -> absl::Status;
 
+  /// Get main graph
   inline auto GetGraph() -> GraphHandle {
     return GraphHandle(this->graph.get());
   }
+  /// Get module
   auto GetModule(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const ModuleHandle>;
+  /// Get subgraph
   auto GetSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;
+  /// Get port form module
   auto GetPort(const ModuleHandle module, Polarity p, std::string_view name)
       -> absl::StatusOr<const PortHandle>;
+  /// Get port from graph
   auto GetPort(const GraphHandle graph, Polarity p, std::string_view name)
       -> absl::StatusOr<const PortHandle>;
 };
