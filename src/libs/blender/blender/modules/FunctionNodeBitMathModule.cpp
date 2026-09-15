@@ -8,9 +8,6 @@
 
 namespace msk::blender {
 
-#define TextToken(text) out.legacy->CreateMTT(text)
-#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-
 auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
@@ -69,6 +66,4 @@ auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       std::format("Illegal value of operand constant: '{}'", op_c));
 }
 
-#undef TextToken
-#undef WildcardToken
 } // namespace msk::blender
