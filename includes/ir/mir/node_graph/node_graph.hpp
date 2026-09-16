@@ -1,5 +1,5 @@
 #pragma once
-#include "mir/codegen.hpp"
+// #include "mir/codegen.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -67,11 +67,13 @@ class GraphContext; // pimpl
  */
 class ContextProvider {
 private:
-  std::unique_ptr<GraphContext> context;
+  std::shared_ptr<GraphContext> context;
 
 public:
+  ContextProvider(std::shared_ptr<GraphContext> context);
+
   // Gets the named constant of the provided node
-  template <typename T>
+  template <class T>
   auto GetConstant(Node *n, std::string_view name) -> absl::StatusOr<T>;
 };
 
@@ -132,18 +134,19 @@ public:
      *  @brief Gets the stored status, supposed to be used as the return value
      * for Module::GenerateTokenString()
      */
-    [[nodiscard]] auto GetStatus() -> absl::Status { return this->status; }
+    auto GetStatus() -> absl::Status { return this->status; }
 
     /**
      *  @brief Gets a Constant from the GraphContext
      *  @throw When a constant is not found, the internal status will be set and
      * no further codegen will be possible from this object
      */
-    template <class T> const T GetConstant(std::string_view name) {
-      if (auto s = cxt->GetConstant<const T>(&parent, name); !s.ok()) {
+    template <class T> auto GetConstant(std::string_view name) -> T {
+      if (auto s = cxt->GetConstant<T>(static_cast<Node *>(&parent), name);
+          !s.ok()) {
         if (this->status.ok())
           this->status = s.status();
-        return 0;
+        return {};
       } else
         return s.value();
     }
