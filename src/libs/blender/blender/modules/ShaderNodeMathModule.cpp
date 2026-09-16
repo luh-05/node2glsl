@@ -9,36 +9,39 @@
 
 namespace msk::blender {
 
-#define TextToken(text) out.legacy->CreateMTT(text)
-#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-
-auto ShaderNodeMath::GenerateTokenString(Out &&out) -> absl::Status {
-  auto op = out.GetConstant<std::string>("operation0");
+auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
+  auto op_c = out.GetConstant<std::string>("operation0");
+  
+  // Clamp Tickbox
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
-  // 1. Zuweisung des Outputs starten
-  out.legacy->AddTokenVector({
-      WildcardToken(Out::RIGHT, "Value3"), 
-      TextToken(" = ")
-  });
 
-  if (use_clamp) {
-    out.legacy->AddTokenVector({ TextToken("clamp(") });
+  if(op_c == "ADD" || "SUBTRACT" || "MULTIPLY" || "DIVIDE"){  
+    std::string sign;
+
+    if (op_c == "ADD") {
+      sign = "+";
+    
+  } else if (op_c == "SUBTRACT") {
+    sign = "-";
+   } else if (op_c == "MULTIPLY") {
+    sign = "*";
+  } else if (op_c == "DIVIDE") {
+    sign = "/";
   }
+  out + Out::RIGHT / "Value0"
+    + "="
+    + Out::LEFT / "A0"
+    + sign 
+    + Out::LEFT / "B0"
+    + ";"
 
-  // 2. Den eigentlichen Ausdruck einfügen
-  // Direct Arithmetic Operations
-  if (op == "ADD") {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0"), TextToken(" + "), WildcardToken(Out::LEFT, "Value1")});
-  } else if (op == "SUBTRACT") {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0"), TextToken(" - "), WildcardToken(Out::LEFT, "Value1")});
-  } else if (op == "MULTIPLY") {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0"), TextToken(" * "), WildcardToken(Out::LEFT, "Value1")});
-  } else if (op == "DIVIDE") {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0"), TextToken(" / "), WildcardToken(Out::LEFT, "Value1")});
+  return.out.GetStatus();
+
   } else if (op == "MULTIPLY_ADD") {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0"), TextToken(" * "), WildcardToken(Out::LEFT, "Value1"), TextToken(" + "), WildcardToken(Out::LEFT, "Value2")});
-  }
+      // a * b + c
+
+}
   // Power & Logarithmic
   else if (op == "POWER") {
     out.legacy->AddTokenVector({TextToken("pow("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});

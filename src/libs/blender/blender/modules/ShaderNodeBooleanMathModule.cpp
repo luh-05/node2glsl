@@ -10,11 +10,13 @@ namespace msk::blender {
 
 auto ShaderNodeBooleanMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   // Lese die Konstante für die Operation aus
-  auto op = out.GetConstant<std::string>("operation0");
+  auto op_c = out.GetConstant<std::string>("operation0");
 
   // Single-input operation edge case
-  if (op == "NOT") {
-    out + Out::RIGHT / "Boolean2" + " = !" + Out::LEFT / "Boolean0" + ";" = 1;
+  if (op_c == "NOT") {
+    out + Out::RIGHT / "Boolean2" 
+    + " = !" + Out::LEFT / "Boolean0" 
+    + ";" = 1;
     return out.GetStatus();
   }
 
@@ -23,27 +25,27 @@ auto ShaderNodeBooleanMathModule::GenerateTokenString(Out &&out) -> absl::Status
   std::string infix = " && ";
   std::string suffix = ";";
 
-  if (op == "AND") {
+  if (op_c == "AND") {
     infix = " && ";
-  } else if (op == "OR") {
+  } else if (op_c == "OR") {
     infix = " || ";
-  } else if (op == "NAND" || op == "NOT AND") {
+  } else if (op_c == "NAND" || op_c == "NOT AND") {
     prefix = " !(";
     infix = " && ";
     suffix = ");";
-  } else if (op == "NOR") {
+  } else if (op_c == "NOR") {
     prefix = " !(";
     infix = " || ";
     suffix = ");";
-  } else if (op == "XOR" || op == "NOT EQUAL") {
+  } else if (op_c == "XOR" || op_c == "NOT EQUAL") {
     infix = " != ";
-  } else if (op == "XNOR" || op == "EQUAL") {
+  } else if (op_c == "XNOR" || op_c == "EQUAL") {
     infix = " == ";
-  } else if (op == "IMPLY") {
+  } else if (op_c == "IMPLY") {
     prefix = " (!";
     infix = " || ";
     suffix = ");";
-  } else if (op == "NIMPLY" || op == "SUBTRACT") {
+  } else if (op_c == "NIMPLY" || op_c == "SUBTRACT") {
     prefix = " (";
     infix = " && !";
     suffix = ");";
