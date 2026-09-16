@@ -34,7 +34,7 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
     + Out::LEFT / "A0"
     + sign 
     + Out::LEFT / "B0"
-    + ";"
+    + ";";
 
   return.out.GetStatus();
 
