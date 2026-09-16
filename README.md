@@ -9,6 +9,7 @@ Utility to convert a shader node-graph to glsl
  - cmake
  - shaderc
  - sdl3
+ - pugixml
  - doxygen
  - sphinx
  - breathe
