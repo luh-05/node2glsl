@@ -27,9 +27,12 @@ auto FunctionNodeFloatToIntMathModule::GenerateTokenString(Out &&out)
         std::format("Unknown operation: '{}'", mode));
   }
 
-  // Generiert z.B.: Integer = int(trunc(Float));
-  out + Out::RIGHT / "Integer" + " = int(" + function + "(" +
-      Out::LEFT / "Float" + "));";
+  out + Out::RIGHT / "Integer" 
+    + " = int(" 
+    + function 
+    + "(" 
+    + Out::LEFT / "Float" 
+    + "));";
 
   return out.GetStatus();
 }
