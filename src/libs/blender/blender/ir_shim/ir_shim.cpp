@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace msk::blender {
-GraphShim::GraphShim() { this->graph = std::make_unique<ir::Graph>(); }
+GraphShim::GraphShim() { this->graph = std::make_shared<ir::Graph>(); }
 
 auto GraphShim::AddModule(const GraphHandle graph, std::string_view name,
                           std::string_view type)
