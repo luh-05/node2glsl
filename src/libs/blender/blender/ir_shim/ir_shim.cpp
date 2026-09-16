@@ -2,10 +2,14 @@
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <blender/ir_shim/ir_shim.hpp>
+#include <ir/graph/graph.hpp>
 #include <memory>
 
 namespace msk::blender {
-GraphShim::GraphShim() { this->graph = std::make_shared<ir::Graph>(); }
+GraphShim::GraphShim(std::shared_ptr<ir::GraphContext> context) {
+  this->graph = std::make_shared<ir::Graph>();
+  this->context = context;
+}
 
 auto GraphShim::AddModule(const GraphHandle graph, std::string_view name,
                           std::string_view type)
@@ -160,6 +164,11 @@ auto GraphShim::GetPort(const GraphHandle graph, Polarity p,
                         std::string_view name)
     -> absl::StatusOr<const PortHandle> {
   return getPort(*graph.graph, p, name);
+}
+
+auto GraphShim::AddConstant(const ModuleHandle module, std::string_view name,
+                            std::string value) -> absl::Status {
+  return this->context.get()->AddConstant(module.module, name, value);
 }
 
 } // namespace msk::blender

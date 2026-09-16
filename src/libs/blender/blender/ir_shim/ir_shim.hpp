@@ -41,9 +41,10 @@ public:
 class GraphShim {
 private:
   std::shared_ptr<ir::Graph> graph;
+  std::shared_ptr<ir::GraphContext> context;
 
 public:
-  GraphShim();
+  GraphShim(std::shared_ptr<ir::GraphContext> context);
 
   enum Polarity { LEFT, RIGHT };
 
@@ -62,6 +63,10 @@ public:
   /// Connect two ports
   auto ConnectPorts(const PortHandle left, const PortHandle right)
       -> absl::Status;
+
+  /// Add constant to node
+  auto AddConstant(const ModuleHandle module, std::string_view name,
+                   std::string value) -> absl::Status;
 
   /// Get main graph
   inline auto GetGraph() -> GraphHandle {
