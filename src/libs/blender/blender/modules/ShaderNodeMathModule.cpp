@@ -15,7 +15,8 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   // Clamp Tickbox
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
-  if (op_c == "ADD" || "SUBTRACT" || "MULTIPLY" || "DIVIDE") {
+  if (op_c == "ADD" || op_c == "SUBTRACT" || op_c == "MULTIPLY" ||
+      op_c == "DIVIDE" || op_c == "LESS_THAN" || op_c == "GREATER_THAN") {
     std::string sign;
 
     if (op_c == "ADD") {
@@ -26,48 +27,36 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       sign = "*";
     } else if (op_c == "DIVIDE") {
       sign = "/";
-    }
-
-    else if (op_c == "LESS_THAN") //<
+    } else if (op_c == "LESS_THAN") //<
     {
       sign = "<";
     } else if (op_c == "GREATER_THAN") //>
     {
       sign = ">";
     }
-    out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
-        Out::LEFT / "B0" + ";";
-  TODO: // hier fehlt clamp
+
+    if (use_clamp) {
+      out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "A0" + sign +
+          Out::LEFT / "B0" + ")" + ";";
+    } else {
+      out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
+          Out::LEFT / "B0" + ";";
+    }
+
     return out.GetStatus();
   }
-
 
   // Power & Logarithmic //alle mit clamp!
 
   // alle mit function und einer variable
 
-  else if (
-  op_c == "SQRT" || 
-  op_c == "INVERSE_SQRT" || 
-  op_c == "EXPONENT" || 
-  op_c == "ABSOLUTE" || 
-  op_c == "FLOOR" || 
-  op_c == "SIGN" || 
-  op_c == "CEIL" || 
-  op_c == "FRACT" || 
-  op_c == "TRUNC" || 
-  op_c == "ROUND" || 
-  op_c == "SINE" || 
-  op_c == "COSINE" || 
-  op_c == "TANGENT" || 
-  op_c == "ARCSINE" || 
-  op_c == "ARCCOSINE" || 
-  op_c == "ARCTANGENT" || 
-  op_c == "SINH" || 
-  op_c == "COSH" || 
-  op_c == "TANH" || 
-  op_c == "RADIANS"
-) {
+  else if (op_c == "SQRT" || op_c == "INVERSE_SQRT" || op_c == "EXPONENT" ||
+           op_c == "ABSOLUTE" || op_c == "FLOOR" || op_c == "SIGN" ||
+           op_c == "CEIL" || op_c == "FRACT" || op_c == "TRUNC" ||
+           op_c == "ROUND" || op_c == "SINE" || op_c == "COSINE" ||
+           op_c == "TANGENT" || op_c == "ARCSINE" || op_c == "ARCCOSINE" ||
+           op_c == "ARCTANGENT" || op_c == "SINH" || op_c == "COSH" ||
+           op_c == "TANH" || op_c == "RADIANS") {
 
     std::string function;
 
@@ -85,11 +74,9 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
 
     else if (op_c == "ABSOLUTE") {
       function = "abs(";
-    }
-    else if (op_c == "FLOOR") {
+    } else if (op_c == "FLOOR") {
       function = "floor(";
-    }
-    else if (op_c == "SIGN") {
+    } else if (op_c == "SIGN") {
       function = "sign(";
     } else if (op_c == "CEIL") {
       function = "ceil(";
@@ -97,8 +84,7 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       function = "fract(";
     } else if (op_c == "TRUNC") {
       function = "trunc(";
-    }
-    else if (op_c == "ROUND") {
+    } else if (op_c == "ROUND") {
       function = "round(";
     } else if (op_c == "SINE") {
       function = "sin(";
@@ -134,11 +120,12 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
     return out.GetStatus();
 
     //=================================================================end
-    //output
+    // output
   }
 
   // alle mit function und 2 variablen
-  else if (op_c == "POWER" || "MINIMUM" || "MAXIMUM" || "ARCTAN2") {
+  else if (op_c == "POWER" || op_c == "MINIMUM" || op_c == "MAXIMUM" ||
+           op_c == "ARCTAN2") {
     std::string function;
 
     if (op_c == "POWER") // pow(x,y) = x^y A = base B = exponent
@@ -160,24 +147,20 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
     }
 
     if (use_clamp) {
-
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
           Out::LEFT / "A0" + ", " + Out::LEFT / "B0" + ")" + ")" + ";";
-    }
-
-    else {
-
+    } else {
       out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ", " +
           Out::LEFT / "B0" + ")" + ";";
     }
-    return out.GetStatus();
 
+    return out.GetStatus();
   }
 
   // alle ganz funky (logarithm...)
   // funky mit mehreren variablen und kram
 
-  else if (op_c == "LOGARITHM" || "COMPARE") {
+  else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
     if (op_c == "LOGARITHM") // es gibt nur natürlichen logarithmus und log2
     /*log_b(x) = log_2(x) / log_2(b)
@@ -207,33 +190,31 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       }
     }
 
-  else if (op_c == "MULTIPLY_ADD") {
-    // a * b + c
+    else if (op_c == "MULTIPLY_ADD") {
+      // a * b + c
 
-    if (use_clamp) {
-      out + Out::RIGHT / "Value0" + "=" + " clamp(" // clamp
-          + Out::LEFT / "A0" + "*" + Out::LEFT / "B0" + "+" + Out::LEFT / "C0" +
-          ", 0.0, 1.0)" // clamp
-          + ";";
-    } else {
-      out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + "*" +
-          Out::LEFT / "B0" + "+" + Out::LEFT / "C0" + ";";
+      if (use_clamp) {
+        out + Out::RIGHT / "Value0" + "=" + " clamp(" // clamp
+            + Out::LEFT / "A0" + "*" + Out::LEFT / "B0" + "+" +
+            Out::LEFT / "C0" + ", 0.0, 1.0)" // clamp
+            + ";";
+      } else {
+        out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + "*" +
+            Out::LEFT / "B0" + "+" + Out::LEFT / "C0" + ";";
+      }
     }
-    
+    return out.GetStatus();
   }
-  return out.GetStatus();
-}
-   
 
-
-
-  //left out
+  // left out
   else if (op_c == "SNAP") {
-  TODO: // mayb leave out
+  //TODO: // mayb leave out
     return absl::UnimplementedError(std::format(
         "Given Operation has not been implemented yet: '{}’", op_c));
   }
 
-
-} 
-}// namespace msk::blender
+  else {
+    return absl::InvalidArgumentError(std::format("Illegal value of operand constant: '{}'", op_c));
+  }
+}
+} // namespace msk::blender
