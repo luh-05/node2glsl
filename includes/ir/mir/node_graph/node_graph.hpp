@@ -141,7 +141,15 @@ public:
      *  @throw When a constant is not found, the internal status will be set and
      * no further codegen will be possible from this object
      */
-    template <class T> auto GetConstant(std::string name) -> T;
+    template <class T> auto GetConstant(std::string_view name) -> T {
+      if (auto s = cxt->GetConstant<T>(static_cast<Node *>(&parent), name);
+          !s.ok()) {
+        if (this->status.ok())
+          this->status = s.status();
+        return {};
+      } else
+        return s.value();
+    }
 
     // Fetch tuple
     using PortFetch = std::tuple<Polarity, std::string_view>;
