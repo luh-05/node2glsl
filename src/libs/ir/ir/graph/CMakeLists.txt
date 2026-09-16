@@ -6,4 +6,4 @@ target_link_libraries(mir_graph
     ir_deps
 )
 
-target_sources(mir_graph PUBLIC GraphContext.cpp Module.cpp graph.cpp)
+target_sources(mir_graph PUBLIC GraphContext.cpp Module.cpp graph.cpp ConstantProvider.cpp)
