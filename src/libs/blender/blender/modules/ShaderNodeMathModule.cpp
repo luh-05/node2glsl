@@ -40,7 +40,172 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   TODO: // hier fehlt clamp
     return out.GetStatus();
   }
-// funky mit mehreren variablen und kram
+
+
+  // Power & Logarithmic //alle mit clamp!
+
+  // alle mit function und einer variable
+
+  else if (
+  op_c == "SQRT" || 
+  op_c == "INVERSE_SQRT" || 
+  op_c == "EXPONENT" || 
+  op_c == "ABSOLUTE" || 
+  op_c == "FLOOR" || 
+  op_c == "SIGN" || 
+  op_c == "CEIL" || 
+  op_c == "FRACT" || 
+  op_c == "TRUNC" || 
+  op_c == "ROUND" || 
+  op_c == "SINE" || 
+  op_c == "COSINE" || 
+  op_c == "TANGENT" || 
+  op_c == "ARCSINE" || 
+  op_c == "ARCCOSINE" || 
+  op_c == "ARCTANGENT" || 
+  op_c == "SINH" || 
+  op_c == "COSH" || 
+  op_c == "TANH" || 
+  op_c == "RADIANS"
+) {
+
+    std::string function;
+
+    if (op_c == "SQRT") // sqrt(x)
+    {
+      function = "sqrt(";
+    } else if (op_c == "INVERSE_SQRT") // inverseqrt(x)
+    {
+      function = "inversesqrt(";
+
+    } else if (op_c == "EXPONENT") // euler^x 2.718281828459045
+    {
+      function = "pow(2.718281828459045, ";
+    }
+
+    else if (op_c == "ABSOLUTE") {
+      function = "abs(";
+    }
+    else if (op_c == "FLOOR") {
+      function = "floor(";
+    }
+    else if (op_c == "SIGN") {
+      function = "sign(";
+    } else if (op_c == "CEIL") {
+      function = "ceil(";
+    } else if (op_c == "FRACT") {
+      function = "fract(";
+    } else if (op_c == "TRUNC") {
+      function = "trunc(";
+    }
+    else if (op_c == "ROUND") {
+      function = "round(";
+    } else if (op_c == "SINE") {
+      function = "sin(";
+    } else if (op_c == "COSINE") {
+      function = "cos(";
+    } else if (op_c == "TANGENT") {
+      function = "tan(";
+    } else if (op_c == "ARCSINE") {
+      function = "asin(";
+    } else if (op_c == "ARCCOSINE") {
+      function = "acos(";
+    } else if (op_c == "ARCTANGENT") {
+      function = "atan(";
+    } else if (op_c == "SINH") {
+      function = "sinh(";
+    } else if (op_c == "COSH") {
+      function = "cosh(";
+    } else if (op_c == "TANH") {
+      function = "tanh(";
+    } else if (op_c == "RADIANS") {
+      function = "radians(";
+    }
+
+    //=======================================================output
+    if (use_clamp) {
+      out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
+          Out::LEFT / "A0" + ")" + ")" + ";";
+    } else {
+
+      out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ")" +
+          ";";
+    }
+    return out.GetStatus();
+
+    //=================================================================end
+    //output
+  }
+
+  // alle mit function und 2 variablen
+  else if (op_c == "POWER" || "MINIMUM" || "MAXIMUM" || "ARCTAN2") {
+    std::string function;
+
+    if (op_c == "POWER") // pow(x,y) = x^y A = base B = exponent
+    {
+      // log2(x)
+      function = "pow(";
+    }
+
+    else if (op_c == "MINIMUM") // min(x,y)
+    {
+      function = "min(";
+    } else if (op_c == "MAXIMUM") // max(x,y)
+    {
+      function = "max(";
+    }
+
+    else if (op_c == "ARCTAN2") {
+      function = "atan(";
+    }
+
+    if (use_clamp) {
+
+      out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
+          Out::LEFT / "A0" + ", " + Out::LEFT / "B0" + ")" + ")" + ";";
+    }
+
+    else {
+
+      out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ", " +
+          Out::LEFT / "B0" + ")" + ";";
+    }
+    return out.GetStatus();
+
+  }
+
+  // alle ganz funky (logarithm...)
+  // funky mit mehreren variablen und kram
+
+  else if (op_c == "LOGARITHM" || "COMPARE") {
+
+    if (op_c == "LOGARITHM") // es gibt nur natürlichen logarithmus und log2
+    /*log_b(x) = log_2(x) / log_2(b)
+    bzw log_b(x) = log(x) / log(b)*/
+    {
+      if (use_clamp) {
+        out + Out::RIGHT / "Value0" + "=" + "clamp(" + "log(" +
+            Out::LEFT / "A0" + ") /" + "log(" + Out::LEFT / "B0" + ")" + ");";
+      } else {
+        out + Out::RIGHT / "Value0" + "=" + "log(" + Out::LEFT / "A0" + ") /" +
+            "log(" + Out::LEFT / "B0" + ");";
+      }
+    }
+
+    else if (op_c == "COMPARE") {
+      /*The compare node outputs either 0 or 1.
+      It outputs 1 if the difference of the two input values are less than
+      epsilon. Used to check if two values are equal within a certain
+      tolerance.*/
+
+      if (use_clamp) {
+        out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "C0" + ">" +
+            "(" + Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ")" + ";";
+      } else {
+        out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "C0" + ">" + "(" +
+            Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ";";
+      }
+    }
 
   else if (op_c == "MULTIPLY_ADD") {
     // a * b + c
@@ -54,116 +219,21 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + "*" +
           Out::LEFT / "B0" + "+" + Out::LEFT / "C0" + ";";
     }
+    
+  }
+  return out.GetStatus();
+}
+   
 
-    return out.GetStatus();
+
+
+  //left out
+  else if (op_c == "SNAP") {
+  TODO: // mayb leave out
+    return absl::UnimplementedError(std::format(
+        "Given Operation has not been implemented yet: '{}’", op_c));
   }
 
-// Power & Logarithmic //alle mit clamp!
 
-
-// alle mit function und einer variable
-
-else if (op_c == "SQRT" || "INVERSE_SQRT" || "EXPONENT" || "MINIMUM" || "MAXIMUM" || "POWER") {
-
-std::string function;
-
- if (op_c== "SQRT") // sqrt(x)
-  {
-    function = "sqrt("
-  } else if (op_c== "INVERSE_SQRT") // inverseqrt(x)
-  {  function = "inversesqrt("
-
-  } else if (op_c== "EXPONENT") // euler^x 2.718281828459045
-  {
-function = "pow(2.718281828459045, "
-  }
-
-  
-
-  if (use_clamp) {
-
-      out + Out::RIGHT / "Value0" + "=" 
-      + "clamp()"
-      + function
-      + Out::LEFT / "A0" 
-      + ")" 
-      + ")"
-      +  ";";
-  }
-
-  else {
-
-      out + Out::RIGHT / "Value0" + "=" 
-      + function
-      + Out::LEFT / "A0" 
-      + ")" +  ";";
-  }
-}
-
-
-
-// alle mit function und 2 variablen
-
-
-  if (op_c== "POWER") // pow(x,y) = x^y A = base B = exponent
-  {
-    // log2(x)
-    function = "pow()"
-  } 
-
-    else if (op_c== "MINIMUM") // min(x,y)
-  {
-  } else if (op_c== "MAXIMUM") // max(x,y)
-  {
-
-// alle ganz funky (logarithm...)
-
-else if (op_c== "LOGARITHM") // es gibt nur natürlichen logarithmus und log2
-/*log_b(x) = log_2(x) / log_2(b)
-bzw log_b(x) = log(x) / log(b)*/
-{
-}
-
-}
-else if (op_c== "COMPARE") {}
-// Rounding & Modulo
-else if (op_c== "ABSOLUTE") {}
-else if (op_c== "SIGN") {}
-else if (op_c== "FLOOR") {}
-else if (op_c== "CEIL") {}
-else if (op_c== "FRACT") {}
-else if (op_c== "TRUNC") {}
-else if (op_c== "ROUND") {}
-else if (op_c== "MODULO" || op_c== "FLOORED_MODULO") {}
-else if (op_c== "SNAP") {}
-// Trigonometry
-else if (op_c== "SINE") {}
-else if (op_c== "COSINE") {}
-else if (op_c== "TANGENT") {}
-else if (op_c== "ARCSINE") {}
-else if (op_c== "ARCCOSINE") {}
-else if (op_c== "ARCTANGENT") {}
-else if (op_c== "ARCTAN2") {}
-else if (op_c== "SINH") {}
-else if (op_c== "COSH") {}
-else if (op_c== "TANH") {
-  
-}
-else if (op_c== "RADIANS") {
-}
-else {
-  
-}
-
-// 3. Statement beenden (inkl. eventuellem Clamp)
-if (use_clamp) {
-} else {}
-
-return out.GetStatus();
-
-
-#undef TextToken
-#undef WildcardToken
-
-} // namespace msk::blender
-}
+} 
+}// namespace msk::blender
