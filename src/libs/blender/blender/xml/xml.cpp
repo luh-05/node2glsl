@@ -4,11 +4,11 @@
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <format>
-#include <map>
 #include <memory>
 #include <pugixml.hpp>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 namespace msk::blender {
 
@@ -77,7 +77,7 @@ auto XMLParser::PopulateGraph(
       if (!port_or.ok())
         return port_or.status();
 
-      port_id_map[port_id] = *port_or;
+      port_id_map.emplace(port_id, *port_or);
     }
   }
 
