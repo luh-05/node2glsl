@@ -4,126 +4,166 @@
 #include <absl/status/statusor.h>
 #include <array>
 #include <memory>
-#include <string>
 #include <mir/codegen.hpp>
+#include <string>
 
 namespace msk::blender {
 
 auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
-  
+
   // Clamp Tickbox
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
-
-  if(op_c == "ADD" || "SUBTRACT" || "MULTIPLY" || "DIVIDE"){  
+  if (op_c == "ADD" || "SUBTRACT" || "MULTIPLY" || "DIVIDE") {
     std::string sign;
 
     if (op_c == "ADD") {
       sign = "+";
-    
-  } else if (op_c == "SUBTRACT") {
-    sign = "-";
-   } else if (op_c == "MULTIPLY") {
-    sign = "*";
-  } else if (op_c == "DIVIDE") {
-    sign = "/";
-  }
-  out + Out::RIGHT / "Value0"
-    + "="
-    + Out::LEFT / "A0"
-    + sign 
-    + Out::LEFT / "B0"
-    + ";";
+    } else if (op_c == "SUBTRACT") {
+      sign = "-";
+    } else if (op_c == "MULTIPLY") {
+      sign = "*";
+    } else if (op_c == "DIVIDE") {
+      sign = "/";
+    }
 
-  return.out.GetStatus();
+    else if (op_c == "LESS_THAN") //<
+    {
+      sign = "<";
+    } else if (op_c == "GREATER_THAN") //>
+    {
+      sign = ">";
+    }
+    out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
+        Out::LEFT / "B0" + ";";
+  TODO: // hier fehlt clamp
+    return out.GetStatus();
+  }
+// funky mit mehreren variablen und kram
 
-  } else if (op == "MULTIPLY_ADD") {
-      // a * b + c
+  else if (op_c == "MULTIPLY_ADD") {
+    // a * b + c
 
-}
-  // Power & Logarithmic
-  else if (op == "POWER") {
-    out.legacy->AddTokenVector({TextToken("pow("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "LOGARITHM") {
-    out.legacy->AddTokenVector({TextToken("log("), WildcardToken(Out::LEFT, "Value0"), TextToken(") / log("), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "SQRT") {
-    out.legacy->AddTokenVector({TextToken("sqrt("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "INVERSE_SQRT") {
-    out.legacy->AddTokenVector({TextToken("inversesqrt("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "EXPONENT") {
-    out.legacy->AddTokenVector({TextToken("exp("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  }
-  // Comparison & Min/Max
-  else if (op == "MINIMUM") {
-    out.legacy->AddTokenVector({TextToken("min("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "MAXIMUM") {
-    out.legacy->AddTokenVector({TextToken("max("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "LESS_THAN") {
-    out.legacy->AddTokenVector({TextToken("float("), WildcardToken(Out::LEFT, "Value0"), TextToken(" < "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "GREATER_THAN") {
-    out.legacy->AddTokenVector({TextToken("float("), WildcardToken(Out::LEFT, "Value0"), TextToken(" > "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "COMPARE") {
-    out.legacy->AddTokenVector({TextToken("float(abs("), WildcardToken(Out::LEFT, "Value0"), TextToken(" - "), WildcardToken(Out::LEFT, "Value1"), TextToken(") <= "), WildcardToken(Out::LEFT, "Value2"), TextToken(")")});
-  }
-  // Rounding & Modulo
-  else if (op == "ABSOLUTE") {
-    out.legacy->AddTokenVector({TextToken("abs("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "SIGN") {
-    out.legacy->AddTokenVector({TextToken("sign("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "FLOOR") {
-    out.legacy->AddTokenVector({TextToken("floor("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "CEIL") {
-    out.legacy->AddTokenVector({TextToken("ceil("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "FRACT") {
-    out.legacy->AddTokenVector({TextToken("fract("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "TRUNC") {
-    out.legacy->AddTokenVector({TextToken("trunc("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "ROUND") {
-    out.legacy->AddTokenVector({TextToken("floor("), WildcardToken(Out::LEFT, "Value0"), TextToken(" + 0.5)")});
-  } else if (op == "MODULO" || op == "FLOORED_MODULO") {
-    out.legacy->AddTokenVector({TextToken("mod("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "SNAP") {
-    out.legacy->AddTokenVector({TextToken("floor("), WildcardToken(Out::LEFT, "Value0"), TextToken(" / "), WildcardToken(Out::LEFT, "Value1"), TextToken(") * "), WildcardToken(Out::LEFT, "Value1")});
-  }
-  // Trigonometry
-  else if (op == "SINE") {
-    out.legacy->AddTokenVector({TextToken("sin("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "COSINE") {
-    out.legacy->AddTokenVector({TextToken("cos("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "TANGENT") {
-    out.legacy->AddTokenVector({TextToken("tan("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "ARCSINE") {
-    out.legacy->AddTokenVector({TextToken("asin("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "ARCCOSINE") {
-    out.legacy->AddTokenVector({TextToken("acos("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "ARCTANGENT") {
-    out.legacy->AddTokenVector({TextToken("atan("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "ARCTAN2") {
-    out.legacy->AddTokenVector({TextToken("atan("), WildcardToken(Out::LEFT, "Value0"), TextToken(", "), WildcardToken(Out::LEFT, "Value1"), TextToken(")")});
-  } else if (op == "SINH") {
-    out.legacy->AddTokenVector({TextToken("sinh("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "COSH") {
-    out.legacy->AddTokenVector({TextToken("cosh("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "TANH") {
-    out.legacy->AddTokenVector({TextToken("tanh("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else if (op == "RADIANS") {
-    out.legacy->AddTokenVector({TextToken("radians("), WildcardToken(Out::LEFT, "Value0"), TextToken(")")});
-  } else {
-    out.legacy->AddTokenVector({WildcardToken(Out::LEFT, "Value0")});
+    if (use_clamp) {
+      out + Out::RIGHT / "Value0" + "=" + " clamp(" // clamp
+          + Out::LEFT / "A0" + "*" + Out::LEFT / "B0" + "+" + Out::LEFT / "C0" +
+          ", 0.0, 1.0)" // clamp
+          + ";";
+    } else {
+      out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + "*" +
+          Out::LEFT / "B0" + "+" + Out::LEFT / "C0" + ";";
+    }
+
+    return out.GetStatus();
   }
 
-  // 3. Statement beenden (inkl. eventuellem Clamp)
+// Power & Logarithmic //alle mit clamp!
+
+
+// alle mit function und einer variable
+
+else if (op_c == "SQRT" || "INVERSE_SQRT" || "EXPONENT" || "MINIMUM" || "MAXIMUM" || "POWER") {
+
+std::string function;
+
+ if (op_c== "SQRT") // sqrt(x)
+  {
+    function = "sqrt("
+  } else if (op_c== "INVERSE_SQRT") // inverseqrt(x)
+  {  function = "inversesqrt("
+
+  } else if (op_c== "EXPONENT") // euler^x 2.718281828459045
+  {
+function = "pow(2.718281828459045, "
+  }
+
+  
+
   if (use_clamp) {
-    out.legacy->AddTokenVector({ TextToken(", 0.0, 1.0);") });
-  } else {
-    out.legacy->AddTokenVector({ TextToken(";") });
+
+      out + Out::RIGHT / "Value0" + "=" 
+      + "clamp()"
+      + function
+      + Out::LEFT / "A0" 
+      + ")" 
+      + ")"
+      +  ";";
   }
 
-  return out.GetStatus();
+  else {
+
+      out + Out::RIGHT / "Value0" + "=" 
+      + function
+      + Out::LEFT / "A0" 
+      + ")" +  ";";
+  }
 }
+
+
+
+// alle mit function und 2 variablen
+
+
+  if (op_c== "POWER") // pow(x,y) = x^y A = base B = exponent
+  {
+    // log2(x)
+    function = "pow()"
+  } 
+
+    else if (op_c== "MINIMUM") // min(x,y)
+  {
+  } else if (op_c== "MAXIMUM") // max(x,y)
+  {
+
+// alle ganz funky (logarithm...)
+
+else if (op_c== "LOGARITHM") // es gibt nur natürlichen logarithmus und log2
+/*log_b(x) = log_2(x) / log_2(b)
+bzw log_b(x) = log(x) / log(b)*/
+{
+}
+
+}
+else if (op_c== "COMPARE") {}
+// Rounding & Modulo
+else if (op_c== "ABSOLUTE") {}
+else if (op_c== "SIGN") {}
+else if (op_c== "FLOOR") {}
+else if (op_c== "CEIL") {}
+else if (op_c== "FRACT") {}
+else if (op_c== "TRUNC") {}
+else if (op_c== "ROUND") {}
+else if (op_c== "MODULO" || op_c== "FLOORED_MODULO") {}
+else if (op_c== "SNAP") {}
+// Trigonometry
+else if (op_c== "SINE") {}
+else if (op_c== "COSINE") {}
+else if (op_c== "TANGENT") {}
+else if (op_c== "ARCSINE") {}
+else if (op_c== "ARCCOSINE") {}
+else if (op_c== "ARCTANGENT") {}
+else if (op_c== "ARCTAN2") {}
+else if (op_c== "SINH") {}
+else if (op_c== "COSH") {}
+else if (op_c== "TANH") {
+  
+}
+else if (op_c== "RADIANS") {
+}
+else {
+  
+}
+
+// 3. Statement beenden (inkl. eventuellem Clamp)
+if (use_clamp) {
+} else {}
+
+return out.GetStatus();
+
 
 #undef TextToken
 #undef WildcardToken
 
 } // namespace msk::blender
+}
