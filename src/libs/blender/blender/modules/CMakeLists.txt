@@ -11,6 +11,7 @@ target_sources(
     ./FunctionNodeCompareModule.cpp
     ./FunctionNodeHashValueModule.cpp
     ./FunctionNodeIntegerMathModule.cpp
+    ./FunctionNodeFloatToIntMathModule.cpp
     ./ShaderNodeBooleanMathModule.cpp
     ./ShaderNodeClampModule.cpp
     ./ShaderNodeFloatCurveModule.cpp
