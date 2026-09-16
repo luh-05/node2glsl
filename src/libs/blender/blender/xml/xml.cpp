@@ -70,7 +70,7 @@ auto XMLParser::PopulateGraph(
       std::string direction = xml_port.attribute("direction").value();
       std::string port_id = xml_port.attribute("id").value();
 
-      if (direction != "in" || direction != "out") {
+      if (direction != "in" && direction != "out") {
         return absl::InvalidArgumentError(
             std::format("Bad XML; Port direction is invalid, should be 'in' or "
                         "'out', is: {}. Node: {}, Port[name: {}, id: {}]",
