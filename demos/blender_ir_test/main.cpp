@@ -21,7 +21,7 @@ int main() {
 
   auto dummy = msk::blender::DummyModule("foo");
   spdlog::warn(dummy.id);
-  auto a = context->AddConstant(&dummy, "a", "13");
+  auto a = context->AddConstant(&dummy, "a", "4");
 
   auto token_string = std::vector<msk::ir::Module::Token>();
   if (auto status = dummy.GenerateTokenString(
