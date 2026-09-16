@@ -21,7 +21,8 @@ private:
 
 public:
   auto XMLread(std::string_view path) -> absl::Status;
-  auto ParseGraph(std::string_view target_graph_id)
+  auto ParseGraph(std::string_view target_graph_id,
+                  std::shared_ptr<msk::ir::GraphContext> graph_context)
       -> absl::StatusOr<std::shared_ptr<ir::Graph>>;
 };
 

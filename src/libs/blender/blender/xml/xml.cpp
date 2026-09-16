@@ -24,7 +24,8 @@ auto XMLParser::XMLread(std::string_view path) -> absl::Status {
   return absl::OkStatus();
 }
 
-auto XMLParser::ParseGraph(std::string_view target_graph_id)
+auto XMLParser::ParseGraph(std::string_view target_graph_id,
+                           std::shared_ptr<msk::ir::GraphContext> graph_context)
     -> absl::StatusOr<std::shared_ptr<ir::Graph>> {
 
   std::string xpath_query = std::format("//Graph[@id='{}']", target_graph_id);
@@ -37,7 +38,7 @@ auto XMLParser::ParseGraph(std::string_view target_graph_id)
 
   pugi::xml_node xml_graph = xpath_graph.node();
 
-  GraphShim graph;
+  GraphShim graph(graph_context);
   GraphHandle graph_hande = graph.GetGraph();
   std::unordered_map<std::string, PortHandle> port_id_map;
 
@@ -69,6 +70,12 @@ auto XMLParser::PopulateGraph(
       std::string direction = xml_port.attribute("direction").value();
       std::string port_id = xml_port.attribute("id").value();
 
+      if (direction != "in" || direction != "out") {
+        return absl::InvalidArgumentError(
+            std::format("Bad XML; Port direction is invalid, should be 'in' or "
+                        "'out', is: {}. Node: {}, Port[name: {}, id: {}]",
+                        direction, node_name, port_name, port_id));
+      }
       GraphShim::Polarity port_polarity = (direction == "in")
                                               ? GraphShim::Polarity::LEFT
                                               : GraphShim::Polarity::RIGHT;
@@ -77,7 +84,28 @@ auto XMLParser::PopulateGraph(
       if (!port_or.ok())
         return port_or.status();
 
+      if (port_id.empty())
+        return absl::InvalidArgumentError(
+            std::format("Bad XML; Port ID is empty. Node: {}, Port: {}",
+                        node_name, port_name));
+
+      if (port_id_map.contains(port_id))
+        return absl::InvalidArgumentError(std::format(
+            "Bad XML; Port ID is duplicate. Node: {}, Port[name: {}, id: {}]",
+            node_name, port_name, port_id));
+
       port_id_map.emplace(port_id, *port_or);
+    }
+
+    // constants
+    for (pugi::xml_node xml_constant : xml_node.children("Constant")) {
+      std::string constant_name = xml_constant.attribute("name").value();
+      std::string constant_value = xml_constant.attribute("value").value();
+
+      if (auto constant_or =
+              graph.AddConstant(module, constant_name, constant_value);
+          !constant_or.ok())
+        return constant_or;
     }
   }
 
