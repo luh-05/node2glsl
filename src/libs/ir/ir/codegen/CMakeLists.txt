@@ -6,4 +6,4 @@ target_link_libraries(mir_codegen
   ir_deps
 )
 
-target_sources(mir_codegen PUBLIC TextToken.cpp WildcardToken.cpp ConstantProvider.cpp Module.cpp)
+target_sources(mir_codegen PUBLIC TextToken.cpp WildcardToken.cpp)

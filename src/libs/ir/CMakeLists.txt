@@ -39,5 +39,10 @@ target_link_libraries(ir
     mir::graph
 )
 
+target_include_directories(ir
+  PUBLIC
+    ${LIBS_DIR}/ir
+)
+
 add_subdirectory(ir/codegen)
 add_subdirectory(ir/graph)
