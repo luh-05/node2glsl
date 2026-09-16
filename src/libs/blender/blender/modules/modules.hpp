@@ -36,6 +36,12 @@ public:
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
+class FunctionNodeFloatToIntMathModule : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
+
 class ShaderNodeBooleanMathModule : public ir::Module {
 public:
   using Module::Module;
