@@ -1,5 +1,4 @@
-#include "ir/graph/graph.hpp"
-#include "mir/node_graph/node_graph.hpp"
+#include "mir/node_graph/GraphContext.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 // #include <mir/codegen.hpp>

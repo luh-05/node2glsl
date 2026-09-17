@@ -1,6 +1,5 @@
-#include "mir/node_graph/node_graph.hpp"
+#include "mir/node_graph/GraphContext.hpp"
 #include <blender/modules/modules.hpp>
-#include <ir/graph/graph.hpp>
 #include <iterator>
 #include <memory>
 // #include <mir/mollusk_ir.hpp>

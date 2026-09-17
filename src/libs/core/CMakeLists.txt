@@ -12,10 +12,6 @@ add_library(msk::core ALIAS mollusk_core)
 
 add_library(core_deps INTERFACE)
 
-target_include_directories(mollusk_core
-  INTERFACE
-    ${LIBS_DIR}/core
-)
 target_include_directories(core_deps
   INTERFACE
     ${LIBS_DIR}/core
@@ -30,6 +26,7 @@ target_link_libraries(core_deps
     absl::statusor
 
     msk::ir
+    msk::blender
 )
 
 target_link_libraries(mollusk_core

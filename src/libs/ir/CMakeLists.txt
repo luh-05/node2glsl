@@ -12,10 +12,6 @@ add_library(msk::ir ALIAS ir)
 
 add_library(ir_deps INTERFACE)
 
-target_include_directories(ir
-  INTERFACE
-  ${LIBS_DIR}/ir
-)
 target_include_directories(ir_deps
   INTERFACE
   ${LIBS_DIR}/ir

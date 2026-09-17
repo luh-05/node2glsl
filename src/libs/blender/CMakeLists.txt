@@ -1,4 +1,4 @@
-add_library(blender
+add_library(blender 
   blender/root.cpp
 )
 add_library(msk::blender ALIAS blender)

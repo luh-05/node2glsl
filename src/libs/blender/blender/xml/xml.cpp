@@ -25,10 +25,8 @@ auto XMLParser::XMLread(std::string_view path) -> absl::Status {
   return absl::OkStatus();
 }
 
-auto XMLParser::ParseGraph(std::string_view target_graph_id,
-                           std::shared_ptr<msk::ir::GraphContext> graph_context)
-    -> absl::StatusOr<std::shared_ptr<ir::Graph>> {
-
+auto XMLParser::ParseGraph(std::string_view target_graph_id)
+    -> absl::StatusOr<std::shared_ptr<ir::GraphContext>> {
   std::string xpath_query = std::format("//Graph[@id='{}']", target_graph_id);
   pugi::xpath_node xpath_graph = doc.select_node(xpath_query.c_str());
 
@@ -39,7 +37,7 @@ auto XMLParser::ParseGraph(std::string_view target_graph_id,
 
   pugi::xml_node xml_graph = xpath_graph.node();
 
-  GraphShim graph(graph_context);
+  GraphShim graph;
   GraphHandle graph_hande = graph.GetGraph();
   std::unordered_map<std::string, PortHandle> port_id_map;
 

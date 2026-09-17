@@ -1,8 +1,9 @@
 
+#include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <flat_map>
-#include <mir/node_graph/node_graph.hpp>
+#include <memory>
 #pragma once
 
 namespace msk::ir {
@@ -77,9 +78,12 @@ public:
 
 class GraphContext {
 public:
+  std::unique_ptr<ir::Graph> graph;
   ConstantStore const_store;
 
 public:
+  GraphContext() { this->graph = std::make_unique<ir::Graph>(); }
+
   template <class T>
   auto GetConstant(Node *n, std::string_view name) -> absl::StatusOr<T> {
     return this->const_store.GetConstant<T>(n, name);

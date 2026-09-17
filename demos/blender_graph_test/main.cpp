@@ -1,7 +1,6 @@
 
 #include "blender/ir_shim/ir_shim.hpp"
 #include "blender/xml/xml.hpp"
-#include "ir/graph/graph.hpp"
 #include <absl/status/statusor.h>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -29,8 +28,7 @@ int main() {
     spdlog::error(status.ToString());
     return 1;
   }
-  auto gt = std::make_shared<msk::ir::GraphContext>();
-  CHECK_OK(parseTest, parser.ParseGraph("0", gt));
+  CHECK_OK(parseTest, parser.ParseGraph("0"));
 
   /*
   CHECK_OK(foo, g.AddModule(g.GetGraph(), "foo.0", "FooModule"));
