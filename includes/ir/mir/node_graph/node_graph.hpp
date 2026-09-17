@@ -254,9 +254,11 @@ public:
   };
 
   // Generates CodegenTokens
-  virtual auto GenerateTokenString(Out &&out) -> absl::Status {
-    return absl::NotFoundError("GenerateTokenString not implemented!");
-  }
+  typedef absl::Status (*GenerateTokenString)(Out &&out);
+  GenerateTokenString impl;
+  // virtual auto GenerateTokenString(Out &&out) -> absl::Status {
+  //   return absl::NotFoundError("GenerateTokenString not implemented!");
+  // }
 };
 inline auto operator/(Module::Out::Polarity pol, std::string_view name)
     -> Module::Out::PortFetch {
