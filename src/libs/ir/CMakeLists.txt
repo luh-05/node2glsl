@@ -5,7 +5,7 @@ target_include_directories(ir_include
   ${INCLUDES_DIR}/ir
 )
 
-add_library(ir
+add_library(ir STATIC
   ir/root.cpp
 )
 add_library(msk::ir ALIAS ir)
@@ -37,11 +37,6 @@ target_link_libraries(ir
     msk::ir::include
     mir::codegen
     mir::graph
-)
-
-target_include_directories(ir
-  PUBLIC
-    ${LIBS_DIR}/ir
 )
 
 add_subdirectory(ir/codegen)
