@@ -133,8 +133,6 @@ auto FunctionNodeIntegerMathModule::GenerateTokenString(Out &&out)
         + ";";
   } 
   else if (op_c == "FLOORED_MODULO") {
-    Out::LEFT / "Value0";
-    Out::LEFT / "Value1";
     out + Out::RIGHT / "Value3"
         + " = (("
         + Out::LEFT / "Value0"
