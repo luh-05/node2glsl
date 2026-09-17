@@ -7,4 +7,6 @@ target_link_libraries(blender_xml
     pugixml
 )
 
+target_link_libraries(blender_xml PUBLIC blender_ir_shim)
+
 target_sources(blender_xml PRIVATE xml.cpp)
