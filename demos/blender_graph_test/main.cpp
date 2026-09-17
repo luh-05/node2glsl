@@ -23,7 +23,7 @@ int main() {
   msk::ir::GraphContext graph_context;
   msk::blender::XMLParser parser;
 
-  std::string xml_text_file = "/home/toto/dev/uni/Mollusk/test.xml";
+  std::string xml_text_file = "./demos/blender_graph_test/test.xml";
   absl::Status status = parser.XMLread(xml_text_file);
   if (!status.ok()) {
     spdlog::error(status.ToString());

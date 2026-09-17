@@ -5,8 +5,7 @@ target_link_libraries(blender_xml
   PRIVATE
     blender_deps
     pugixml
+    msk::blender::ir_shim
 )
-
-target_link_libraries(blender_xml PUBLIC blender_ir_shim)
 
 target_sources(blender_xml PRIVATE xml.cpp)
