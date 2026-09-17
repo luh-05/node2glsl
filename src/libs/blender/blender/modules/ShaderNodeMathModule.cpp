@@ -40,7 +40,7 @@ TODO:
 
     if (use_clamp) {
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "A0" + sign +
-          Out::LEFT / "B0" + ")" + ";";
+          Out::LEFT / "B0" + ", " + ", 0.0, 1.0)" + ";";
     } else {
       out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
           Out::LEFT / "B0" + ";";
@@ -112,10 +112,10 @@ TODO:
     }
 
   //=======================================================output
-  TODO: // clamp falsch
+  //TODO: // clamp falsch
     if (use_clamp) {
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
-          Out::LEFT / "A0" + ")" + ")" + ";";
+          Out::LEFT / "A0" + ")" + ", 0.0, 1.0)" + ";";
     } else {
 
       out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ")" +
@@ -152,7 +152,7 @@ TODO:
 
     if (use_clamp) {
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
-          Out::LEFT / "A0" + ", " + Out::LEFT / "B0" + ")" + ")" + ";";
+          Out::LEFT / "A0" + ", " + Out::LEFT / "B0" + ")" + ", 0.0, 1.0)" + ";";
     } else {
       out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ", " +
           Out::LEFT / "B0" + ")" + ";";
@@ -172,7 +172,7 @@ TODO:
     {
       if (use_clamp) {
         out + Out::RIGHT / "Value0" + "=" + "clamp(" + "log(" +
-            Out::LEFT / "A0" + ") /" + "log(" + Out::LEFT / "B0" + ")" + ");";
+            Out::LEFT / "A0" + ") /" + "log(" + Out::LEFT / "B0" + ")" + ", 0.0. 1.0);";
       } else {
         out + Out::RIGHT / "Value0" + "=" + "log(" + Out::LEFT / "A0" + ") /" +
             "log(" + Out::LEFT / "B0" + ");";
@@ -187,7 +187,7 @@ TODO:
 
       if (use_clamp) {
         out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "C0" + ">" +
-            "(" + Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ")" + ";";
+            "(" + Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ", 0.0, 1.0)" + ";";
       } else {
         out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "C0" + ">" + "(" +
             Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ";";
