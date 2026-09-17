@@ -12,7 +12,10 @@ namespace msk::blender {
 auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
-  // Clamp Tickbox
+// Clamp Tickbox
+// vielleicht falsch? ich glaube das ist clamp_factor0
+// und vielleicht habe ich das clamp auch falsch benutzt?
+TODO:
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
   if (op_c == "ADD" || op_c == "SUBTRACT" || op_c == "MULTIPLY" ||
@@ -108,7 +111,8 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
       function = "radians(";
     }
 
-    //=======================================================output
+  //=======================================================output
+  TODO: // clamp falsch
     if (use_clamp) {
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
           Out::LEFT / "A0" + ")" + ")" + ";";
@@ -208,13 +212,14 @@ auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
 
   // left out
   else if (op_c == "SNAP") {
-  //TODO: // mayb leave out
+    // TODO: // mayb leave out
     return absl::UnimplementedError(std::format(
         "Given Operation has not been implemented yet: '{}’", op_c));
   }
 
   else {
-    return absl::InvalidArgumentError(std::format("Illegal value of operand constant: '{}'", op_c));
+    return absl::InvalidArgumentError(
+        std::format("Illegal value of operand constant: '{}'", op_c));
   }
 }
 } // namespace msk::blender
