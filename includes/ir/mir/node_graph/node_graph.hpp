@@ -24,9 +24,15 @@ public:
   // TODO: change to enum
   std::string dataType; // Data type of Port
 
-  std::shared_ptr<Connection> connection;
+  // std::vector<std::shared_ptr<Connection>> connections;
+  using ConnectionPointer = std::shared_ptr<Connection>;
+  std::variant<ConnectionPointer, std::vector<ConnectionPointer>> connection;
 
-  Port(std::string dataType) : dataType(dataType) {};
+  Port(std::string dataType, bool left) : dataType(dataType) {
+    if (!left) {
+      connection = std::vector<ConnectionPointer>();
+    }
+  };
 
   /**
    * @brief Establishes connection with another port

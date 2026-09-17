@@ -40,6 +40,7 @@
           abseil-cpp
           glm
           spdlog
+          pugixml
 
           # documentation
           doxygen

@@ -3,18 +3,35 @@
 #include <absl/status/statusor.h>
 #include <memory>
 #include <string_view>
+#include <variant>
+#include <vector>
 namespace msk::ir {
 
 // --- PORT ---
 
 auto Port::EstablishConnection(Port &other) -> absl::Status {
-  if (this->connection) {
-    auto status = absl::AlreadyExistsError("Port already has a connection!");
-    status.SetPayload("mollusk.ir/AlreadyExistsReason", absl::Cord("this"));
-
-    return status;
+  if (std::holds_alternative<std::vector<ConnectionPointer>>(
+          other.connection)) {
+    return absl::InvalidArgumentError(
+        std::format("Tried adding incoming connection to right port!"));
   }
-  if (other.connection) {
+
+  if (!std::holds_alternative<std::vector<ConnectionPointer>>(
+          this->connection)) {
+    return absl::InvalidArgumentError(
+        std::format("Tried adding outgoing connection to left port!"));
+  }
+
+  auto right_conn = std::get<std::vector<ConnectionPointer>>(this->connection);
+  auto left_conn = std::get<ConnectionPointer>(other.connection);
+
+  // if (this->connection) {
+  //   auto status = absl::AlreadyExistsError("Port already has a connection!");
+  //   status.SetPayload("mollusk.ir/AlreadyExistsReason", absl::Cord("this"));
+  //
+  //   return status;
+  // }
+  if (left_conn) {
     auto status = absl::AlreadyExistsError("Port already has a connection!");
     status.SetPayload("mollusk.ir/AlreadyExistsReason", absl::Cord("other"));
 
@@ -26,27 +43,29 @@ auto Port::EstablishConnection(Port &other) -> absl::Status {
         "Cannot establish connection between ports of differing datatypes!");
   }
 
-  this->connection = std::make_shared<Connection>(this, &other);
-  other.connection = this->connection;
+  auto c = std::make_shared<Connection>(&other, this);
+
+  right_conn.push_back(c);
+  other.connection = c;
 
   return absl::OkStatus();
 }
 
 // --- NODE ---
 
-auto addPort(Node::MapType &map, std::string_view name,
+auto addPort(Node::MapType &map, bool left, std::string_view name,
              std::string_view data_type) -> absl::Status {
   if (map.contains(name)) {
     return absl::AlreadyExistsError("Port already exists!");
   }
 
-  map[std::string(name)] = std::make_unique<Port>(std::string(data_type));
+  map[std::string(name)] = std::make_unique<Port>(std::string(data_type), left);
   return absl::OkStatus();
 }
 
 auto Node::AddLeftPort(std::string_view name, std::string_view data_type)
     -> absl::StatusOr<Port *> {
-  auto status = addPort(this->leftPorts, name, data_type);
+  auto status = addPort(this->leftPorts, true, name, data_type);
 
   if (!status.ok()) {
     return status;
@@ -56,7 +75,7 @@ auto Node::AddLeftPort(std::string_view name, std::string_view data_type)
 }
 auto Node::AddRightPort(std::string_view name, std::string_view data_type)
     -> absl::StatusOr<Port *> {
-  auto status = addPort(this->rightPorts, name, data_type);
+  auto status = addPort(this->rightPorts, false, name, data_type);
 
   if (!status.ok()) {
     return status;

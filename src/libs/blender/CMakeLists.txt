@@ -5,6 +5,8 @@ add_library(msk::blender ALIAS blender)
 
 add_library(blender_deps INTERFACE)
 
+find_package(pugixml REQUIRED)
+
 target_include_directories(blender
   PUBLIC
     ${LIBS_DIR}/blender 

@@ -1,7 +1,11 @@
 
 #include "blender/ir_shim/ir_shim.hpp"
+#include "blender/xml/xml.hpp"
+#include "ir/graph/graph.hpp"
 #include <absl/status/statusor.h>
+#include <memory>
 #include <spdlog/spdlog.h>
+#include <string>
 
 using GraphShim = msk::blender::GraphShim;
 
@@ -14,7 +18,21 @@ using GraphShim = msk::blender::GraphShim;
   auto var = *var##_s;
 
 int main() {
-  GraphShim g;
+  // GraphShim g(msk::ir::GraphContext graph_context);
+
+  msk::ir::GraphContext graph_context;
+  msk::blender::XMLParser parser;
+
+  std::string xml_text_file = "./demos/blender_graph_test/test.xml";
+  absl::Status status = parser.XMLread(xml_text_file);
+  if (!status.ok()) {
+    spdlog::error(status.ToString());
+    return 1;
+  }
+  auto gt = std::make_shared<msk::ir::GraphContext>();
+  CHECK_OK(parseTest, parser.ParseGraph("0", gt));
+
+  /*
   CHECK_OK(foo, g.AddModule(g.GetGraph(), "foo.0", "FooModule"));
   CHECK_OK(bar, g.AddSubGraph(g.GetGraph(), "bar.0"));
 
@@ -27,6 +45,6 @@ int main() {
     spdlog::error(conn_c.ToString());
     return 1;
   }
-
+  */
   return 0;
 }
