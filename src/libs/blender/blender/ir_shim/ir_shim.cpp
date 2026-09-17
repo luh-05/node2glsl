@@ -97,9 +97,9 @@ auto GraphShim::AddPort(const GraphHandle graph, Polarity p,
   return addPort(*graph.graph, p, name, data_type);
 }
 
-auto GraphShim::ConnectPorts(const PortHandle left, const PortHandle right)
+auto GraphShim::ConnectPorts(const PortHandle right, const PortHandle left)
     -> absl::Status {
-  auto status = left.port->EstablishConnection(*right.port);
+  auto status = right.port->EstablishConnection(*left.port);
 
   if (status.ok())
     return absl::OkStatus();
@@ -122,8 +122,8 @@ auto GraphShim::ConnectPorts(const PortHandle left, const PortHandle right)
                     status.ToString()));
   } else if (status.code() == absl::StatusCode::kInvalidArgument) {
     return absl::AbortedError(std::format(
-        "Port types do not match! (left: '{}', right: '{}'): {}",
-        left.port->dataType, right.port->dataType, status.ToString()));
+        "Port types do not match! (right: '{}', left: '{}'): {}",
+        right.port->dataType, left.port->dataType, status.ToString()));
   }
 
   return absl::AbortedError(std::format(
