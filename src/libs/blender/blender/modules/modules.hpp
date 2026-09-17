@@ -3,12 +3,10 @@
 #pragma once
 
 namespace msk::blender {
+
+using Out = msk::ir::Module::Out;
 /**
  *  @brief Dummy Module
  */
-class DummyModule : public ir::Module {
-public:
-  using Module::Module;
-  auto GenerateTokenString(Out &&out) -> absl::Status;
-};
+auto GenerateTokenStringDummy(Out &&out) -> absl::Status;
 } // namespace msk::blender

@@ -88,11 +88,14 @@ public:
  */
 class Module : public Node {
 public:
-  std::string type;
-
   using Token = std::unique_ptr<CodegenToken>;
 
-  Module(std::string type) : type(type) {}
+  class Out;
+  // Generates CodegenTokens
+  typedef absl::Status (*GenerateTokenString)(Out &&out);
+  GenerateTokenString impl;
+
+  Module(GenerateTokenString impl) : impl(impl) {}
 
   /**
    *  @brief Helper Class for specifying Module::GenerateTokenString(), provides
@@ -252,11 +255,6 @@ public:
       }
     };
   };
-
-  // Generates CodegenTokens
-  virtual auto GenerateTokenString(Out &&out) -> absl::Status {
-    return absl::NotFoundError("GenerateTokenString not implemented!");
-  }
 };
 inline auto operator/(Module::Out::Polarity pol, std::string_view name)
     -> Module::Out::PortFetch {
@@ -279,7 +277,7 @@ private:
   auto addNode(std::string_view name, Args... args) -> absl::StatusOr<T *>;
 
 public:
-  auto AddModule(std::string_view name, std::string_view type)
+  auto AddModule(std::string_view name, Module::GenerateTokenString impl)
       -> absl::StatusOr<Module *>;
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;

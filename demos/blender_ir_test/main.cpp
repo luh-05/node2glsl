@@ -1,3 +1,4 @@
+#include "mir/node_graph/node_graph.hpp"
 #include <blender/modules/modules.hpp>
 #include <ir/graph/graph.hpp>
 #include <iterator>
@@ -19,13 +20,13 @@ int main() {
 
   auto context_provider = std::make_shared<msk::ir::ContextProvider>(context);
 
-  auto dummy = msk::blender::DummyModule("foo");
-  spdlog::warn(dummy.id);
-  auto a = context->AddConstant(&dummy, "a", "4");
+  auto mod = msk::ir::Module(msk::blender::GenerateTokenStringDummy);
+  spdlog::warn(mod.id);
+  auto a = context->AddConstant(&mod, "a", "4");
 
   auto token_string = std::vector<msk::ir::Module::Token>();
-  if (auto status = dummy.GenerateTokenString(
-          {context_provider, std::back_inserter(token_string), dummy});
+  if (auto status =
+          mod.impl({context_provider, std::back_inserter(token_string), mod});
       !status.ok()) {
     spdlog::error(status.message());
   }

@@ -12,14 +12,13 @@ GraphShim::GraphShim(std::shared_ptr<ir::GraphContext> context) {
 }
 
 auto GraphShim::AddModule(const GraphHandle graph, std::string_view name,
-                          std::string_view type)
+                          ir::Module::GenerateTokenString type)
     -> absl::StatusOr<const ModuleHandle> {
   auto status = graph.graph->AddModule(name, type);
 
   if (!status.ok()) {
-    return absl::AbortedError(
-        std::format("Failed to add module '{}' of type '{}': {}", name, type,
-                    status.status().ToString()));
+    return absl::AbortedError(std::format("Failed to add module '{}': {}", name,
+                                          status.status().ToString()));
   }
 
   return ModuleHandle(status.value());
