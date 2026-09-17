@@ -30,7 +30,7 @@ public:
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionIntegerMathModule : public ir::Module {
+class FunctionNodeIntegerMathModule : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
