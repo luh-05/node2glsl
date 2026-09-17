@@ -15,176 +15,157 @@ namespace msk::blender {
 
 auto ShaderNodeMixModule::GenerateTokenString(Out &&out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");
-  bool use_clamp = (out.GetConstant<std::string>("clamp_factor0") == "True");
-  auto factorMode  = out.GetConstant<std::string>("factor_mode0");
-  bool clamp_result = (out.GetConstant<std::string> ("clamp_result0")=="True");
+  bool clamp_factor = (out.GetConstant<std::string>("clamp_factor0") == "True");
+  auto factorMode = out.GetConstant<std::string>("factor_mode0");
+  bool clamp_result = (out.GetConstant<std::string>("clamp_result0") == "True");
+  auto blend_type = (out.GetConstant<std::string>("blend_type0"));
+
   // ich habe die naming conventions vergessen
   /*
 man nehme die mix funktion von glsl
 glsl: result = x * ( 1-a ) + y * a
 */
 
-/*
-A0 = Factor
-B0 = A
-C0 = b*/
-  clamp_result 
+  /*
+  A0 = Factor
+  B0 = A
+  C0 = b*/
+
   if (dataType == "FLOAT") {
-    
-    if(use_clamp){
-    out + Out::RIGHT / "Value0" + "=" 
-    + "mix("
-    + Out::LEFT / "B0" + ", "
-    + Out::LEFT / "C0" + ", "
-    + "clamp("
-    + Out::LEFT / "A0" + "," + "0.0" + ", " + "1.0" + ")" + ")"
-    + ";";
-    
-    }
-    else{
-      out + Out::RIGHT / "Value0" + "=" 
-    + "mix("
-    + Out::LEFT / "B0" + ", "
-    + Out::LEFT / "C0" + ", "
-    + Out::LEFT / "A0" + ";";
-    }
 
-  } 
-  else if (dataType == "VECTOR") {
-      // if(factorMode == "UNIFORM"){
-
-      // }
-      // else if (factorMode == TBA ){
-
-      // }
-      // else {
-
-      // }
-    if(use_clamp){
-      out + Out::RIGHT / "Value0" + "=" 
-      + "mix("
-      + Out::LEFT / "B0" + ", "
-      + Out::LEFT / "C0" + ", "
-      + "clamp("
-      + Out::LEFT / "A0" + "," + "0.0" + ", " + "1.0" + ")"
-      + ";";
-    
-    }
-    else{
-      out + Out::RIGHT / "Value0" + "=" 
-      + "mix("
-      + Out::LEFT / "B0" + ", "
-      + Out::LEFT / "C0" + ", "
-      + Out::LEFT / "A0" + ";";
-    }
-  } else if(dataType == "RGBA")//COLOR 
-  {
-    if(clamp_result){
-
-    }
-    else{
-
+    if (clamp_factor) {
+      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+          Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
+          ", " + "1.0" + ")" + ")" + ";";
+    } else {
+      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+          Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
     }
   }
 
-    else if (dataType == "ROTATION")//vllt nicht glsl fähig direkt
-    {
+  else if (dataType == "VECTOR") {
+//TODO: Uniform / Non Uniform
+    if (clamp_factor) {
+      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+          Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
+          ", " + "1.0" + ")" + ";";
 
-
+    } else {
+      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+          Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
     }
 
-    else {
-      
+    return out.GetStatus();
+  }
+
+  else if (dataType == "RGBA") // COLOR
+  /*macht blender das automatisch zu einem vektor?*/
+  {
+    return absl::UnimplementedError(
+        std::format("Not yet implemented: {}", dataType));
+  }
+
+  else if (dataType == "ROTATION") // vllt nicht glsl fähig direkt
+  {
+    
+    return absl::UnimplementedError(
+        std::format("Not yet implemented: {}", dataType));
+  }
+
+  else {
+
     // throw falscher input fehler
     return absl::InvalidArgumentError(
-        std::format("Illegal value of data type constant: '{}'", dataType));}
+        std::format("Illegal value of data type constant: '{}'", dataType));
   }
-
-  // std::string portFactor = (factorMode == "NON_UNIFORM") ? "Factor1" :
-  // "Factor0";
-
-  // Result assignment start
-  // out.legacy->AddTokenVector({
-  //     WildcardToken(Out::RIGHT, "Result0"),
-  //     TextToken(" = ")
-  // });
-
-  if (clampResult == "True") {
-    // out.legacy->AddTokenVector({ TextToken("clamp(") });
-  }
-
-  // Mix function call start
-  // out.legacy->AddTokenVector({
-  //     TextToken("mix("),
-  //     WildcardToken(Out::LEFT, portA),
-  //     TextToken(", ")
-  // });
-
-  // Blended value (second argument of mix)
-  if (blendType == "MIX") {
-    // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portB) });
-  } else {
-    std::string prefix = "";
-    std::string infix = "";
-    std::string suffix = "";
-
-    if (blendType == "DARKEN") {
-      prefix = "min(";
-      infix = ", ";
-      suffix = ")";
-    } else if (blendType == "LIGHTEN") {
-      prefix = "max(";
-      infix = ", ";
-      suffix = ")";
-    } else if (blendType == "MULTIPLY") {
-      infix = " * ";
-    } else if (blendType == "SCREEN") {
-      prefix = "(vec4(1.0) - (vec4(1.0) - ";
-      infix = ") * (vec4(1.0) - ";
-      suffix = "))";
-    } else if (blendType == "DODGE") {
-      infix = " / (vec4(1.0) - ";
-      suffix = ")";
-    } else if (blendType == "BURN") {
-      prefix = "(vec4(1.0) - (vec4(1.0) - ";
-      infix = ") / ";
-      suffix = ")";
-    }
-
-    if (!prefix.empty()) {
-      // out.legacy->AddTokenVector({ TextToken(prefix) });
-    }
-    // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portA) });
-    // out.legacy->AddTokenVector({ TextToken(infix) });
-    // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portB) });
-    if (!suffix.empty()) {
-      // out.legacy->AddTokenVector({ TextToken(suffix) });
-    }
-  }
-
-  // Factor parameter (third argument of mix)
-  // out.legacy->AddTokenVector({ TextToken(", ") });
-
-  if (clampFactor == "True") {
-    // out.legacy->AddTokenVector({
-    //     TextToken("clamp("),
-    //     WildcardToken(Out::LEFT, portFactor),
-    //     TextToken(", 0.0, 1.0)")
-    // });
-  } else {
-    // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portFactor) });
-  }
-
-  // out.legacy->AddTokenVector({ TextToken(")") });
-
-  // Close statement and optional result clamping
-  if (clampResult == "True") {
-    // out.legacy->AddTokenVector({ TextToken(", 0.0, 1.0);") });
-  } else {
-    // out.legacy->AddTokenVector({ TextToken(";") });
-  }
-
-  return out.GetStatus();
 }
+
+// std::string portFactor = (factorMode == "NON_UNIFORM") ? "Factor1" :
+// "Factor0";
+
+// Result assignment start
+// out.legacy->AddTokenVector({
+//     WildcardToken(Out::RIGHT, "Result0"),
+//     TextToken(" = ")
+// });
+
+// if (clampResult == "True") {
+//   // out.legacy->AddTokenVector({ TextToken("clamp(") });
+// }
+
+// Mix function call start
+// out.legacy->AddTokenVector({
+//     TextToken("mix("),
+//     WildcardToken(Out::LEFT, portA),
+//     TextToken(", ")
+// });
+
+// Blended value (second argument of mix)
+// if (blendType == "MIX") {
+//   // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portB) });
+// } else {
+//   std::string prefix = "";
+//   std::string infix = "";
+//   std::string suffix = "";
+
+//   if (blendType == "DARKEN") {
+//     prefix = "min(";
+//     infix = ", ";
+//     suffix = ")";
+//   } else if (blendType == "LIGHTEN") {
+//     prefix = "max(";
+//     infix = ", ";
+//     suffix = ")";
+//   } else if (blendType == "MULTIPLY") {
+//     infix = " * ";
+//   } else if (blendType == "SCREEN") {
+//     prefix = "(vec4(1.0) - (vec4(1.0) - ";
+//     infix = ") * (vec4(1.0) - ";
+//     suffix = "))";
+//   } else if (blendType == "DODGE") {
+//     infix = " / (vec4(1.0) - ";
+//     suffix = ")";
+//   } else if (blendType == "BURN") {
+//     prefix = "(vec4(1.0) - (vec4(1.0) - ";
+//     infix = ") / ";
+//     suffix = ")";
+//   }
+
+//   if (!prefix.empty()) {
+//     // out.legacy->AddTokenVector({ TextToken(prefix) });
+//   }
+//   // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portA) });
+//   // out.legacy->AddTokenVector({ TextToken(infix) });
+//   // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portB) });
+//   if (!suffix.empty()) {
+//     // out.legacy->AddTokenVector({ TextToken(suffix) });
+//   }
+// }
+
+// // Factor parameter (third argument of mix)
+// // out.legacy->AddTokenVector({ TextToken(", ") });
+
+// if (clampFactor == "True") {
+//   // out.legacy->AddTokenVector({
+//   //     TextToken("clamp("),
+//   //     WildcardToken(Out::LEFT, portFactor),
+//   //     TextToken(", 0.0, 1.0)")
+//   // });
+// } else {
+//   // out.legacy->AddTokenVector({ WildcardToken(Out::LEFT, portFactor) });
+// }
+
+// // out.legacy->AddTokenVector({ TextToken(")") });
+
+// // Close statement and optional result clamping
+// if (clampResult == "True") {
+//   // out.legacy->AddTokenVector({ TextToken(", 0.0, 1.0);") });
+// } else {
+//   // out.legacy->AddTokenVector({ TextToken(";") });
+// }
+
+// return out.GetStatus();
+
+
 
 } // namespace msk::blender
