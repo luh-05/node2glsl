@@ -34,6 +34,7 @@ target_link_libraries(mollusk_core
     core_deps
   PUBLIC
     msk::include
+    msk::eval_strats
 )
 
-
+add_subdirectory(mollusk/evaluation_strategies)

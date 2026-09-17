@@ -266,14 +266,15 @@ inline auto operator/(Module::Out::Polarity pol, std::string_view name)
   return {pol, name};
 }
 
+class Graph;
 /**
  * @brief Graph Node
  */
 class Graph : public Node {
 private:
-  using VariantType =
+  using SubnodesMapVariant =
       std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
-  using MapType = std::map<std::string, VariantType, std::less<>>;
+  using MapType = std::map<std::string, SubnodesMapVariant, std::less<>>;
 
   MapType subnodes;
 
@@ -286,9 +287,8 @@ public:
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;
 
-  inline auto GetSubnodes() -> MapType::const_iterator {
-    return subnodes.begin();
-  }
+  inline auto GetSubnodesIt() -> MapType::iterator { return subnodes.begin(); }
+  inline auto GetSubnodesItEnd() -> MapType::iterator { return subnodes.end(); }
 };
 
 /**
