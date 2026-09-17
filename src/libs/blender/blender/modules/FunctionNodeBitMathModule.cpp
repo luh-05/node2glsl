@@ -42,8 +42,9 @@ auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   }
 
   if (op_c == "SHIFT" || "ROTATE") {
-
     std::string function;
+
+    //FIXME: Implement GLSL Helperfunction
 
     if (op_c == "SHIFT") {
       function = "glsl_shift(";
