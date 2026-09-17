@@ -1,5 +1,6 @@
 #pragma once
 // #include "mir/codegen.hpp"
+#include "mir/codegen.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -15,6 +16,7 @@
 #include <string_view>
 #include <tuple>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace msk::ir {
@@ -46,7 +48,9 @@ public:
   auto EstablishConnection(Port &other) -> absl::Status;
 };
 
-class CodegenToken; // pimpl
+class TextToken;     // pimpl
+class WildcardToken; // pimpl
+using CodegenToken = std::variant<TextToken, WildcardToken>;
 /**
  * @brief Node representation in Graph
  */
@@ -88,7 +92,8 @@ public:
  */
 class Module : public Node {
 public:
-  using Token = std::unique_ptr<CodegenToken>;
+  // using Token = std::unique_ptr<CodegenToken>;
+  using Token = CodegenToken;
 
   class Out;
   // Generates CodegenTokens
@@ -98,7 +103,7 @@ public:
   Module(GenerateTokenString impl) : impl(impl) {}
 
   /**
-   *  @brief Helper Class for specifying Module::GenerateTokenString(), provides
+   *  @brief Helper Class for specifying Module::GenerateTokenString, provides
    * a mini DSL
    */
   class Out {
@@ -110,16 +115,16 @@ public:
     enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
 
   private:
-    std::shared_ptr<ContextProvider> cxt;
+    std::shared_ptr<ContextProvider> ctx;
 
-    ContextProvider *GetContext() { return cxt.get(); };
+    ContextProvider *GetContext() { return ctx.get(); };
 
     absl::Status status = absl::OkStatus();
     std::string text_buff;
 
     bool checkPort(Polarity p, std::string name, Node::MapType *&map);
-    auto createWildcardToken(std::string_view name, Node::MapType *&map)
-        -> std::unique_ptr<CodegenToken>;
+    // auto createWildcardToken(std::string_view name, Node::MapType *&map)
+    //     -> std::unique_ptr<CodegenToken>;
 
   public:
     using Inserter = std::back_insert_iterator<std::vector<Token>>;
@@ -128,7 +133,7 @@ public:
     std::unique_ptr<Legacy> legacy;
 
     Out(std::shared_ptr<ContextProvider> cxt, Inserter it, Module &parent)
-        : cxt(cxt), it(it), parent(parent) {
+        : ctx(cxt), it(it), parent(parent) {
       this->legacy = std::make_unique<Legacy>(*this);
     };
     ~Out() noexcept {
@@ -151,7 +156,7 @@ public:
      * no further codegen will be possible from this object
      */
     template <class T> auto GetConstant(std::string_view name) -> T {
-      if (auto s = cxt->GetConstant<T>(static_cast<Node *>(&parent), name);
+      if (auto s = ctx->GetConstant<T>(static_cast<Node *>(&parent), name);
           !s.ok()) {
         if (this->status.ok())
           this->status = s.status();
@@ -265,12 +270,11 @@ inline auto operator/(Module::Out::Polarity pol, std::string_view name)
  * @brief Graph Node
  */
 class Graph : public Node {
-public:
+private:
   using VariantType =
       std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
   using MapType = std::map<std::string, VariantType, std::less<>>;
 
-private:
   MapType subnodes;
 
   template <class T, class... Args>
@@ -281,6 +285,10 @@ public:
       -> absl::StatusOr<Module *>;
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;
+
+  inline auto GetSubnodes() -> MapType::const_iterator {
+    return subnodes.begin();
+  }
 };
 
 /**

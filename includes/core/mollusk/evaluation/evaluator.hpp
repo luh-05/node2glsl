@@ -1,26 +1,29 @@
 #pragma once
 
-#include "ir/graph/graph.hpp"
-#include "mir/codegen.hpp"
-#include "mir/node_graph/node_graph.hpp"
+#include "mir/node_graph/GraphContext.hpp"
 #include <memory>
 #include <vector>
 namespace msk {
 
-class Evaluator {
+class EvaluationStrategy {
 private:
-  using GraphPointer = std::shared_ptr<ir::Graph>;
-  using ContextPointer = std::shared_ptr<ir::GraphContext>;
-  GraphPointer graph;
-  ContextPointer context;
-
-  using TokenVector = std::vector<ir::CodegenToken>;
+  using TokenVector = std::vector<msk::ir::Module::Token>;
   TokenVector tokens;
 
-  // auto GenerateTokens()
 public:
-  Evaluator(GraphPointer graph, ContextPointer context)
-      : graph(graph), context(context) {}
+  EvaluationStrategy() { tokens = TokenVector(); };
+};
+
+class Evaluator {
+private:
+  using ContextPointer = std::shared_ptr<ir::GraphContext>;
+  ContextPointer context;
+
+  EvaluationStrategy strat;
+
+public:
+  Evaluator(ContextPointer context, EvaluationStrategy strat)
+      : context(context), strat(strat) {}
 
   auto Evaluate(std::string &out) -> absl::Status;
 };

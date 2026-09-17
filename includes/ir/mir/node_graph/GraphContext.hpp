@@ -7,6 +7,10 @@
 #pragma once
 
 namespace msk::ir {
+/*
+ * @brief Store for constants. Internally stores std::strings, but converts to
+ * templated type on retrieval
+ */
 class ConstantStore {
 private:
   std::map<Node *, std::flat_map<std::string, std::string, std::less<>>> map;
@@ -76,6 +80,10 @@ public:
   }
 };
 
+/*
+ * @brief Holds all context associated with a graph including ownership of the
+ * Graph itself
+ */
 class GraphContext {
 public:
   std::unique_ptr<ir::Graph> graph;
