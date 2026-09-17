@@ -6,6 +6,7 @@ target_link_libraries(blender_xml
     blender_deps
     pugixml
     msk::blender::ir_shim
+    msk::blender::modules
 )
 
 target_sources(blender_xml PRIVATE xml.cpp)

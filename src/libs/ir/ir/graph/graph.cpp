@@ -120,9 +120,9 @@ auto Graph::addNode(std::string_view name, Args... args)
   return node_status.value();
 }
 
-auto Graph::AddModule(std::string_view name, std::string_view type)
+auto Graph::AddModule(std::string_view name, Module::GenerateTokenString impl)
     -> absl::StatusOr<Module *> {
-  return this->addNode<Module>(name, std::string(type));
+  return this->addNode<Module>(name, impl);
 }
 
 auto Graph::AddGraph(std::string_view name) -> absl::StatusOr<Graph *> {

@@ -20,8 +20,7 @@ int main() {
 
   auto context_provider = std::make_shared<msk::ir::ContextProvider>(context);
 
-  auto mod = msk::ir::Module("foo");
-  mod.impl = msk::blender::GenerateTokenStringDummy;
+  auto mod = msk::ir::Module(msk::blender::GenerateTokenStringDummy);
   spdlog::warn(mod.id);
   auto a = context->AddConstant(&mod, "a", "4");
 
