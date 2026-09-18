@@ -90,21 +90,15 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out) -> absl::Status {
     out + "}";
 
     return out.GetStatus();
-
   }
 
   else if (op_c == "LCM") {
     out + "{";
-
     out + "int lcm_a = abs(" + Out::LEFT / "Value0" + ");";
-
     out + "int lcm_b = abs(" + Out::LEFT / "Value1" + ");";
-
     out + "int lcm_x = lcm_a;" + "int lcm_y = lcm_b;";
-
     out + "while (lcm_y != 0) {" + "int lcm_tmp = lcm_x % lcm_y;" +
         "lcm_x = lcm_y;" + "lcm_y = lcm_tmp;" + "}";
-
     out + Out::RIGHT / "Value3" +
         " = (lcm_x == 0) ? 0 : abs((lcm_a / lcm_x) * lcm_b);";
     out + "}";
