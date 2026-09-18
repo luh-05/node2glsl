@@ -40,25 +40,65 @@ auto FunctionNodeBitMath::GenerateTokenString(Out &&out) -> absl::Status {
 
     return out.GetStatus();
   }
+  
+  if (op_c == "SHIFT") {
+    out + "if (" + Out::LEFT / "Shift0" + " > 0) {"
+        + Out::RIGHT / "Value0"
+        + "="
+        + Out::LEFT / "A0"
+        + "<<"
+        + Out::LEFT / "Shift0"
+        + ";"
+        + "}"
+        + "else if (" + Out::LEFT / "Shift0" + " < 0) {"
+        + Out::RIGHT / "Value0"
+        + "="
+        + Out::LEFT / "A0"
+        + ">>(-"
+        + Out::LEFT / "Shift0"
+        + ");"
+        + "}"
+        + "else {"
+        + Out::RIGHT / "Value0"
+        + "="
+        + Out::LEFT / "A0"
+        + ";"
+        + "}";
 
-  if (op_c == "SHIFT" || "ROTATE") {
-    std::string function;
+    return out.GetStatus();
+  }
 
-    // FIXME: Implement GLSL Helperfunction
-
-    if (op_c == "SHIFT") {
-      function = "glsl_shift(";
-    } else if (op_c == "ROTATE") {
-      function = "glsl_rotate(";
-    }
-
-    out + Out::RIGHT / "Value0" 
+  if (op_c == "ROTATE") {
+    out + "if (" + Out::LEFT / "Shift0" + " > 0) {"
+      + Out::RIGHT / "Value0"
       + "="
-      + function
-      + Out::LEFT / "A0"
-      + ","
+      + "(" + Out::LEFT / "A0"
+      + "<<"
       + Out::LEFT / "Shift0"
-      + ");";
+      + ") | ("
+      + Out::LEFT / "A0"
+      + ">> (32 - "
+      + Out::LEFT / "Shift0"
+      + "));"
+      + "}"
+      + "else if (" + Out::LEFT / "Shift0" + " < 0) {"
+      + Out::RIGHT / "Value0"
+      + "="
+      + "(" + Out::LEFT / "A0"
+      + ">> (-"
+      + Out::LEFT / "Shift0"
+      + ")) | ("
+      + Out::LEFT / "A0"
+      + "<< (32 + "
+      + Out::LEFT / "Shift0"
+      + "));"
+      + "}"
+      + "else {"
+      + Out::RIGHT / "Value0"
+      + "="
+      + Out::LEFT / "A0"
+      + ";"
+      + "}";
 
     return out.GetStatus();
   }
