@@ -72,7 +72,7 @@ public:
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderMathMixModule : public ir::Module {
+class ShaderNodeMixModule : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
