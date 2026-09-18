@@ -4,16 +4,20 @@
 #include <absl/status/statusor.h>
 #include <array>
 #include <memory>
-#include <mir/codegen.hpp>
 #include <string>
+#include <mir/codegen.hpp>
 
 namespace msk::blender {
 
 auto ShaderNodeFloatCurve::GenerateTokenString(Out &&out) -> absl::Status {
-
+  
   // FIXME: implement GLSL Helperfunction
-  out + Out::RIGHT / "Value1" + " = evaluate_float_curve(" +
-      Out::LEFT / "Value0" + ", " + Out::LEFT / "Factor0" + ");";
+  out + Out::RIGHT / "Value1"
+      + " = evaluate_float_curve("
+      + Out::LEFT / "Value0"
+      + ", "
+      + Out::LEFT / "Factor0"
+      + ");";
 
   return out.GetStatus();
 }
