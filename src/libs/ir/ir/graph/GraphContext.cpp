@@ -33,39 +33,4 @@ auto ConstantStore::AddConstant(Node *node, std::string_view name,
 ContextProvider::ContextProvider(std::shared_ptr<GraphContext> context) {
   this->context = context;
 }
-
-// template <class T> auto Module::Out::GetConstant(std::string_view name) -> T
-// {
-//   if (auto s = cxt->GetConstant<T>(static_cast<Node *>(&parent), name);
-//       !s.ok()) {
-//     if (this->status.ok())
-//       this->status = s.status();
-//     return {};
-//   } else
-//     return s.value();
-//   // return (T)0;
-// }
-// template auto Module::Out::GetConstant<uint64_t>(std::string_view name)
-//     -> uint64_t;
-// template auto Module::Out::GetConstant<uint32_t>(std::string_view name)
-//     -> uint32_t;
-// template auto Module::Out::GetConstant<uint16_t>(std::string_view name)
-//     -> uint16_t;
-// template auto Module::Out::GetConstant<uint8_t>(std::string_view name)
-//     -> uint8_t;
-// template auto Module::Out::GetConstant<int64_t>(std::string_view name)
-//     -> int64_t;
-// template auto Module::Out::GetConstant<int32_t>(std::string_view name)
-//     -> int32_t;
-// template auto Module::Out::GetConstant<int16_t>(std::string_view name)
-//     -> int16_t;
-// template auto Module::Out::GetConstant<int8_t>(std::string_view name) ->
-// int8_t; template auto Module::Out::GetConstant<float>(std::string_view name)
-// -> float; template auto Module::Out::GetConstant<double>(std::string_view
-// name) -> double; template auto
-// Module::Out::GetConstant<std::string>(std::string_view name)
-//     -> std::string;
-// template auto Module::Out::GetConstant<const char *>(std::string_view name)
-//     -> const char *;
-
 } // namespace msk::ir
