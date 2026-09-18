@@ -68,7 +68,7 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out) -> absl::Status {
   }
 
   else if (op_c == "GCD") {
-    
+
 
     out + "{";
     out + "if(" + Out::LEFT / "Value0" + "= 0 or" + Out::LEFT / "Value1" +
@@ -88,6 +88,8 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out) -> absl::Status {
     out + "}";
     out + Out::RIGHT / "Value3" + "= result;";
     out + "}";
+
+    return out.GetStatus();
 
   }
 
