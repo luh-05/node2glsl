@@ -147,6 +147,8 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out)
 
   else if (op_c == "GCD" || op_c == "LCM") {
     // FIXME: Implement GLSL Helperfunctions
+
+      if(op_c == "LCM"){
     std::string func_name = (op_c == "GCD") ? "integer_gcd" : "integer_lcm";
     out + Out::RIGHT / "Value3"
         + " = "
@@ -156,6 +158,26 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out)
         + ", "
         + Out::LEFT / "Value1"
         + ");";
+      }
+        else{
+          /*was in code in glsl muss:*/
+          /*
+          int findGCD(int A0, int B0){
+            if(A0 = 0 or B0 = 0){
+            return max(A0, B0);
+            }
+            int result = min(A0, B0);
+
+            while (result>0){
+              if(mod(A0,result)==0 && mod(B0,result)==0){
+                break;
+                }
+                result--;
+            }
+            C0 = 
+          }
+            */
+        }
   } 
   else if (op_c == "LCM") {
     out + "{";

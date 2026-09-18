@@ -26,6 +26,7 @@ auto FunctionNodeHashValue::GenerateTokenString(Out &&out) -> absl::Status {
   }
 
   // FIXME: Implement GLSL Helper Function
+  // GLSL does not have hash function?
 
   out + Out::RIGHT / "Hash0"
     + " = " + glsl_func + "(" 
