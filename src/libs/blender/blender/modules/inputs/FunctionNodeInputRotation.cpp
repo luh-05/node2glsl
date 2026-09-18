@@ -10,9 +10,18 @@
 namespace msk::blender {
 
 auto FunctionNodeInputRotation::GenerateTokenString(Out &&out) -> absl::Status {
- // auto rotation_var = out.GetConstant<class T>(std::string_view name)
+  auto rotation_var = out.GetConstant<std::string>("");
 
-  //out + Out
+
+  out + Out::RIGHT / "Rotation0"
+    + "= vec3("
+    + Out::LEFT / "Value0"
+    + ","
+    + Out::LEFT / "Value1"
+    + ","
+    + Out::LEFT / "Value2"
+    + ");";
+
   return out.GetStatus();
 }
 
