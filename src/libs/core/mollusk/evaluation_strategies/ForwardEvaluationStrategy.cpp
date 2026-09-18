@@ -9,20 +9,29 @@
 #include <memory>
 namespace msk {
 
-auto ForwardEvaluationStrategy::evalGraph(ir::GraphContext &cxt,
-                                          ir::Graph &graph) -> absl::Status {
-  for (auto it = cxt.graph->GetSubnodesIt();
-       it != cxt.graph->GetSubnodesItEnd(); it++) {
+auto ForwardEvaluationStrategy::evalGraph(ContextPointer cxt, ir::Graph &graph)
+    -> absl::Status {
+  for (auto it = cxt->graph->GetSubnodesIt();
+       it != cxt->graph->GetSubnodesItEnd(); it++) {
     auto value = &it->second;
 
-    if (auto *g = std::get_if<std::unique_ptr<ir::Graph>>(value)->get()) {
-      if (auto s = evalGraph(cxt, *g); !s.ok()) {
-        return s;
+    if (auto *g = std::get_if<std::unique_ptr<ir::Graph>>(value)) {
+      if (g) {
+        if (auto s = evalGraph(cxt, *g->get()); !s.ok()) {
+          return s;
+        }
+      } else {
+        return absl::NotFoundError(
+            std::format("The graph '{}', is nullptr!", it->first));
       }
-    } else if (auto *m =
-                   std::get_if<std::unique_ptr<ir::Module>>(value)->get()) {
-      if (auto s = evalModule(cxt, *m); !s.ok()) {
-        return s;
+    } else if (auto *m = std::get_if<std::unique_ptr<ir::Module>>(value)) {
+      if (m) {
+        if (auto s = evalModule(cxt, *m->get()); !s.ok()) {
+          return s;
+        }
+      } else {
+        return absl::NotFoundError(
+            std::format("The node '{}', is nullptr!", it->first));
       }
     } else {
       return absl::InternalError(
@@ -33,7 +42,7 @@ auto ForwardEvaluationStrategy::evalGraph(ir::GraphContext &cxt,
   return absl::OkStatus();
 }
 
-auto ForwardEvaluationStrategy::evalModule(ir::GraphContext &cxt,
+auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
                                            ir::Module &module) -> absl::Status {
   auto inserter = std::back_inserter(this->tokens);
 
@@ -49,26 +58,30 @@ auto ForwardEvaluationStrategy::evalModule(ir::GraphContext &cxt,
   return absl::OkStatus();
 }
 
-auto ForwardEvaluationStrategy::GenerateTokens(ir::GraphContext &cxt)
+auto ForwardEvaluationStrategy::GenerateTokens(ContextPointer cxt)
     -> absl::Status {
-  if (auto s = this->evalGraph(cxt, *cxt.graph.get()); !s.ok()) {
+  this->cxt_prov = std::make_shared<ir::ContextProvider>(cxt);
+  if (auto s = this->evalGraph(cxt, *cxt->graph.get()); !s.ok()) {
     return s;
   }
   return absl::OkStatus();
 }
 
-auto ForwardEvaluationStrategy::EvaluateTokens(ir::GraphContext &cxt,
+auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
                                                std::string &out)
     -> absl::Status {
-
   for (auto it = tokens.begin(); it != tokens.end(); it++) {
-    static int i = 0;
+    // static int i = 0;
     auto token = &*it;
     std::string token_string;
     if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
       token_string = t->GetString();
     } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
       token_string = t->GetString();
+    } else {
+      return absl::InvalidArgumentError(
+          std::format("Invalid Token Type in Token Evaluation: '{}'",
+                      typeid(token).name()));
     }
     out += token_string;
   }
