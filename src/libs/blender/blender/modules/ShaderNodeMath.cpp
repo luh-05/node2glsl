@@ -49,7 +49,7 @@ TODO:
     return out.GetStatus();
   }
 
-  // Power & Logarithmic //alle mit clamp!
+  
 
   // alle mit function und einer variable
 
@@ -111,8 +111,6 @@ TODO:
       function = "radians(";
     }
 
-  //=======================================================output
-  //TODO: // clamp falsch
     if (use_clamp) {
       out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
           Out::LEFT / "A0" + ")" + ", 0.0, 1.0)" + ";";
@@ -123,8 +121,7 @@ TODO:
     }
     return out.GetStatus();
 
-    //=================================================================end
-    // output
+  
   }
 
   // alle mit function und 2 variablen
@@ -134,14 +131,14 @@ TODO:
 
     if (op_c == "POWER") // pow(x,y) = x^y A = base B = exponent
     {
-      // log2(x)
       function = "pow(";
     }
 
     else if (op_c == "MINIMUM") // min(x,y)
     {
       function = "min(";
-    } else if (op_c == "MAXIMUM") // max(x,y)
+    }
+    else if (op_c == "MAXIMUM") // max(x,y)
     {
       function = "max(";
     }
@@ -161,8 +158,8 @@ TODO:
     return out.GetStatus();
   }
 
-  // alle ganz funky (logarithm...)
-  // funky mit mehreren variablen und kram
+
+  // alle die ganz anders aufgebaut sind
 
   else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
@@ -183,15 +180,20 @@ TODO:
       /*The compare node outputs either 0 or 1.
       It outputs 1 if the difference of the two input values are less than
       epsilon. Used to check if two values are equal within a certain
-      tolerance.*/
+      tolerance.
+      A0 = Epsilon
+      B0, C0 = Inputs to be compared
+
+      abs(B0-C0)<=A0
+      */
 
       if (use_clamp) {
-        out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "C0" + ">" +
-            "(" + Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ", 0.0, 1.0)" + ";";
+        out + Out::RIGHT / "Value0" + "=" + "clamp(float(abs(" + Out::LEFT / "B0" + 
+        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "A0" + "), 0.0, 1.0)" + ";";
       } else {
-        out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "C0" + ">" + "(" +
-            Out::LEFT / "A0" + "-" + Out::LEFT / "B0" + ")" + ";";
-      }
+        out + Out::RIGHT / "Value0" + "=" + "float(abs(" + Out::LEFT / "B0" + 
+        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "A0" + ")" + ";";
+}
     }
 
     else if (op_c == "MULTIPLY_ADD") {
@@ -212,11 +214,10 @@ TODO:
 
   // left out
   else if (op_c == "SNAP") {
-    // TODO: // mayb leave out
+
     return absl::UnimplementedError(std::format(
         "Given Operation has not been implemented yet: '{}’", op_c));
   }
-
   else {
     return absl::InvalidArgumentError(
         std::format("Illegal value of operand constant: '{}'", op_c));
