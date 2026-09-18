@@ -31,6 +31,5 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
 
   return out.GetStatus();
 }
-#undef TextToken
-#undef WildcardToken
+
 } // namespace msk::blender

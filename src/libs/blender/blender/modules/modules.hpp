@@ -78,4 +78,33 @@ public:
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
+class FunctionNodeInputBool : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
+
+class FunctionNodeInputInt : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
+
+class FunctionNodeInputRotation : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
+
+class FunctionNodeInputVector : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
+
+class ShaderNodeValue : public ir::Module {
+public:
+  using Module::Module;
+  auto GenerateTokenString(Out &&out) -> absl::Status;
+};
 } // namespace msk::blender
