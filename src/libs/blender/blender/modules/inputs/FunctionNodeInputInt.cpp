@@ -1,0 +1,19 @@
+#include "blender/modules/modules.hpp"
+#include "mir/node_graph/node_graph.hpp"
+#include <absl/status/status.h>
+#include <absl/status/statusor.h>
+#include <array>
+#include <memory>
+#include <mir/codegen.hpp>
+
+namespace msk::blender {
+
+auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
+  auto number = out.GetConstant<std::string>("integer0");
+
+  out + Out::RIGHT / "Integer0" + "=" + number + ";";
+
+  return out.GetStatus();
+}
+
+} // namespace msk::blender
