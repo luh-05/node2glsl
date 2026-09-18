@@ -35,11 +35,11 @@ glsl: result = x * ( 1-a ) + y * a
   if (dataType == "FLOAT") {
 
     if (clamp_factor) {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
           ", " + "1.0" + ")" + ")" + ";";
     } else {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
     }
   }
@@ -47,12 +47,12 @@ glsl: result = x * ( 1-a ) + y * a
   else if (dataType == "VECTOR") {
 TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs rauskommen
     if (clamp_factor) {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
           ", " + "1.0" + ")" + ";";
 
     } else {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
     }
 
@@ -68,14 +68,14 @@ TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs
 
   else if (dataType == "ROTATION") // vllt nicht glsl fähig direkt
   {
-    TODO: //warten auf Totos Export um zu gucken wie viele Inputs das hat
+   
     if (clamp_factor) {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
           ", " + "1.0" + ")" + ";";
 
     } else {
-      out + Out::RIGHT / "Value0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
     }
 
