@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeClampModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto ShaderNodeClamp::GenerateTokenString(Out &&out) -> absl::Status {
   auto clamp_type = out.GetConstant<std::string>("clamp_type0");
 
   if (clamp_type == "MINMAX") {

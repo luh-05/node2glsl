@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeHashValueModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto FunctionNodeHashValue::GenerateTokenString(Out &&out) -> absl::Status {
   auto data_type = out.GetConstant<std::string>("data_type0");
 
   std::string glsl_func;
@@ -25,7 +25,7 @@ auto FunctionNodeHashValueModule::GenerateTokenString(Out &&out) -> absl::Status
       std::format("Unsupported data_type for Hash Value: '{}'", data_type));
   }
 
-  //FIXME: Implement GLSL Helper Function
+  // FIXME: Implement GLSL Helper Function
 
   out + Out::RIGHT / "Hash0"
     + " = " + glsl_func + "(" 

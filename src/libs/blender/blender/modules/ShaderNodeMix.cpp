@@ -13,7 +13,7 @@ namespace msk::blender {
 // #define TextToken(text) out.legacy->CreateMTT(text)
 // #define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
 
-auto ShaderNodeMixModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");
   bool clamp_factor = (out.GetConstant<std::string>("clamp_factor0") == "True");
   auto factorMode = out.GetConstant<std::string>("factor_mode0");
