@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeMathModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto ShaderNodeMath::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
 // Clamp Tickbox

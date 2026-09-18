@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto FunctionNodeBitMath::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {
@@ -44,7 +44,7 @@ auto FunctionNodeBitMathModule::GenerateTokenString(Out &&out) -> absl::Status {
   if (op_c == "SHIFT" || "ROTATE") {
     std::string function;
 
-    //FIXME: Implement GLSL Helperfunction
+    // FIXME: Implement GLSL Helperfunction
 
     if (op_c == "SHIFT") {
       function = "glsl_shift(";

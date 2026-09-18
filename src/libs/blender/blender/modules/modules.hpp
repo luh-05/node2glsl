@@ -12,67 +12,67 @@ public:
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionNodeBitMathModule : public ir::Module {
+class FunctionNodeBitMath : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionNodeCompareModule : public ir::Module {
+class FunctionNodeBooleanMath : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionNodeHashValueModule : public ir::Module {
+class FunctionNodeCompare : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionNodeIntegerMathModule : public ir::Module {
+class FunctionNodeHashValue : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class FunctionNodeFloatToIntMathModule : public ir::Module {
+class FunctionNodeIntegerMath : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeBooleanMathModule : public ir::Module {
+class FunctionNodeFloatToIntMath : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeClampModule : public ir::Module {
+class ShaderNodeClamp : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeFloatCurveModule : public ir::Module {
+class ShaderNodeFloatCurve : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeMapRangeModule : public ir::Module {
+class ShaderNodeMapRange : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeMathModule : public ir::Module {
+class ShaderNodeMath : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;
 };
 
-class ShaderNodeMixModule : public ir::Module {
+class ShaderNodeMix : public ir::Module {
 public:
   using Module::Module;
   auto GenerateTokenString(Out &&out) -> absl::Status;

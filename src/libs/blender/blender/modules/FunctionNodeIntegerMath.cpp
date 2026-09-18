@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeIntegerMathModule::GenerateTokenString(Out &&out)
+auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out)
     -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
@@ -146,7 +146,7 @@ auto FunctionNodeIntegerMathModule::GenerateTokenString(Out &&out)
   }
 
   else if (op_c == "GCD" || op_c == "LCM") {
-    //FIXME: Implement GLSL Helperfunctions
+    // FIXME: Implement GLSL Helperfunctions
     std::string func_name = (op_c == "GCD") ? "integer_gcd" : "integer_lcm";
     out + Out::RIGHT / "Value3"
         + " = "

@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeBooleanMathModule::GenerateTokenString(Out &&out)
+auto FunctionNodeBooleanMath::GenerateTokenString(Out &&out)
     -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 

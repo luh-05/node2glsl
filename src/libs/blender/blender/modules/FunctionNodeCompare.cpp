@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeCompareModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto FunctionNodeCompare::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
   auto data_type = out.GetConstant<std::string>("data_type0");
   std::string sign;
