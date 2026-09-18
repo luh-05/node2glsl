@@ -12,6 +12,7 @@ namespace msk::blender {
 
 // #define TextToken(text) out.legacy->CreateMTT(text)
 // #define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
+TODO: //Die inputs heissen überall anders
 
 auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");

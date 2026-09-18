@@ -15,7 +15,7 @@ auto ShaderNodeMath::GenerateTokenString(Out &&out) -> absl::Status {
 // Clamp Tickbox
 // vielleicht falsch? ich glaube das ist clamp_factor0
 // und vielleicht habe ich das clamp auch falsch benutzt?
-TODO:
+TODO: //die inputs heißen überall andrees
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
   if (op_c == "ADD" || op_c == "SUBTRACT" || op_c == "MULTIPLY" ||
