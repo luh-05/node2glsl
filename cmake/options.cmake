@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(CTest)
 include(FetchContent)
 
+enable_testing()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_SOURCE_DIR}/bin/debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release)
 
