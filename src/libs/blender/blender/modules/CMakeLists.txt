@@ -7,15 +7,15 @@ target_sources(
   blender_modules
   PRIVATE
     ./DummyModule.cpp
-    ./FunctionNodeBitMathModule.cpp
-    ./FunctionNodeCompareModule.cpp
-    ./FunctionNodeHashValueModule.cpp
-    ./FunctionNodeIntegerMathModule.cpp
-    ./FunctionNodeFloatToIntMathModule.cpp
-    ./ShaderNodeBooleanMathModule.cpp
-    ./ShaderNodeClampModule.cpp
-    ./ShaderNodeFloatCurveModule.cpp
-    ./ShaderNodeMapRangeModule.cpp
-    ./ShaderNodeMathModule.cpp
-    ./ShaderNodeMixModule.cpp
+    ./FunctionNodeBitMath.cpp
+    ./FunctionNodeBooleanMath.cpp
+    ./FunctionNodeCompare.cpp
+    ./FunctionNodeFloatToInt.cpp
+    ./FunctionNodeHashValue.cpp
+    ./FunctionNodeIntegerMath.cpp
+    ./ShaderNodeClamp.cpp
+    ./ShaderNodeFloatCurve.cpp
+    ./ShaderNodeMapRange.cpp
+    ./ShaderNodeMath.cpp
+    ./ShaderNodeMix.cpp
 )
