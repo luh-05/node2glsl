@@ -11,27 +11,54 @@ namespace msk {
 
 auto ForwardEvaluationStrategy::evalGraph(ContextPointer cxt, ir::Graph &graph)
     -> absl::Status {
-  for (auto it = cxt->graph->GetSubnodesIt();
-       it != cxt->graph->GetSubnodesItEnd(); it++) {
-    auto value = &it->second;
+  // for (auto it = cxt->graph->GetSubnodesIt();
+  //      it != cxt->graph->GetSubnodesItEnd(); it++) {
+  //   auto value = &it->second;
+  //
+  //   if (auto &g = std::get_if<ir::Graph>(value)) {
+  //     if (g) {
+  //       if (auto s = evalGraph(cxt, *g); !s.ok()) {
+  //         return s;
+  //       }
+  //     } else {
+  //       return absl::NotFoundError(
+  //           std::format("The graph '{}', is nullptr!", it->first));
+  //     }
+  //   } else if (auto &m = std::get_if<ir::Module>(value)) {
+  //     if (m) {
+  //       if (auto s = evalModule(cxt, m); !s.ok()) {
+  //         return s;
+  //       }
+  //     } else {
+  //       return absl::NotFoundError(
+  //           std::format("The node '{}', is nullptr!", it->first));
+  //     }
+  //   } else {
+  //     return absl::InternalError(
+  //         "Could not determine variant type to be neither Graph nor
+  //         Module!");
+  //   }
+  // }
+  auto &subnodes = *graph.GetSubnodes();
+  for (auto &[key, value] : subnodes) {
 
-    if (auto *g = std::get_if<std::unique_ptr<ir::Graph>>(value)) {
+    if (auto *g = std::get_if<ir::Graph>(&value)) {
       if (g) {
-        if (auto s = evalGraph(cxt, *g->get()); !s.ok()) {
+        if (auto s = evalGraph(cxt, *g); !s.ok()) {
           return s;
         }
       } else {
         return absl::NotFoundError(
-            std::format("The graph '{}', is nullptr!", it->first));
+            std::format("The graph '{}', is nullptr!", key));
       }
-    } else if (auto *m = std::get_if<std::unique_ptr<ir::Module>>(value)) {
+    } else if (auto *m = std::get_if<ir::Module>(&value)) {
       if (m) {
-        if (auto s = evalModule(cxt, *m->get()); !s.ok()) {
+        if (auto s = evalModule(cxt, *m); !s.ok()) {
           return s;
         }
       } else {
         return absl::NotFoundError(
-            std::format("The node '{}', is nullptr!", it->first));
+            std::format("The node '{}', is nullptr!", key));
       }
     } else {
       return absl::InternalError(

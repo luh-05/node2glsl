@@ -271,10 +271,13 @@ class Graph;
  * @brief Graph Node
  */
 class Graph : public Node {
-private:
-  using SubnodesMapVariant =
-      std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
+public:
+  using SubnodesMapVariant = std::variant<Module, Graph>;
   using MapType = std::map<std::string, SubnodesMapVariant, std::less<>>;
+
+private:
+  // using SubnodesMapVariant =
+  //     std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
 
   MapType subnodes;
 
@@ -282,6 +285,8 @@ private:
   auto addNode(std::string_view name, Args... args) -> absl::StatusOr<T *>;
 
 public:
+  Graph() {}
+
   auto AddModule(std::string_view name, Module::GenerateTokenString impl)
       -> absl::StatusOr<Module *>;
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
@@ -289,6 +294,7 @@ public:
 
   inline auto GetSubnodesIt() -> MapType::iterator { return subnodes.begin(); }
   inline auto GetSubnodesItEnd() -> MapType::iterator { return subnodes.end(); }
+  inline auto GetSubnodes() -> MapType * { return &this->subnodes; }
 };
 
 /**

@@ -109,7 +109,7 @@ auto Graph::addNode(std::string_view name, Args... args)
     return absl::AlreadyExistsError("Node already exists!");
   }
 
-  this->subnodes[std::string(name)] = std::make_unique<T>(args...);
+  this->subnodes.emplace(std::string(name), T(args...));
 
   auto node_status = this->GetNode<T>(name);
 
@@ -135,9 +135,8 @@ auto Graph::GetNode(std::string_view name) -> absl::StatusOr<T *> {
     return absl::NotFoundError("Node not found!");
   }
 
-  if (auto *node = std::get_if<std::unique_ptr<T>>(
-          &this->subnodes.at(std::string(name)))) {
-    return node->get();
+  if (auto *node = std::get_if<T>(&this->subnodes.at(std::string(name)))) {
+    return node;
   }
 
   return absl::InvalidArgumentError("Node found but type doesn't match!");

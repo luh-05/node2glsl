@@ -16,7 +16,7 @@ using GraphShim = msk::blender::GraphShim;
     spdlog::error(var##_s.status().ToString());                                \
     return 1;                                                                  \
   }                                                                            \
-  auto var = *var##_s;
+  auto var = var##_s.value();
 
 int main() {
   // GraphShim g(msk::ir::GraphContext graph_context);

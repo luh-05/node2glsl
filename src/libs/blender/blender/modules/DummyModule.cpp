@@ -12,7 +12,8 @@ namespace msk::blender {
 #define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
 auto GenerateTokenStringDummy(Out &&out) -> absl::Status {
   // const uint32_t a = out.GetConstant<uint32_t>(std::string("a"));
-  auto a = out.GetConstant<uint32_t>("a");
+  // auto a = out.GetConstant<uint32_t>("a");
+  auto a = 4;
   // auto b = out.GetConstant<bool>("b");
   // auto c = out.GetConstant<uint32_t>("foo");
 
