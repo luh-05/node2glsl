@@ -163,7 +163,7 @@ TODO:
 
   else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
-    if (op_c == "LOGARITHM") // es gibt nur natürlichen logarithmus und log2
+    if (op_c == "LOGARITHM") // es gibt nur natürlichen logarithmus und log2 in glsl
     /*log_b(x) = log_2(x) / log_2(b)
     bzw log_b(x) = log(x) / log(b)*/
     {
