@@ -166,15 +166,15 @@ auto FunctionNodeIntegerMath::GenerateTokenString(Out &&out)
             if(A0 = 0 or B0 = 0){
             return max(A0, B0);
             }
-            int min = min(A0, B0);
+            int result = min(A0, B0);
 
-            while (min>0){
-              if(mod(A0,min)==0 && mod(B0,min)==0){
+            while (result>0){
+              if(mod(A0,result)==0 && mod(B0,result)==0){
                 break;
                 }
-                
+                result--;
             }
-                return min;
+            C0 = 
           }
             */
         }
