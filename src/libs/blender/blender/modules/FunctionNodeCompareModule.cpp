@@ -106,33 +106,34 @@ auto FunctionNodeCompareModule::GenerateTokenString(Out &&out) -> absl::Status {
       }
       return out.GetStatus();
 
-    } else if (mode == "DIRECTION") {
-      if (is_eps) {
-        out + Out::RIGHT / "Value0"
-          + "= abs(acos(dot(normalize(" 
-          + Out::LEFT / "A0" 
-          + "), normalize(" 
-          + Out::LEFT / "B0" 
-          + "))) - " 
-          + Out::LEFT / "Angle0"
-          + ") " 
-          + eps_sign
-          + " "
-          + Out::LEFT / "Epsilon0"
-          + ";";
-      } else {
-        out + Out::RIGHT / "Value0"
-          + "= acos(dot(normalize(" 
-          + Out::LEFT / "A0" 
-          + "), normalize(" 
-          + Out::LEFT / "B0" 
-          + "))) " 
-          + sign
-          + " "
-          + Out::LEFT / "Angle0"
-          + ";";
-      }
-      return out.GetStatus();
+
+      } else if (mode == "DIRECTION") {
+        if (is_eps) {
+          out + Out::RIGHT / "Value0"
+            + "= abs(acos(clamp(dot(normalize("
+            + Out::LEFT / "A0"
+            + "), normalize("
+            + Out::LEFT / "B0"
+            + ")), -1.0, 1.0)) - "
+            + Out::LEFT / "Angle0"
+            + ") "
+            + eps_sign
+            + " "
+            + Out::LEFT / "Epsilon0"
+            + ";";
+        } else {
+          out + Out::RIGHT / "Value0"
+            + "= acos(clamp(dot(normalize("
+            + Out::LEFT / "A0"
+            + "), normalize("
+            + Out::LEFT / "B0"
+            + ")), -1.0, 1.0)) "
+            + sign
+            + " "
+            + Out::LEFT / "Angle0"
+            + ";";
+        }
+        return out.GetStatus();
 
     } else if (mode == "ELEMENT") {
       if (is_eps) {
