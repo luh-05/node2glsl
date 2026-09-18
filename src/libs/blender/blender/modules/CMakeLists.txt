@@ -18,4 +18,5 @@ target_sources(
     ./ShaderNodeMapRange.cpp
     ./ShaderNodeMath.cpp
     ./ShaderNodeMix.cpp
+    ./inputs/FunctionNodeInputBool.cpp
 )
