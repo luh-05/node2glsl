@@ -189,10 +189,10 @@ TODO: //die inputs heißen überall andrees
 
       if (use_clamp) {
         out + Out::RIGHT / "Value3" + "=" + "clamp(float(abs(" + Out::LEFT / "Value1" + 
-        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
+        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
       } else {
         out + Out::RIGHT / "Value3" + "=" + "float(abs(" + Out::LEFT / "Value1" + 
-        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "Value0" + ")" + ";";
+        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + ")" + ";";
 }
     }
 
@@ -202,11 +202,11 @@ TODO: //die inputs heißen überall andrees
       if (use_clamp) {
         out + Out::RIGHT / "Value3" + "=" + " clamp(" // clamp
             + Out::LEFT / "Value0" + "*" + Out::LEFT / "Value1" + "+" +
-            Out::LEFT / "C0" + ", 0.0, 1.0)" // clamp
+            Out::LEFT / "Value2" + ", 0.0, 1.0)" // clamp
             + ";";
       } else {
         out + Out::RIGHT / "Value3" + "=" + Out::LEFT / "Value0" + "*" +
-            Out::LEFT / "Value1" + "+" + Out::LEFT / "C0" + ";";
+            Out::LEFT / "Value1" + "+" + Out::LEFT / "Value2" + ";";
       }
     }
     return out.GetStatus();
