@@ -10,13 +10,12 @@
 
 namespace msk::blender {
 
-auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeMix(Out &&out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");
   bool clamp_factor = (out.GetConstant<std::string>("clamp_factor0") == "True");
   auto factorMode = out.GetConstant<std::string>("factor_mode0");
   bool clamp_result = (out.GetConstant<std::string>("clamp_result0") == "True");
   auto blend_type = (out.GetConstant<std::string>("blend_type0"));
-
 
   if (dataType == "FLOAT") {
 
@@ -32,7 +31,7 @@ auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
 
   else if (dataType == "VECTOR") {
 
-    //Uniform / Non Uniform beeinflusst nicht die ports
+    // Uniform / Non Uniform beeinflusst nicht die ports
     if (clamp_factor) {
       out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B1" + ", " +
           Out::LEFT / "C1" + ", " + "clamp(" + Out::LEFT / "A1" + "," + "0.0" +
@@ -66,7 +65,7 @@ auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
     }
 
     return out.GetStatus();
-  
+
   }
 
   else {
@@ -76,8 +75,7 @@ auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
   }
 
   return absl::InvalidArgumentError(
-        std::format("Illegal value of data type constant: '{}'", dataType));
+      std::format("Illegal value of data type constant: '{}'", dataType));
 }
-
 
 } // namespace msk::blender

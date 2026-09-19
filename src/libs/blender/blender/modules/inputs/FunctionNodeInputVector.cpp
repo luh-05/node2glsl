@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeInputVector::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeInputVector(Out &&out) -> absl::Status {
   auto vector_var = out.GetConstant<std::string>("vector_dimensions0");
 
   out + Out::RIGHT / "Vector0" + vector_var + ";";

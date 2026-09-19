@@ -1,11 +1,32 @@
 #include "mir/node_graph/GraphContext.hpp"
+#include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
+#include <string_view>
 // #include <mir/codegen.hpp>
 
 namespace msk::ir {
 
-template <typename T>
+template <>
+auto ContextProvider::GetConstant(Node *n, std::string_view name)
+    -> absl::StatusOr<bool> {
+  auto s = this->context.get()->GetConstant<std::string>(n, name);
+  if (!s.ok())
+    return s.status();
+
+  if (*s == "True" || *s == "true" || *s == "1") {
+    return true;
+  }
+  if (*s == "False" || *s == "false" || *s == "0") {
+    return false;
+  }
+
+  return absl::InvalidArgumentError(std::format(
+      "Constant '{}' with value '{}' cannot be interpreted as boolean!", name,
+      *s));
+}
+
+template <class T>
 auto ContextProvider::GetConstant(Node *n, std::string_view name)
     -> absl::StatusOr<T> {
   return this->context.get()->GetConstant<T>(n, name);

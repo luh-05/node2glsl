@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeHashValue::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeHashValue(Out &&out) -> absl::Status {
   auto data_type = out.GetConstant<std::string>("data_type0");
 
   // FIXME: Implement GLSL Helper Function

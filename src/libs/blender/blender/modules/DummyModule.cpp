@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringDummy(Out &&out) -> absl::Status {
   auto a = out.GetConstant<uint32_t>("a");
   auto b = out.GetConstant<bool>("b");
   // auto c = out.GetConstant<uint32_t>("foo");
@@ -23,9 +23,6 @@ auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
   //
   out + Out::RIGHT / "value2" + "=" + Out::LEFT / "value0" + "+" +
       Out::LEFT / "value1" + ";" = 1;
-
-  out.legacy->AddTokenVector(
-      {TextToken("bla"), WildcardToken(Out::LEFT, "value0")});
 
   return out.GetStatus();
 }

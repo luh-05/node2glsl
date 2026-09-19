@@ -8,14 +8,11 @@
 
 namespace msk::blender {
 
-auto FunctionNodeBitMath::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeBitMath(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {
-    out + Out::RIGHT / "Value0"
-     + "= ~"
-     + Out::LEFT / "A0"
-     + ";";
+    out + Out::RIGHT / "Value0" + "= ~" + Out::LEFT / "A0" + ";";
 
     return out.GetStatus();
   }
@@ -31,74 +28,31 @@ auto FunctionNodeBitMath::GenerateTokenString(Out &&out) -> absl::Status {
       sign = "^";
     }
 
-    out + Out::RIGHT / "Value0"
-     + "="
-     + Out::LEFT / "A0"
-     + sign
-     + Out::LEFT / "B0"
-     + ";";
+    out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
+        Out::LEFT / "B0" + ";";
 
     return out.GetStatus();
   }
-  
+
   if (op_c == "SHIFT") {
-    out + "if (" + Out::LEFT / "Shift0" + " > 0) {"
-        + Out::RIGHT / "Value0"
-        + "="
-        + Out::LEFT / "A0"
-        + "<<"
-        + Out::LEFT / "Shift0"
-        + ";"
-        + "}"
-        + "else if (" + Out::LEFT / "Shift0" + " < 0) {"
-        + Out::RIGHT / "Value0"
-        + "="
-        + Out::LEFT / "A0"
-        + ">>(-"
-        + Out::LEFT / "Shift0"
-        + ");"
-        + "}"
-        + "else {"
-        + Out::RIGHT / "Value0"
-        + "="
-        + Out::LEFT / "A0"
-        + ";"
-        + "}";
+    out + "if (" + Out::LEFT / "Shift0" + " > 0) {" + Out::RIGHT / "Value0" +
+        "=" + Out::LEFT / "A0" + "<<" + Out::LEFT / "Shift0" + ";" + "}" +
+        "else if (" + Out::LEFT / "Shift0" + " < 0) {" + Out::RIGHT / "Value0" +
+        "=" + Out::LEFT / "A0" + ">>(-" + Out::LEFT / "Shift0" + ");" + "}" +
+        "else {" + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + ";" + "}";
 
     return out.GetStatus();
   }
 
   if (op_c == "ROTATE") {
-    out + "if (" + Out::LEFT / "Shift0" + " > 0) {"
-      + Out::RIGHT / "Value0"
-      + "="
-      + "(" + Out::LEFT / "A0"
-      + "<<"
-      + Out::LEFT / "Shift0"
-      + ") | ("
-      + Out::LEFT / "A0"
-      + ">> (32 - "
-      + Out::LEFT / "Shift0"
-      + "));"
-      + "}"
-      + "else if (" + Out::LEFT / "Shift0" + " < 0) {"
-      + Out::RIGHT / "Value0"
-      + "="
-      + "(" + Out::LEFT / "A0"
-      + ">> (-"
-      + Out::LEFT / "Shift0"
-      + ")) | ("
-      + Out::LEFT / "A0"
-      + "<< (32 + "
-      + Out::LEFT / "Shift0"
-      + "));"
-      + "}"
-      + "else {"
-      + Out::RIGHT / "Value0"
-      + "="
-      + Out::LEFT / "A0"
-      + ";"
-      + "}";
+    out + "if (" + Out::LEFT / "Shift0" + " > 0) {" + Out::RIGHT / "Value0" +
+        "=" + "(" + Out::LEFT / "A0" + "<<" + Out::LEFT / "Shift0" + ") | (" +
+        Out::LEFT / "A0" + ">> (32 - " + Out::LEFT / "Shift0" + "));" + "}" +
+        "else if (" + Out::LEFT / "Shift0" + " < 0) {" + Out::RIGHT / "Value0" +
+        "=" + "(" + Out::LEFT / "A0" + ">> (-" + Out::LEFT / "Shift0" +
+        ")) | (" + Out::LEFT / "A0" + "<< (32 + " + Out::LEFT / "Shift0" +
+        "));" + "}" + "else {" + Out::RIGHT / "Value0" + "=" +
+        Out::LEFT / "A0" + ";" + "}";
 
     return out.GetStatus();
   }

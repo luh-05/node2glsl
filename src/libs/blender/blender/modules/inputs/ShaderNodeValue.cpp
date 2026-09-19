@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeValue::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeValue(Out &&out) -> absl::Status {
   auto value_var = out.GetConstant<std::string>("Value0");
 
   out + Out::RIGHT / "Value1" + "=" + value_var + ";";

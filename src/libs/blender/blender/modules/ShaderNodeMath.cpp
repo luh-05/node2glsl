@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeMath::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeMath(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
 TODO: // die inputs heißen überall andrees

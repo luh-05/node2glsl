@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringDummyModule(Out &&out) -> absl::Status {
   auto integer_var = out.GetConstant<std::string>("integer0");
 
   out + Out::RIGHT / "Integer0" + "=" + integer_var + ";";

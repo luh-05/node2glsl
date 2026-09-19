@@ -9,8 +9,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeFloatToInt::GenerateTokenString(Out &&out)
-    -> absl::Status {
+auto GenerateTokenStringFunctionNodeFloatToInt(Out &&out) -> absl::Status {
   auto mode = out.GetConstant<std::string>("rounding_mode0");
   std::string function;
 
@@ -27,12 +26,8 @@ auto FunctionNodeFloatToInt::GenerateTokenString(Out &&out)
         std::format("Unknown operation: '{}'", mode));
   }
 
-  out + Out::RIGHT / "Integer" 
-    + " = int(" 
-    + function 
-    + "(" 
-    + Out::LEFT / "Float" 
-    + "));";
+  out + Out::RIGHT / "Integer" + " = int(" + function + "(" +
+      Out::LEFT / "Float" + "));";
 
   return out.GetStatus();
 }

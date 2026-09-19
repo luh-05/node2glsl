@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto ShaderNodeFloatCurve::GenerateTokenString(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeFloatCurve(Out &&out) -> absl::Status {
 
   // FIXME: implement GLSL Helperfunction
   return absl::UnimplementedError("Function has not been implemented yet.");
