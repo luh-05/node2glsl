@@ -38,10 +38,11 @@ auto Port::EstablishConnection(Port &other) -> absl::Status {
     return status;
   }
 
-  if (this->dataType != other.dataType) {
-    return absl::InvalidArgumentError(
-        "Cannot establish connection between ports of differing datatypes!");
-  }
+  // NOTE: Heterogenous connections are now allowed but require type resolution
+  // in evaluation if (this->dataType != other.dataType) {
+  //   return absl::InvalidArgumentError(
+  //       "Cannot establish connection between ports of differing datatypes!");
+  // }
 
   auto c = std::make_shared<Connection>(&other, this);
 
