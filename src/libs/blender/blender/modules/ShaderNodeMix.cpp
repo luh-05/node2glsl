@@ -68,7 +68,7 @@ TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs
 
   else if (dataType == "ROTATION") // vllt nicht glsl fähig direkt
   {
-   
+    TODO: //warten auf Totos Export um zu gucken wie viele Inputs das hat
     if (clamp_factor) {
       out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
           Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +

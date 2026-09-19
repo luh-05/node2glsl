@@ -39,11 +39,11 @@ TODO: //die inputs heißen überall andrees
     }
 
     if (use_clamp) {
-      out + Out::RIGHT / "Value0" + "=" + "clamp(" + Out::LEFT / "A0" + sign +
-          Out::LEFT / "B0" + ", " + ", 0.0, 1.0)" + ";";
+      out + Out::RIGHT / "Value3" + "=" + "clamp(" + Out::LEFT / "Value0" + sign +
+          Out::LEFT / "Value1" + ", " + ", 0.0, 1.0)" + ";";
     } else {
-      out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + sign +
-          Out::LEFT / "B0" + ";";
+      out + Out::RIGHT / "Value3" + "=" + Out::LEFT / "Value0" + sign +
+          Out::LEFT / "Value1" + ";";
     }
 
     return out.GetStatus();
@@ -112,11 +112,11 @@ TODO: //die inputs heißen überall andrees
     }
 
     if (use_clamp) {
-      out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
-          Out::LEFT / "A0" + ")" + ", 0.0, 1.0)" + ";";
+      out + Out::RIGHT / "Value3" + "=" + "clamp(" + function +
+          Out::LEFT / "Value0" + ")" + ", 0.0, 1.0)" + ";";
     } else {
 
-      out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ")" +
+      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" + ")" +
           ";";
     }
     return out.GetStatus();
@@ -148,11 +148,11 @@ TODO: //die inputs heißen überall andrees
     }
 
     if (use_clamp) {
-      out + Out::RIGHT / "Value0" + "=" + "clamp(" + function +
-          Out::LEFT / "A0" + ", " + Out::LEFT / "B0" + ")" + ", 0.0, 1.0)" + ";";
+      out + Out::RIGHT / "Value3" + "=" + "clamp(" + function +
+          Out::LEFT / "Value0" + ", " + Out::LEFT / "Value1" + ")" + ", 0.0, 1.0)" + ";";
     } else {
-      out + Out::RIGHT / "Value0" + "=" + function + Out::LEFT / "A0" + ", " +
-          Out::LEFT / "B0" + ")" + ";";
+      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" + ", " +
+          Out::LEFT / "Value1" + ")" + ";";
     }
 
     return out.GetStatus();
@@ -168,11 +168,11 @@ TODO: //die inputs heißen überall andrees
     bzw log_b(x) = log(x) / log(b)*/
     {
       if (use_clamp) {
-        out + Out::RIGHT / "Value0" + "=" + "clamp(" + "log(" +
-            Out::LEFT / "A0" + ") /" + "log(" + Out::LEFT / "B0" + ")" + ", 0.0. 1.0);";
+        out + Out::RIGHT / "Value3" + "=" + "clamp(" + "log(" +
+            Out::LEFT / "Value0" + ") /" + "log(" + Out::LEFT / "Value1" + ")" + ", 0.0. 1.0);";
       } else {
-        out + Out::RIGHT / "Value0" + "=" + "log(" + Out::LEFT / "A0" + ") /" +
-            "log(" + Out::LEFT / "B0" + ");";
+        out + Out::RIGHT / "Value3" + "=" + "log(" + Out::LEFT / "Value0" + ") /" +
+            "log(" + Out::LEFT / "Value1" + ");";
       }
     }
 
@@ -181,18 +181,18 @@ TODO: //die inputs heißen überall andrees
       It outputs 1 if the difference of the two input values are less than
       epsilon. Used to check if two values are equal within a certain
       tolerance.
-      A0 = Epsilon
-      B0, C0 = Inputs to be compared
+      Value0 = Epsilon
+      Value1, C0 = Inputs to be compared
 
-      abs(B0-C0)<=A0
+      abs(Value1-C0)<=Value0
       */
 
       if (use_clamp) {
-        out + Out::RIGHT / "Value0" + "=" + "clamp(float(abs(" + Out::LEFT / "B0" + 
-        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "A0" + "), 0.0, 1.0)" + ";";
+        out + Out::RIGHT / "Value3" + "=" + "clamp(float(abs(" + Out::LEFT / "Value1" + 
+        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
       } else {
-        out + Out::RIGHT / "Value0" + "=" + "float(abs(" + Out::LEFT / "B0" + 
-        " - " + Out::LEFT / "C0" + ") <= " + Out::LEFT / "A0" + ")" + ";";
+        out + Out::RIGHT / "Value3" + "=" + "float(abs(" + Out::LEFT / "Value1" + 
+        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + ")" + ";";
 }
     }
 
@@ -200,13 +200,13 @@ TODO: //die inputs heißen überall andrees
       // a * b + c
 
       if (use_clamp) {
-        out + Out::RIGHT / "Value0" + "=" + " clamp(" // clamp
-            + Out::LEFT / "A0" + "*" + Out::LEFT / "B0" + "+" +
-            Out::LEFT / "C0" + ", 0.0, 1.0)" // clamp
+        out + Out::RIGHT / "Value3" + "=" + " clamp(" // clamp
+            + Out::LEFT / "Value0" + "*" + Out::LEFT / "Value1" + "+" +
+            Out::LEFT / "Value2" + ", 0.0, 1.0)" // clamp
             + ";";
       } else {
-        out + Out::RIGHT / "Value0" + "=" + Out::LEFT / "A0" + "*" +
-            Out::LEFT / "B0" + "+" + Out::LEFT / "C0" + ";";
+        out + Out::RIGHT / "Value3" + "=" + Out::LEFT / "Value0" + "*" +
+            Out::LEFT / "Value1" + "+" + Out::LEFT / "Value2" + ";";
       }
     }
     return out.GetStatus();
