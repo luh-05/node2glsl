@@ -8,8 +8,7 @@
 
 namespace msk::blender {
 
-auto FunctionNodeBooleanMath::GenerateTokenString(Out &&out)
-    -> absl::Status {
+auto FunctionNodeBooleanMath::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {
@@ -25,7 +24,7 @@ auto FunctionNodeBooleanMath::GenerateTokenString(Out &&out)
     infix = " && ";
   } else if (op_c == "OR") {
     infix = " || ";
-  } else if (op_c == "NAND" || op_c == "NOT AND") {
+  } else if (op_c == "NAND") {
     prefix = "!(";
     infix = " && ";
     suffix = ");";
@@ -33,15 +32,15 @@ auto FunctionNodeBooleanMath::GenerateTokenString(Out &&out)
     prefix = "!(";
     infix = " || ";
     suffix = ");";
-  } else if (op_c == "XOR" || op_c == "NOT EQUAL") {
+  } else if (op_c == "XOR") {
     infix = " != ";
-  } else if (op_c == "XNOR" || op_c == "EQUAL") {
+  } else if (op_c == "XNOR") {
     infix = " == ";
   } else if (op_c == "IMPLY") {
     prefix = "(!";
     infix = " || ";
     suffix = ");";
-  } else if (op_c == "NIMPLY" || op_c == "SUBTRACT") {
+  } else if (op_c == "NIMPLY") {
     prefix = "(";
     infix = " && !";
     suffix = ");";
