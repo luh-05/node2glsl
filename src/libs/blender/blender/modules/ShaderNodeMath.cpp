@@ -12,10 +12,7 @@ namespace msk::blender {
 auto ShaderNodeMath::GenerateTokenString(Out &&out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
-// Clamp Tickbox
-// vielleicht falsch? ich glaube das ist clamp_factor0
-// und vielleicht habe ich das clamp auch falsch benutzt?
-TODO: //die inputs heißen überall andrees
+TODO: // die inputs heißen überall andrees
   bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
   if (op_c == "ADD" || op_c == "SUBTRACT" || op_c == "MULTIPLY" ||
@@ -39,8 +36,8 @@ TODO: //die inputs heißen überall andrees
     }
 
     if (use_clamp) {
-      out + Out::RIGHT / "Value3" + "=" + "clamp(" + Out::LEFT / "Value0" + sign +
-          Out::LEFT / "Value1" + ", " + ", 0.0, 1.0)" + ";";
+      out + Out::RIGHT / "Value3" + "=" + "clamp(" + Out::LEFT / "Value0" +
+          sign + Out::LEFT / "Value1" + ", " + ", 0.0, 1.0)" + ";";
     } else {
       out + Out::RIGHT / "Value3" + "=" + Out::LEFT / "Value0" + sign +
           Out::LEFT / "Value1" + ";";
@@ -48,8 +45,6 @@ TODO: //die inputs heißen überall andrees
 
     return out.GetStatus();
   }
-
-  
 
   // alle mit function und einer variable
 
@@ -116,12 +111,11 @@ TODO: //die inputs heißen überall andrees
           Out::LEFT / "Value0" + ")" + ", 0.0, 1.0)" + ";";
     } else {
 
-      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" + ")" +
-          ";";
+      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" +
+          ")" + ";";
     }
     return out.GetStatus();
 
-  
   }
 
   // alle mit function und 2 variablen
@@ -137,8 +131,7 @@ TODO: //die inputs heißen überall andrees
     else if (op_c == "MINIMUM") // min(x,y)
     {
       function = "min(";
-    }
-    else if (op_c == "MAXIMUM") // max(x,y)
+    } else if (op_c == "MAXIMUM") // max(x,y)
     {
       function = "max(";
     }
@@ -149,30 +142,32 @@ TODO: //die inputs heißen überall andrees
 
     if (use_clamp) {
       out + Out::RIGHT / "Value3" + "=" + "clamp(" + function +
-          Out::LEFT / "Value0" + ", " + Out::LEFT / "Value1" + ")" + ", 0.0, 1.0)" + ";";
+          Out::LEFT / "Value0" + ", " + Out::LEFT / "Value1" + ")" +
+          ", 0.0, 1.0)" + ";";
     } else {
-      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" + ", " +
-          Out::LEFT / "Value1" + ")" + ";";
+      out + Out::RIGHT / "Value3" + "=" + function + Out::LEFT / "Value0" +
+          ", " + Out::LEFT / "Value1" + ")" + ";";
     }
 
     return out.GetStatus();
   }
 
-
   // alle die ganz anders aufgebaut sind
 
   else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
-    if (op_c == "LOGARITHM") // es gibt nur natürlichen logarithmus und log2 in glsl
+    if (op_c ==
+        "LOGARITHM") // es gibt nur natürlichen logarithmus und log2 in glsl
     /*log_b(x) = log_2(x) / log_2(b)
     bzw log_b(x) = log(x) / log(b)*/
     {
       if (use_clamp) {
         out + Out::RIGHT / "Value3" + "=" + "clamp(" + "log(" +
-            Out::LEFT / "Value0" + ") /" + "log(" + Out::LEFT / "Value1" + ")" + ", 0.0. 1.0);";
+            Out::LEFT / "Value0" + ") /" + "log(" + Out::LEFT / "Value1" + ")" +
+            ", 0.0. 1.0);";
       } else {
-        out + Out::RIGHT / "Value3" + "=" + "log(" + Out::LEFT / "Value0" + ") /" +
-            "log(" + Out::LEFT / "Value1" + ");";
+        out + Out::RIGHT / "Value3" + "=" + "log(" + Out::LEFT / "Value0" +
+            ") /" + "log(" + Out::LEFT / "Value1" + ");";
       }
     }
 
@@ -188,12 +183,14 @@ TODO: //die inputs heißen überall andrees
       */
 
       if (use_clamp) {
-        out + Out::RIGHT / "Value3" + "=" + "clamp(float(abs(" + Out::LEFT / "Value1" + 
-        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
+        out + Out::RIGHT / "Value3" + "=" + "clamp(float(abs(" +
+            Out::LEFT / "Value1" + " - " + Out::LEFT / "Value2" +
+            ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
       } else {
-        out + Out::RIGHT / "Value3" + "=" + "float(abs(" + Out::LEFT / "Value1" + 
-        " - " + Out::LEFT / "Value2" + ") <= " + Out::LEFT / "Value0" + ")" + ";";
-}
+        out + Out::RIGHT / "Value3" + "=" + "float(abs(" +
+            Out::LEFT / "Value1" + " - " + Out::LEFT / "Value2" +
+            ") <= " + Out::LEFT / "Value0" + ")" + ";";
+      }
     }
 
     else if (op_c == "MULTIPLY_ADD") {
@@ -217,8 +214,7 @@ TODO: //die inputs heißen überall andrees
 
     return absl::UnimplementedError(std::format(
         "Given Operation has not been implemented yet: '{}’", op_c));
-  }
-  else {
+  } else {
     return absl::InvalidArgumentError(
         std::format("Illegal value of operand constant: '{}'", op_c));
   }

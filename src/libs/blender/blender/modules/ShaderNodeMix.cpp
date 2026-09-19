@@ -10,10 +10,6 @@
 
 namespace msk::blender {
 
-// #define TextToken(text) out.legacy->CreateMTT(text)
-// #define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-TODO: //Die inputs heissen überall anders
-
 auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");
   bool clamp_factor = (out.GetConstant<std::string>("clamp_factor0") == "True");
@@ -21,16 +17,6 @@ auto ShaderNodeMix::GenerateTokenString(Out &&out) -> absl::Status {
   bool clamp_result = (out.GetConstant<std::string>("clamp_result0") == "True");
   auto blend_type = (out.GetConstant<std::string>("blend_type0"));
 
-  // ich habe die naming conventions vergessen
-  /*
-man nehme die mix funktion von glsl
-glsl: result = x * ( 1-a ) + y * a
-*/
-
-  /*
-  A0 = Factor
-  B0 = A
-  C0 = b*/
 
   if (dataType == "FLOAT") {
 
@@ -45,22 +31,22 @@ glsl: result = x * ( 1-a ) + y * a
   }
 
   else if (dataType == "VECTOR") {
-TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs rauskommen
+
+    //Uniform / Non Uniform beeinflusst nicht die ports
     if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B1" + ", " +
+          Out::LEFT / "C1" + ", " + "clamp(" + Out::LEFT / "A1" + "," + "0.0" +
           ", " + "1.0" + ")" + ";";
 
     } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B1" + ", " +
+          Out::LEFT / "C1" + ", " + Out::LEFT / "A1" + ";";
     }
 
     return out.GetStatus();
   }
 
   else if (dataType == "RGBA") // COLOR
-  /*macht blender das automatisch zu einem vektor?*/
   {
     return absl::UnimplementedError(
         std::format("Not yet implemented: {}", dataType));
@@ -68,15 +54,15 @@ TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs
 
   else if (dataType == "ROTATION") // vllt nicht glsl fähig direkt
   {
-    TODO: //warten auf Totos Export um zu gucken wie viele Inputs das hat
+
     if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B3" + ", " +
+          Out::LEFT / "C3" + ", " + "clamp(" + Out::LEFT / "A3" + "," + "0.0" +
           ", " + "1.0" + ")" + ";";
 
     } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B3" + ", " +
+          Out::LEFT / "C3" + ", " + Out::LEFT / "A3" + ";";
     }
 
     return out.GetStatus();
@@ -85,12 +71,12 @@ TODO://Uniform / Non Uniform nur relevant falls beim export jetzt mehrere inputs
 
   else {
 
-    // throw falscher input fehler
     return absl::InvalidArgumentError(
         std::format("Illegal value of data type constant: '{}'", dataType));
   }
 
-  
+  return absl::InvalidArgumentError(
+        std::format("Illegal value of data type constant: '{}'", dataType));
 }
 
 
