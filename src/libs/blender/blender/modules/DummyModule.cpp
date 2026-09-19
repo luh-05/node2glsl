@@ -8,13 +8,9 @@
 
 namespace msk::blender {
 
-#define TextToken(text) out.legacy->CreateMTT(text)
-#define WildcardToken(p, name) out.legacy->CreateMWT(p, name)
-auto GenerateTokenStringDummy(Out &&out) -> absl::Status {
-  // const uint32_t a = out.GetConstant<uint32_t>(std::string("a"));
-  // auto a = out.GetConstant<uint32_t>("a");
-  auto a = 4;
-  // auto b = out.GetConstant<bool>("b");
+auto DummyModule::GenerateTokenString(Out &&out) -> absl::Status {
+  auto a = out.GetConstant<uint32_t>("a");
+  auto b = out.GetConstant<bool>("b");
   // auto c = out.GetConstant<uint32_t>("foo");
 
   out + "Constant 'a' is: " + a = 1;
@@ -33,6 +29,5 @@ auto GenerateTokenStringDummy(Out &&out) -> absl::Status {
 
   return out.GetStatus();
 }
-#undef TextToken
-#undef WildcardToken
+
 } // namespace msk::blender
