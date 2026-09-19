@@ -75,7 +75,7 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
 
   *inserter = ir::TextToken("{\n");
 
-  if (auto s = module.impl({this->cxt_prov, inserter, module}); !s.ok()) {
+  if (auto s = module.Evaluate({this->cxt_prov, inserter, module}); !s.ok()) {
     return absl::AbortedError(
         std::format("Failed to evaluate Module: {}", s.ToString()));
   }

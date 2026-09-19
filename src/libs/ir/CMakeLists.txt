@@ -1,3 +1,24 @@
+# PLUGIN ABI
+add_library(plugin_abi INTERFACE)
+target_include_directories(plugin_abi
+  INTERFACE
+    ${INCLUDES_DIR}/plugin_abi
+)
+
+# C library that will fail to build when c++ features are present in the ABI
+add_library(abi_header_check STATIC abi_check.c)
+target_link_libraries(abi_header_check PRIVATE plugin_abi)
+
+set_target_properties(abi_header_check PROPERTIES
+    C_STANDARD 11
+    C_STANDARD_REQUIRED ON
+)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(abi_header_check PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+# IR
 add_library(ir_include INTERFACE)
 add_library(msk::ir::include ALIAS ir_include)
 target_include_directories(ir_include
@@ -19,6 +40,7 @@ target_include_directories(ir_deps
 
 target_link_libraries(ir_deps
   INTERFACE
+    plugin_abi
     msk::ir::include
     spdlog::spdlog
 
@@ -37,3 +59,4 @@ target_link_libraries(ir
 
 add_subdirectory(ir/codegen)
 add_subdirectory(ir/graph)
+

@@ -28,7 +28,7 @@ TEST(BLENDER_IR_TEST, DUMMY_EVALUATION) {
 
   auto tokens = std::vector<msk::ir::CodegenToken>();
   if (auto status =
-          mod.impl({context_provider, std::back_inserter(tokens), mod});
+          mod.Evaluate({context_provider, std::back_inserter(tokens), mod});
       !status.ok()) {
     // spdlog::error(status.message());
     ABSL_EXPECT_OK(status);

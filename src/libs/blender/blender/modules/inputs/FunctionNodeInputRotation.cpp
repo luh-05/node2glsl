@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeInputRotation(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeInputRotation(Out &out) -> absl::Status {
   auto rotation_value0 = out.GetConstant<std::string>("Value0");
   auto rotation_value1 = out.GetConstant<std::string>("Value1");
   auto rotation_value2 = out.GetConstant<std::string>("Value2");

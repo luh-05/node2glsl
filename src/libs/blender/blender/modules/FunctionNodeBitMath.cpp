@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeBitMath(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeBitMath(Out &out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {

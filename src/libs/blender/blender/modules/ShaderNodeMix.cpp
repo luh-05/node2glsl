@@ -10,7 +10,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringShaderNodeMix(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
   auto dataType = out.GetConstant<std::string>("data_type0");
   bool clamp_factor = (out.GetConstant<std::string>("clamp_factor0") == "True");
   auto factorMode = out.GetConstant<std::string>("factor_mode0");

@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeIntegerMath(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "ADD") {

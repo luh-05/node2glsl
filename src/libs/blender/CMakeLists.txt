@@ -19,6 +19,7 @@ target_include_directories(blender_deps
 
 target_link_libraries(blender_deps
   INTERFACE
+    plugin_abi
     msk::ir::include
     spdlog::spdlog
 

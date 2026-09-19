@@ -26,7 +26,7 @@ int main() {
 
   auto tokens = std::vector<msk::ir::CodegenToken>();
   if (auto status =
-          mod.impl({context_provider, std::back_inserter(tokens), mod});
+          mod.Evaluate({context_provider, std::back_inserter(tokens), mod});
       !status.ok()) {
     spdlog::error(status.message());
   }

@@ -9,7 +9,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeFloatToInt(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeFloatToInt(Out &out) -> absl::Status {
   auto mode = out.GetConstant<std::string>("rounding_mode0");
   std::string function;
 

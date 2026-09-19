@@ -97,10 +97,12 @@ public:
 
   class Out;
   // Generates CodegenTokens
-  typedef absl::Status (*GenerateTokenString)(Out &&out);
+  typedef absl::Status (*GenerateTokenString)(Out &out);
   GenerateTokenString impl;
 
   Module(GenerateTokenString impl) : impl(impl) {}
+
+  auto Evaluate(Out &&out) -> absl::Status { return this->impl(out); }
 
   /**
    *  @brief Helper Class for specifying Module::GenerateTokenString, provides

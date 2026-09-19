@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeBooleanMath(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeBooleanMath(Out &out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
   if (op_c == "NOT") {

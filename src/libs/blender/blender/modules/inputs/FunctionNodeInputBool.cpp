@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringFunctionNodeInputBool(Out &&out) -> absl::Status {
+auto GenerateTokenStringFunctionNodeInputBool(Out &out) -> absl::Status {
   auto boolean_var = out.GetConstant<std::string>("boolean0");
 
   out + Out::RIGHT / "Boolean0" + "=" + boolean_var + ";";

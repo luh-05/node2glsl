@@ -8,7 +8,7 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringShaderNodeMapRange(Out &&out) -> absl::Status {
+auto GenerateTokenStringShaderNodeMapRange(Out &out) -> absl::Status {
   auto data_type = out.GetConstant<std::string>("data_type0");
   auto interp = out.GetConstant<std::string>("interpolation_type0");
   auto clamp_val = out.GetConstant<std::string>("clamp0");
