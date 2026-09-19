@@ -70,6 +70,7 @@ auto XMLParser::PopulateGraph(
       std::string port_name = xml_port.attribute("name").value();
       std::string direction = xml_port.attribute("direction").value();
       std::string port_id = xml_port.attribute("id").value();
+      std::string port_datatype = xml_port.attribute("type").value();
 
       if (direction != "in" && direction != "out") {
         return absl::InvalidArgumentError(
@@ -81,7 +82,8 @@ auto XMLParser::PopulateGraph(
                                               ? GraphShim::Polarity::LEFT
                                               : GraphShim::Polarity::RIGHT;
 
-      auto port_or = graph.AddPort(module, port_polarity, port_name, "");
+      auto port_or =
+          graph.AddPort(module, port_polarity, port_name, port_datatype);
       if (!port_or.ok())
         return port_or.status();
 
@@ -102,6 +104,7 @@ auto XMLParser::PopulateGraph(
     for (pugi::xml_node xml_constant : xml_node.children("Constant")) {
       std::string constant_name = xml_constant.attribute("name").value();
       std::string constant_value = xml_constant.attribute("value").value();
+      // std::string constant_datatype = xml_constant.attribute("type").value();
 
       if (auto constant_or =
               graph.AddConstant(module, constant_name, constant_value);
