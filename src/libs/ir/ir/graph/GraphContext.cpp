@@ -17,7 +17,7 @@ auto ConstantStore::AddConstant(Node *node, std::string_view name,
             node, std::flat_map<std::string, std::string, std::less<>>());
         !r.second) {
       return absl::InternalError(std::format(
-          "std::map::try_emplace failed to add new node-scope lookup"));
+          "std::map::try_emplace failed to add new constant submap"));
     }
   }
 
