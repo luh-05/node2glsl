@@ -10,8 +10,7 @@
 namespace msk {
 
 class ModuleStore {
-private:
-  using GenerateTokenString = msk::ir::Module::GenerateTokenString;
+public:
   using LookupType = std::map<std::string, ModuleFunc>;
   LookupType lookup;
 

@@ -4,6 +4,7 @@
 #include <blender/modules/modules.hpp>
 #include <gtest/gtest.h>
 #include <mir/codegen.hpp>
+#include <print>
 #include <spdlog/spdlog.h>
 
 TEST(BLENDER_PLUGIN_TEST, LOAD_BLENDER_PLUGIN) {
