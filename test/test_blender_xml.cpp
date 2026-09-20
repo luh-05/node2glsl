@@ -1,5 +1,6 @@
 #include "blender/ir_shim/ir_shim.hpp"
 #include "blender/modules/modules.hpp"
+#include "blender/root.hpp"
 #include "blender/xml/xml.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include "mollusk/evaluation/evaluator.hpp"
@@ -19,15 +20,19 @@ TEST(BLENDER_GRAPH_TEST, GRAPH_SHIM) {
 
   GraphShim g;
 
-  auto foo0 = g.AddModule(g.GetGraph(), "foo.0",
-                          msk::blender::GenerateTokenStringDummy);
+  auto foo0 = g.AddModule(
+      g.GetGraph(), "foo.0",
+      msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
   ABSL_EXPECT_OK(foo0);
-  auto foo1 = g.AddModule(g.GetGraph(), "foo.1",
-                          msk::blender::GenerateTokenStringDummy);
+  auto foo1 = g.AddModule(
+      g.GetGraph(), "foo.1",
+      msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
   ABSL_EXPECT_OK(foo1);
 
   EXPECT_FALSE(
-      g.AddModule(g.GetGraph(), "foo.0", msk::blender::GenerateTokenStringDummy)
+      g.AddModule(
+           g.GetGraph(), "foo.0",
+           msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>)
           .ok());
 
   auto foo0_again = g.GetModule(g.GetGraph(), "foo.0");

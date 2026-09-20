@@ -1,3 +1,4 @@
+#include "blender/root.hpp"
 #include "mir/node_graph/GraphContext.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include <blender/modules/modules.hpp>
@@ -21,7 +22,8 @@ int main() {
 
   auto context_provider = std::make_shared<msk::ir::ContextProvider>(context);
 
-  auto mod = msk::ir::Module(msk::blender::GenerateTokenStringDummy);
+  auto mod = msk::ir::Module(
+      msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
   auto a = context->AddConstant(&mod, "a", "4");
 
   auto tokens = std::vector<msk::ir::CodegenToken>();

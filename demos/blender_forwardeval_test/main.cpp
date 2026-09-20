@@ -1,3 +1,4 @@
+#include "blender/root.hpp"
 #include "mir/node_graph/GraphContext.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include "mollusk/evaluation/evaluator.hpp"
@@ -11,7 +12,8 @@ int main() {
 
   msk::ir::Module *mod;
   if (auto s = context->graph->AddModule(
-          "foo", msk::blender::GenerateTokenStringDummy);
+          "foo",
+          msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
       !s.ok()) {
     spdlog::error(s.status().ToString());
     return 1;

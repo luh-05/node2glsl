@@ -4,9 +4,14 @@ target_include_directories(core_include
   INTERFACE
     ${INCLUDES_DIR}/core
 )
+target_link_libraries(core_include
+  INTERFACE
+    plugin_abi
+)
 
 add_library(mollusk_core
   mollusk/root.cpp
+  mollusk/plugins.cpp
 )
 add_library(msk::core ALIAS mollusk_core)
 
@@ -19,6 +24,7 @@ target_include_directories(core_deps
 
 target_link_libraries(core_deps
   INTERFACE
+    plugin_abi
     msk::include
     spdlog::spdlog
 

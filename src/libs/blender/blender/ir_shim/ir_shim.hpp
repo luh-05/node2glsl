@@ -49,8 +49,7 @@ public:
 
   /// Add module
   auto AddModule(const GraphHandle graph, std::string_view name,
-                 ir::Module::GenerateTokenString impl)
-      -> absl::StatusOr<const ModuleHandle>;
+                 ModuleFunc impl) -> absl::StatusOr<const ModuleHandle>;
   /// Add subgraph
   auto AddSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;

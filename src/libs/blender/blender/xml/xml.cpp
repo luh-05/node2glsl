@@ -1,6 +1,7 @@
 #include "blender/xml/xml.hpp"
 #include "blender/ir_shim/ir_shim.hpp"
 #include "blender/modules/modules.hpp"
+#include "blender/root.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
@@ -59,8 +60,9 @@ auto XMLParser::PopulateGraph(
     std::string node_type = xml_node.attribute("type").value();
 
     // FIXME: Make every module a dummy module until all are implemented
-    auto node_impl = msk::blender::GenerateTokenStringDummy;
-    auto module_or = graph.AddModule(current_graph, node_name, node_impl);
+    auto module_or = graph.AddModule(
+        current_graph, node_name,
+        msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
     if (!module_or.ok())
       return module_or.status();
     ModuleHandle module = *module_or;

@@ -1,0 +1,22 @@
+#pragma once
+
+#include "mir/node_graph/node_graph.hpp"
+#include <absl/status/status.h>
+#include <map>
+#include <plugin_abi/plugin_abi.h>
+#include <string>
+#include <vector>
+
+namespace msk {
+
+class ModuleStore {
+private:
+  using GenerateTokenString = msk::ir::Module::GenerateTokenString;
+  using LookupType = std::map<std::string, ModuleFunc>;
+  LookupType lookup;
+
+public:
+  auto FetchPlugin() -> absl::Status;
+};
+
+} // namespace msk

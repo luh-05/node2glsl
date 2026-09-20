@@ -25,6 +25,10 @@ target_include_directories(ir_include
   INTERFACE
   ${INCLUDES_DIR}/ir
 )
+target_link_libraries(ir_include
+  INTERFACE
+  plugin_abi
+)
 
 add_library(ir STATIC
   ir/root.cpp

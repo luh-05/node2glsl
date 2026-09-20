@@ -1,6 +1,7 @@
 #pragma once
 // #include "mir/codegen.hpp"
 #include "mir/codegen.hpp"
+#include "plugin_abi/plugin_abi.h"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -98,11 +99,26 @@ public:
   class Out;
   // Generates CodegenTokens
   typedef absl::Status (*GenerateTokenString)(Out &out);
-  GenerateTokenString impl;
+  class GenerationStrategy {
+  private:
+    ModuleFunc func;
 
-  Module(GenerateTokenString impl) : impl(impl) {}
+  public:
+    GenerationStrategy(ModuleFunc func) : func(func) {}
 
-  auto Evaluate(Out &&out) -> absl::Status { return this->impl(out); }
+    absl::Status operator()(Out &&out) const {
+      PluginStatus status{};
+      this->func(&out, &status);
+
+      return absl::ErrnoToStatus(status.errc, status.message);
+    }
+  };
+
+  // auto Evaluate(Out &&out) -> absl::Status { return this->impl(out); }
+
+  const GenerationStrategy Evaluate;
+
+  Module(ModuleFunc impl) : Evaluate(impl) {}
 
   /**
    *  @brief Helper Class for specifying Module::GenerateTokenString, provides
@@ -289,7 +305,7 @@ private:
 public:
   Graph() {}
 
-  auto AddModule(std::string_view name, Module::GenerateTokenString impl)
+  auto AddModule(std::string_view name, ModuleFunc impl)
       -> absl::StatusOr<Module *>;
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;

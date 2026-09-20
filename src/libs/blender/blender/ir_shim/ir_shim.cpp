@@ -5,7 +5,7 @@
 
 namespace msk::blender {
 auto GraphShim::AddModule(const GraphHandle graph, std::string_view name,
-                          ir::Module::GenerateTokenString type)
+                          ModuleFunc type)
     -> absl::StatusOr<const ModuleHandle> {
   auto status = graph.graph->AddModule(name, type);
 

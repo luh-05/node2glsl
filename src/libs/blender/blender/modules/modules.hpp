@@ -20,7 +20,7 @@ auto GenerateTokenStringFunctionNodeHashValue(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status;
 
-auto GenerateTokenStringFunctionNodeFloatToIntMath(Out &out) -> absl::Status;
+auto GenerateTokenStringFunctionNodeFloatToInt(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeClamp(Out &out) -> absl::Status;
 

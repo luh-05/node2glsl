@@ -1,4 +1,5 @@
 #include "mir/node_graph/node_graph.hpp"
+#include "plugin_abi/plugin_abi.h"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <memory>
@@ -121,7 +122,7 @@ auto Graph::addNode(std::string_view name, Args... args)
   return node_status.value();
 }
 
-auto Graph::AddModule(std::string_view name, Module::GenerateTokenString impl)
+auto Graph::AddModule(std::string_view name, ModuleFunc impl)
     -> absl::StatusOr<Module *> {
   return this->addNode<Module>(name, impl);
 }

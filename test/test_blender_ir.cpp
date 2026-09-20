@@ -1,3 +1,4 @@
+#include "blender/root.hpp"
 #include "mir/node_graph/GraphContext.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include "mollusk/evaluation/evaluator.hpp"
@@ -13,8 +14,9 @@
 #include <vector>
 
 TEST(BLENDER_IR_TEST, DUMMY_IMPLEMENTATION) {
-  EXPECT_NO_THROW(auto mod =
-                      msk::ir::Module(msk::blender::GenerateTokenStringDummy););
+  EXPECT_NO_THROW(
+      auto mod = msk::ir::Module(
+          msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>););
 }
 
 TEST(BLENDER_IR_TEST, DUMMY_EVALUATION) {
@@ -22,7 +24,8 @@ TEST(BLENDER_IR_TEST, DUMMY_EVALUATION) {
 
   auto context_provider = std::make_shared<msk::ir::ContextProvider>(context);
 
-  auto mod = msk::ir::Module(msk::blender::GenerateTokenStringDummy);
+  auto mod = msk::ir::Module(
+      msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
   auto a = context->AddConstant(&mod, "a", "4");
   ABSL_EXPECT_OK(a);
 
@@ -40,7 +43,8 @@ TEST(BLENDER_IR_TEST, DUMMY_FORWARD_EVAL) {
 
   msk::ir::Module *mod;
   if (auto s = context->graph->AddModule(
-          "foo", msk::blender::GenerateTokenStringDummy);
+          "foo",
+          msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
       !s.ok()) {
     // spdlog::error(s.status().ToString());
     ABSL_EXPECT_OK(s);

@@ -5,6 +5,7 @@ target_link_libraries(blender_xml
   PRIVATE
     blender_deps
     pugixml
+    blender
     msk::blender::ir_shim
     msk::blender::modules
 )

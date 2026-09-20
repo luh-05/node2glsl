@@ -19,4 +19,8 @@ target_sources(
     ./ShaderNodeMath.cpp
     ./ShaderNodeMix.cpp
     ./inputs/FunctionNodeInputBool.cpp
+    ./inputs/FunctionNodeInputInt.cpp
+    ./inputs/FunctionNodeInputRotation.cpp
+    ./inputs/FunctionNodeInputVector.cpp
+    ./inputs/ShaderNodeValue.cpp
 )
