@@ -16,6 +16,8 @@ private:
   LookupType lookup;
 
 public:
+  /// TODO: Make this an actual plugin implementation
+  /// Currently mock implemention, only uses Blender "plugin"
   auto FetchPlugin() -> absl::Status;
 };
 

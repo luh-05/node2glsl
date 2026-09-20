@@ -17,42 +17,67 @@ void FuncWrapper(void *out, PluginStatus *status) {
 }
 } // namespace msk::blender
 
-void EnumerateModules(PluginModuleCallback callback, void *userdata) {
+bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
   using namespace msk::blender;
 
-  callback("DummyModule", FuncWrapper<GenerateTokenStringDummy>, userdata);
-  callback("FunctionNodeBitMath",
-           FuncWrapper<GenerateTokenStringFunctionNodeBitMath>, userdata);
-  callback("FunctionNodeBooleanMath",
-           FuncWrapper<GenerateTokenStringFunctionNodeBooleanMath>, userdata);
-  callback("FunctionNodeCompare",
-           FuncWrapper<GenerateTokenStringFunctionNodeCompare>, userdata);
-  callback("FunctionNodeFloatToInt",
-           FuncWrapper<GenerateTokenStringFunctionNodeFloatToInt>, userdata);
-  callback("FunctionNodeHashValue",
-           FuncWrapper<GenerateTokenStringFunctionNodeHashValue>, userdata);
-  callback("FunctionNodeIntegerMath",
-           FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>, userdata);
-  callback("ShaderNodeClamp", FuncWrapper<GenerateTokenStringShaderNodeClamp>,
-           userdata);
-  callback("ShaderNodeFloatCurve",
-           FuncWrapper<GenerateTokenStringShaderNodeFloatCurve>, userdata);
-  callback("ShaderNodeMapRange",
-           FuncWrapper<GenerateTokenStringShaderNodeMapRange>, userdata);
-  callback("ShaderNodeMath", FuncWrapper<GenerateTokenStringShaderNodeMath>,
-           userdata);
-  callback("ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>,
-           userdata);
-  callback("FunctionNodeInputBool",
-           FuncWrapper<GenerateTokenStringFunctionNodeInputBool>, userdata);
-  callback("FunctionNodeInputInt",
-           FuncWrapper<GenerateTokenStringFunctionNodeInputInt>, userdata);
-  callback("FunctionNodeInputRotation",
-           FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>, userdata);
-  callback("FunctionNodeInputVector",
-           FuncWrapper<GenerateTokenStringFunctionNodeInputVector>, userdata);
-  callback("ShaderNodeValue", FuncWrapper<GenerateTokenStringShaderNodeValue>,
-           userdata);
+  if (!callback("DummyModule", FuncWrapper<GenerateTokenStringDummy>, userdata))
+    return false;
+  if (!callback("FunctionNodeBitMath",
+                FuncWrapper<GenerateTokenStringFunctionNodeBitMath>, userdata))
+    return false;
+  if (!callback("FunctionNodeBooleanMath",
+                FuncWrapper<GenerateTokenStringFunctionNodeBooleanMath>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeCompare",
+                FuncWrapper<GenerateTokenStringFunctionNodeCompare>, userdata))
+    return false;
+  if (!callback("FunctionNodeFloatToInt",
+                FuncWrapper<GenerateTokenStringFunctionNodeFloatToInt>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeHashValue",
+                FuncWrapper<GenerateTokenStringFunctionNodeHashValue>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeIntegerMath",
+                FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>,
+                userdata))
+    return false;
+  if (!callback("ShaderNodeClamp",
+                FuncWrapper<GenerateTokenStringShaderNodeClamp>, userdata))
+    return false;
+  if (!callback("ShaderNodeFloatCurve",
+                FuncWrapper<GenerateTokenStringShaderNodeFloatCurve>, userdata))
+    return false;
+  if (!callback("ShaderNodeMapRange",
+                FuncWrapper<GenerateTokenStringShaderNodeMapRange>, userdata))
+    return false;
+  if (!callback("ShaderNodeMath",
+                FuncWrapper<GenerateTokenStringShaderNodeMath>, userdata))
+    return false;
+  if (!callback("ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeInputBool",
+                FuncWrapper<GenerateTokenStringFunctionNodeInputBool>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeInputInt",
+                FuncWrapper<GenerateTokenStringFunctionNodeInputInt>, userdata))
+    return false;
+  if (!callback("FunctionNodeInputRotation",
+                FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>,
+                userdata))
+    return false;
+  if (!callback("FunctionNodeInputVector",
+                FuncWrapper<GenerateTokenStringFunctionNodeInputVector>,
+                userdata))
+    return false;
+  if (!callback("ShaderNodeValue",
+                FuncWrapper<GenerateTokenStringShaderNodeValue>, userdata))
+    return false;
+  return true;
 }
 
 void GetInfo(PluginInfo *info) {

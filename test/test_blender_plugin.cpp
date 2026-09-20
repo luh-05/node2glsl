@@ -6,7 +6,7 @@
 #include <mir/codegen.hpp>
 #include <spdlog/spdlog.h>
 
-TEST(BLENDER_PLUGIN_TEST, LOAD_BLENDER_PLUIG) {
+TEST(BLENDER_PLUGIN_TEST, LOAD_BLENDER_PLUGIN) {
   msk::ModuleStore store;
   ABSL_EXPECT_OK(store.FetchPlugin());
 }

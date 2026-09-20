@@ -6,12 +6,14 @@
 namespace msk {
 
 auto ModuleStore::FetchPlugin() -> absl::Status {
-  EnumerateModules(
-      [](const char *name, ModuleFunc func, void *userdata) {
-        auto &l = *static_cast<LookupType *>(userdata);
-        l.try_emplace(std::string(name), func);
-      },
-      &this->lookup);
+  if (!EnumerateModules(
+          [](const char *name, ModuleFunc func, void *userdata) {
+            auto &l = *static_cast<LookupType *>(userdata);
+            return l.try_emplace(std::string(name), func).second;
+          },
+          &this->lookup)) {
+    return absl::InternalError("Failed Enumerating Plugin Modules");
+  }
 
   return absl::OkStatus();
 }
