@@ -13,6 +13,7 @@ target_sources(
     ./FunctionNodeFloatToInt.cpp
     ./FunctionNodeHashValue.cpp
     ./FunctionNodeIntegerMath.cpp
+    ./NodeGroupOutput.cpp
     ./ShaderNodeClamp.cpp
     ./ShaderNodeFloatCurve.cpp
     ./ShaderNodeMapRange.cpp

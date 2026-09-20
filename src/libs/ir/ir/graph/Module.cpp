@@ -21,12 +21,13 @@ bool Out::checkPort(Out::Polarity p, std::string name, Node::MapType *&map) {
 
   if (!map->contains(name)) {
     // FIXME: Ports not implemented correctly yet, so this will always throw
-    // if (this->status.ok()) {
-    //   this->status = absl::NotFoundError(
-    //       std::format("Cound not find {} token '{}'",
-    //                   p == RIGHT ? "right" : "left", name));
-    // }
-    // return false;
+    if (this->status.ok()) {
+      this->status = absl::NotFoundError(
+          std::format("Cound not find {} port '{}' (module: '{}')",
+                      p == RIGHT ? "right" : "left", name,
+                      reinterpret_cast<void *>(&this->parent)));
+    }
+    return false;
   }
 
   return true;
@@ -50,6 +51,7 @@ Out &Out::operator+(Out::PortFetch fetch) {
 
   if (this->status.ok()) {
     auto port = map->operator[](name_lower).get();
+    this->GetContext()->LogPort(&this->parent, port, p == Polarity::RIGHT);
     *this->it = WildcardToken(port);
   }
 

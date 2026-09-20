@@ -51,8 +51,10 @@ TEST(BLENDER_GRAPH_TEST, GRAPH_SHIM) {
 }
 
 TEST(BLENDER_GRAPH_TEST, READ_GRAPH) {
+  msk::ModuleStore store;
+  ABSL_EXPECT_OK(store.FetchPlugin());
 
-  msk::blender::XMLParser parser;
+  msk::blender::XMLParser parser(&store);
 
   std::string xml_text_file =
       std::string(TEST_DATA_DIR) + "/test_blender_xml.xml";
@@ -61,7 +63,10 @@ TEST(BLENDER_GRAPH_TEST, READ_GRAPH) {
 
 TEST(BLENDER_GRAPH_TEST, PARSE_GRAPH) {
 
-  msk::blender::XMLParser parser;
+  msk::ModuleStore store;
+  ABSL_EXPECT_OK(store.FetchPlugin());
+
+  msk::blender::XMLParser parser(&store);
 
   std::string xml_text_file =
       std::string(TEST_DATA_DIR) + "/test_blender_xml.xml";
@@ -77,7 +82,10 @@ TEST(BLENDER_GRAPH_TEST, PARSE_GRAPH) {
 
 TEST(BLENDER_GRAPH_TEST, EVALUATE_GRAPH_LINEAR) {
 
-  msk::blender::XMLParser parser;
+  msk::ModuleStore store;
+  ABSL_EXPECT_OK(store.FetchPlugin());
+
+  msk::blender::XMLParser parser(&store);
 
   std::string xml_text_file =
       std::string(TEST_DATA_DIR) + "/test_blender_xml.xml";

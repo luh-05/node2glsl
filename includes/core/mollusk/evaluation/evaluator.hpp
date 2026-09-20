@@ -4,6 +4,8 @@
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <memory>
+#include <tuple>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 namespace msk {
@@ -15,11 +17,14 @@ using NodeVariant = std::variant<ir::Graph *, ir::Module *>;
 class EvaluationStrategy {
 public:
   using TokenVector = std::vector<msk::ir::Module::Token>;
+
+public:
   TokenVector tokens;
 
   virtual auto GenerateTokens(ContextPointer cxt) -> absl::Status {
     return absl::InternalError("Tried using base EvaluationStrategy!");
   }
+
   virtual auto EvaluateTokens(ContextPointer cxt, std::string &out)
       -> absl::Status {
     return absl::InternalError("Tried using base EvaluationStrategy!");
@@ -27,11 +32,25 @@ public:
 };
 
 class ForwardEvaluationStrategy : public EvaluationStrategy {
+public:
+  std::vector<TokenVector> vectors;
+
+  using PortAccessLog = msk::ir::GraphContext::PortAccessLog;
+  using ConnectionSet = std::unordered_set<msk::ir::Connection *>;
+  using ConnectionAccessLog = std::pair<ConnectionSet, ConnectionSet>;
+  using ModuleOrdering =
+      std::pair<std::shared_ptr<ConnectionAccessLog>, size_t>;
+  using Schedule = std::vector<ModuleOrdering>;
+
+  Schedule schedule;
+
 private:
   std::shared_ptr<ir::ContextProvider> cxt_prov;
 
   auto evalGraph(ContextPointer cxt, ir::Graph &graph) -> absl::Status;
   auto evalModule(ContextPointer cxt, ir::Module &module) -> absl::Status;
+
+  auto orderSchedule() -> absl::Status;
 
 public:
   auto GenerateTokens(ContextPointer cxt) -> absl::Status override;

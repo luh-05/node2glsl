@@ -5,6 +5,7 @@
 #include <absl/status/statusor.h>
 #include <format>
 #include <memory>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -19,9 +20,17 @@ using GraphShim = msk::blender::GraphShim;
   auto var = var##_s.value();
 
 int main() {
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::flush_on(spdlog::level::debug);
   // GraphShim g(msk::ir::GraphContext graph_context);
 
-  msk::blender::XMLParser parser;
+  msk::ModuleStore store;
+  if (auto s = store.FetchPlugin(); !s.ok()) {
+    spdlog::error(s.ToString());
+    return 1;
+  }
+
+  msk::blender::XMLParser parser(&store);
 
   std::string xml_text_file = "./demos/blender_graph_test/test.xml";
   absl::Status status = parser.XMLread(xml_text_file);

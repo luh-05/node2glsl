@@ -6,6 +6,7 @@ target_link_libraries(blender_xml
     blender_deps
     pugixml
     blender
+    msk::core
     msk::blender::ir_shim
     msk::blender::modules
 )

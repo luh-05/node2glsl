@@ -60,9 +60,12 @@ auto XMLParser::PopulateGraph(
     std::string node_type = xml_node.attribute("type").value();
 
     // FIXME: Make every module a dummy module until all are implemented
-    auto module_or = graph.AddModule(
-        current_graph, node_name,
-        msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
+    auto func = this->store->GetModuleFunc(node_type);
+    if (!func.ok()) {
+      return func.status();
+    }
+    auto module_or = graph.AddModule(current_graph, node_name, *func);
+    // msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
     if (!module_or.ok())
       return module_or.status();
     ModuleHandle module = *module_or;

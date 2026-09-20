@@ -18,6 +18,16 @@ public:
   /// TODO: Make this an actual plugin implementation
   /// Currently mock implemention, only uses Blender "plugin"
   auto FetchPlugin() -> absl::Status;
+
+  auto GetModuleFunc(std::string_view name) -> absl::StatusOr<ModuleFunc> {
+    auto f = this->lookup.find(std::string(name));
+    if (f == this->lookup.end()) {
+      return absl::NotFoundError(std::format(
+          "No Module implementation with name '{}' found in store!", name));
+    }
+
+    return f->second;
+  }
 };
 
 } // namespace msk

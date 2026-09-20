@@ -70,4 +70,8 @@ template auto ContextProvider::GetConstant<const char *>(Node *n,
 // template auto ContextProvider::GetConstant<bool>(Node *n, std::string_view
 // name)
 //     -> absl::StatusOr<bool>;
+
+auto ContextProvider::LogPort(Node *n, Port *port, bool right) -> void {
+  this->context->LogPort(n, port, right);
+}
 } // namespace msk::ir

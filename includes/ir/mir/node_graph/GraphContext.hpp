@@ -2,8 +2,13 @@
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
+#include <exception>
 #include <flat_map>
+#include <map>
 #include <memory>
+#include <optional>
+#include <tuple>
+#include <vector>
 #pragma once
 
 namespace msk::ir {
@@ -90,6 +95,10 @@ public:
   ConstantStore const_store;
 
 public:
+  using PortSet = std::unordered_set<ir::Port *>;
+  using PortAccessLog = std::pair<PortSet, PortSet>;
+  std::map<Node *, PortAccessLog> access_info;
+
   GraphContext() { this->graph = std::make_unique<ir::Graph>(); }
 
   template <class T>
@@ -100,6 +109,36 @@ public:
   inline auto AddConstant(Node *n, std::string_view name, std::string value)
       -> absl::Status {
     return this->const_store.AddConstant(n, name, value);
+  }
+
+  inline auto LogPort(Node *n, Port *port, bool right) {
+    auto entry = this->access_info.find(n);
+    if (entry == this->access_info.end()) {
+      auto r = this->access_info.try_emplace(n, std::move(PortAccessLog()));
+      if (!r.second)
+        std::terminate();
+      entry = r.first;
+      // FIXME:
+      entry->second.first = PortSet();
+      entry->second.second = PortSet();
+    }
+
+    if (right) {
+      entry->second.second.insert(port);
+    } else {
+      entry->second.first.insert(port);
+    }
+  }
+
+  // If there is at least one logged access for the given module, return the
+  // associated ModuleAccessLog
+  inline auto GetModuleInfo(Module *m) -> std::optional<PortAccessLog *> {
+    auto info = this->access_info.find(m);
+    if (info == this->access_info.end()) {
+      return {};
+    }
+
+    return &info->second;
   }
 };
 } // namespace msk::ir

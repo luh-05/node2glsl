@@ -44,6 +44,9 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
                 FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>,
                 userdata))
     return false;
+  if (!callback("NodeGroupOutput",
+                FuncWrapper<GenerateTokenStringNodeGroupOutput>, userdata))
+    return false;
   if (!callback("ShaderNodeClamp",
                 FuncWrapper<GenerateTokenStringShaderNodeClamp>, userdata))
     return false;

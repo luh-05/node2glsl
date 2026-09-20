@@ -24,16 +24,14 @@ namespace msk::ir {
 class Connection;
 class Port : public Identifiable<Port> {
 public:
-  // TODO: change to enum
-  std::string dataType; // Data type of Port
-
   // std::vector<std::shared_ptr<Connection>> connections;
   using ConnectionPointer = std::shared_ptr<Connection>;
   std::variant<ConnectionPointer, std::vector<ConnectionPointer>> connection;
 
+  std::string dataType; // Data type of Port
   Port(std::string dataType, bool left) : dataType(dataType) {
     if (!left) {
-      connection = std::vector<ConnectionPointer>();
+      this->connection = std::vector<ConnectionPointer>();
     }
   };
 
@@ -43,7 +41,6 @@ public:
    * @return absl::AlreadyExistsError - payload url:
    * "mollusk.ir/AlreadyExistsReason" ("this" meaning this port already has a
    * connection and "other for the other")
-   * @return absl::InvalidArgumentError when port datatypes are incompatible
    * @return absl::OkStatus() if success
    */
   auto EstablishConnection(Port &other) -> absl::Status;
@@ -86,6 +83,9 @@ public:
   // Gets the named constant of the provided node
   template <class T>
   auto GetConstant(Node *n, std::string_view name) -> absl::StatusOr<T>;
+
+  // Registers the given port as visited
+  auto LogPort(Node *n, Port *port, bool right) -> void;
 };
 
 /**
