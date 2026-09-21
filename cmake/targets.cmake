@@ -22,3 +22,5 @@ endif()
 if(${BUILD_DEMOS}) 
   add_subdirectory(${DEMOS_DIR})
 endif()
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/test)

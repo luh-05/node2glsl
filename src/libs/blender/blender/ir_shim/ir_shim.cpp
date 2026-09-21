@@ -1,18 +1,11 @@
-#include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <blender/ir_shim/ir_shim.hpp>
-#include <ir/graph/graph.hpp>
 #include <memory>
 
 namespace msk::blender {
-GraphShim::GraphShim(std::shared_ptr<ir::GraphContext> context) {
-  this->graph = std::make_shared<ir::Graph>();
-  this->context = context;
-}
-
 auto GraphShim::AddModule(const GraphHandle graph, std::string_view name,
-                          ir::Module::GenerateTokenString type)
+                          ModuleFunc type)
     -> absl::StatusOr<const ModuleHandle> {
   auto status = graph.graph->AddModule(name, type);
 

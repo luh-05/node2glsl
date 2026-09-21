@@ -2,7 +2,7 @@
 
 #include <absl/status/statusor.h>
 #include <memory>
-#include <mir/node_graph/node_graph.hpp>
+#include <mir/node_graph/GraphContext.hpp>
 
 namespace msk::blender {
 
@@ -40,18 +40,16 @@ public:
 
 class GraphShim {
 private:
-  std::shared_ptr<ir::Graph> graph;
   std::shared_ptr<ir::GraphContext> context;
 
 public:
-  GraphShim(std::shared_ptr<ir::GraphContext> context);
+  GraphShim() { this->context = std::make_shared<ir::GraphContext>(); };
 
   enum Polarity { LEFT, RIGHT };
 
   /// Add module
   auto AddModule(const GraphHandle graph, std::string_view name,
-                 ir::Module::GenerateTokenString impl)
-      -> absl::StatusOr<const ModuleHandle>;
+                 ModuleFunc impl) -> absl::StatusOr<const ModuleHandle>;
   /// Add subgraph
   auto AddSubGraph(const GraphHandle graph, std::string_view name)
       -> absl::StatusOr<const GraphHandle>;
@@ -71,10 +69,11 @@ public:
 
   /// Get main graph
   inline auto GetGraph() -> GraphHandle {
-    return GraphHandle(this->graph.get());
+    return GraphHandle(this->context->graph.get());
   }
-  inline auto GetSharedPointer() -> std::shared_ptr<ir::Graph> {
-    return this->graph;
+  /// Get GraphContext
+  inline auto GetSharedPointer() -> std::shared_ptr<ir::GraphContext> {
+    return this->context;
   }
   /// Get module
   auto GetModule(const GraphHandle graph, std::string_view name)

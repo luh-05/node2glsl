@@ -1,6 +1,7 @@
 #include "blender/xml/xml.hpp"
 #include "blender/ir_shim/ir_shim.hpp"
 #include "blender/modules/modules.hpp"
+#include "blender/root.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
@@ -25,10 +26,8 @@ auto XMLParser::XMLread(std::string_view path) -> absl::Status {
   return absl::OkStatus();
 }
 
-auto XMLParser::ParseGraph(std::string_view target_graph_id,
-                           std::shared_ptr<msk::ir::GraphContext> graph_context)
-    -> absl::StatusOr<std::shared_ptr<ir::Graph>> {
-
+auto XMLParser::ParseGraph(std::string_view target_graph_id)
+    -> absl::StatusOr<std::shared_ptr<ir::GraphContext>> {
   std::string xpath_query = std::format("//Graph[@id='{}']", target_graph_id);
   pugi::xpath_node xpath_graph = doc.select_node(xpath_query.c_str());
 
@@ -39,7 +38,7 @@ auto XMLParser::ParseGraph(std::string_view target_graph_id,
 
   pugi::xml_node xml_graph = xpath_graph.node();
 
-  GraphShim graph(graph_context);
+  GraphShim graph;
   GraphHandle graph_hande = graph.GetGraph();
   std::unordered_map<std::string, PortHandle> port_id_map;
 
@@ -61,8 +60,12 @@ auto XMLParser::PopulateGraph(
     std::string node_type = xml_node.attribute("type").value();
 
     // FIXME: Make every module a dummy module until all are implemented
-    auto node_impl = msk::blender::GenerateTokenStringDummy;
-    auto module_or = graph.AddModule(current_graph, node_name, node_impl);
+    auto func = this->store->GetModuleFunc(node_type);
+    if (!func.ok()) {
+      return func.status();
+    }
+    auto module_or = graph.AddModule(current_graph, node_name, *func);
+    // msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
     if (!module_or.ok())
       return module_or.status();
     ModuleHandle module = *module_or;
@@ -72,6 +75,7 @@ auto XMLParser::PopulateGraph(
       std::string port_name = xml_port.attribute("name").value();
       std::string direction = xml_port.attribute("direction").value();
       std::string port_id = xml_port.attribute("id").value();
+      std::string port_datatype = xml_port.attribute("type").value();
 
       if (direction != "in" && direction != "out") {
         return absl::InvalidArgumentError(
@@ -83,7 +87,8 @@ auto XMLParser::PopulateGraph(
                                               ? GraphShim::Polarity::LEFT
                                               : GraphShim::Polarity::RIGHT;
 
-      auto port_or = graph.AddPort(module, port_polarity, port_name, "");
+      auto port_or =
+          graph.AddPort(module, port_polarity, port_name, port_datatype);
       if (!port_or.ok())
         return port_or.status();
 
@@ -104,6 +109,7 @@ auto XMLParser::PopulateGraph(
     for (pugi::xml_node xml_constant : xml_node.children("Constant")) {
       std::string constant_name = xml_constant.attribute("name").value();
       std::string constant_value = xml_constant.attribute("value").value();
+      // std::string constant_datatype = xml_constant.attribute("type").value();
 
       if (auto constant_or =
               graph.AddConstant(module, constant_name, constant_value);

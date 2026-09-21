@@ -1,11 +1,13 @@
+#include "blender/root.hpp"
+#include "mir/node_graph/GraphContext.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include <blender/modules/modules.hpp>
-#include <ir/graph/graph.hpp>
 #include <iterator>
 #include <memory>
 // #include <mir/mollusk_ir.hpp>
 #include <mir/codegen.hpp>
 #include <spdlog/spdlog.h>
+#include <variant>
 #include <vector>
 
 int main() {
@@ -20,23 +22,31 @@ int main() {
 
   auto context_provider = std::make_shared<msk::ir::ContextProvider>(context);
 
-  auto mod = msk::ir::Module(msk::blender::GenerateTokenStringDummy);
-  spdlog::warn(mod.id);
+  auto mod = msk::ir::Module(
+      msk::blender::FuncWrapper<msk::blender::GenerateTokenStringDummy>);
   auto a = context->AddConstant(&mod, "a", "4");
 
-  auto token_string = std::vector<msk::ir::Module::Token>();
+  auto tokens = std::vector<msk::ir::CodegenToken>();
   if (auto status =
-          mod.impl({context_provider, std::back_inserter(token_string), mod});
+          mod.Evaluate({context_provider, std::back_inserter(tokens), mod});
       !status.ok()) {
     spdlog::error(status.message());
   }
 
   std::string c;
-  spdlog::warn("DummyModule generated {} tokens:", token_string.size());
-  for (auto it = token_string.begin(); it != token_string.end(); it++) {
+  spdlog::warn("DummyModule generated {} tokens:", tokens.size());
+  for (auto it = tokens.begin(); it != tokens.end(); it++) {
     static int i = 0;
-    spdlog::warn("Token {}: {:?}", ++i, it->get()->GetString());
-    c += it->get()->GetString();
+    auto token = &*it;
+    std::string token_string;
+    if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
+      token_string = t->GetString();
+    } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
+      token_string = t->GetString();
+    }
+
+    spdlog::warn("Token {}: {:?}", ++i, token_string);
+    c += token_string;
   }
 
   spdlog::warn(std::format("Output: \n{}\n", c));

@@ -8,8 +8,8 @@ namespace msk::ir {
 using Out = Module::Out;
 
 void Out::FlushBuffer() {
-  *this->it = std::make_unique<TextToken>(text_buff);
-  text_buff = "";
+  *this->it = TextToken(this->text_buff);
+  this->text_buff = "";
 }
 
 bool Out::checkPort(Out::Polarity p, std::string name, Node::MapType *&map) {
@@ -20,22 +20,22 @@ bool Out::checkPort(Out::Polarity p, std::string name, Node::MapType *&map) {
   name | std::views::transform([](unsigned char c) { return std::tolower(c); });
 
   if (!map->contains(name)) {
-    // FIXME: Ports not implemented correctly yet, so this will always throw
-    // if (this->status.ok()) {
-    //   this->status = absl::NotFoundError(
-    //       std::format("Cound not find {} token '{}'",
-    //                   p == RIGHT ? "right" : "left", name));
-    // }
-    // return false;
+    if (this->status.ok()) {
+      this->status = absl::NotFoundError(
+          std::format("Cound not find {} port '{}' (module: '{}')",
+                      p == RIGHT ? "right" : "left", name,
+                      reinterpret_cast<void *>(&this->parent)));
+    }
+    return false;
   }
 
   return true;
 }
-auto Out::createWildcardToken(std::string_view name, Node::MapType *&map)
-    -> std::unique_ptr<CodegenToken> {
-  return std::make_unique<WildcardToken>(
-      map->operator[](std::string(name)).get());
-}
+// auto Out::createWildcardToken(std::string_view name, Node::MapType *&map)
+//     -> std::unique_ptr<CodegenToken> {
+//   return std::make_unique<WildcardToken>(
+//       map->operator[](std::string(name)).get());
+// }
 
 Out &Out::operator+(Out::PortFetch fetch) {
   auto [p, name] = fetch;
@@ -49,7 +49,9 @@ Out &Out::operator+(Out::PortFetch fetch) {
   this->FlushBuffer();
 
   if (this->status.ok()) {
-    *(this->it) = this->createWildcardToken(name_lower, map);
+    auto port = map->operator[](name_lower).get();
+    this->GetContext()->LogPort(&this->parent, port, p == Polarity::RIGHT);
+    *this->it = WildcardToken(port);
   }
 
   return *this;
@@ -64,7 +66,7 @@ void Out::Legacy::AddTokenVector(std::vector<std::shared_ptr<MockToken>> &&v) {
   for (int i = 0; i < v.size(); i++) {
     auto *m = v[i].get();
     if (auto t = dynamic_cast<MTextToken *>(m)) {
-      *self.it = std::make_unique<TextToken>(t->text);
+      *self.it = TextToken(t->text);
     } else if (auto w = dynamic_cast<MWildcardToken *>(m)) {
       Node::MapType *map;
       std::string name_lower = std::string(w->name);
@@ -72,7 +74,8 @@ void Out::Legacy::AddTokenVector(std::vector<std::shared_ptr<MockToken>> &&v) {
         return;
       }
 
-      *self.it = self.createWildcardToken(name_lower, map);
+      auto port = map->operator[](name_lower).get();
+      *self.it = WildcardToken(port);
     } else
       spdlog::warn("MockToken of base type discarded - how did this get here?");
   }

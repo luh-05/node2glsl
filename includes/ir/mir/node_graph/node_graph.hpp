@@ -1,5 +1,7 @@
 #pragma once
 // #include "mir/codegen.hpp"
+#include "mir/codegen.hpp"
+#include "plugin_abi/plugin_abi.h"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <cstdint>
@@ -15,22 +17,21 @@
 #include <string_view>
 #include <tuple>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace msk::ir {
 class Connection;
 class Port : public Identifiable<Port> {
 public:
-  // TODO: change to enum
-  std::string dataType; // Data type of Port
-
   // std::vector<std::shared_ptr<Connection>> connections;
   using ConnectionPointer = std::shared_ptr<Connection>;
   std::variant<ConnectionPointer, std::vector<ConnectionPointer>> connection;
 
+  std::string dataType; // Data type of Port
   Port(std::string dataType, bool left) : dataType(dataType) {
     if (!left) {
-      connection = std::vector<ConnectionPointer>();
+      this->connection = std::vector<ConnectionPointer>();
     }
   };
 
@@ -40,13 +41,14 @@ public:
    * @return absl::AlreadyExistsError - payload url:
    * "mollusk.ir/AlreadyExistsReason" ("this" meaning this port already has a
    * connection and "other for the other")
-   * @return absl::InvalidArgumentError when port datatypes are incompatible
    * @return absl::OkStatus() if success
    */
   auto EstablishConnection(Port &other) -> absl::Status;
 };
 
-class CodegenToken; // pimpl
+class TextToken;     // pimpl
+class WildcardToken; // pimpl
+using CodegenToken = std::variant<TextToken, WildcardToken>;
 /**
  * @brief Node representation in Graph
  */
@@ -81,6 +83,9 @@ public:
   // Gets the named constant of the provided node
   template <class T>
   auto GetConstant(Node *n, std::string_view name) -> absl::StatusOr<T>;
+
+  // Registers the given port as visited
+  auto LogPort(Node *n, Port *port, bool right) -> void;
 };
 
 /**
@@ -88,17 +93,35 @@ public:
  */
 class Module : public Node {
 public:
-  using Token = std::unique_ptr<CodegenToken>;
+  // using Token = std::unique_ptr<CodegenToken>;
+  using Token = CodegenToken;
 
   class Out;
   // Generates CodegenTokens
-  typedef absl::Status (*GenerateTokenString)(Out &&out);
-  GenerateTokenString impl;
+  typedef absl::Status (*GenerateTokenString)(Out &out);
+  class GenerationStrategy {
+  private:
+    ModuleFunc func;
 
-  Module(GenerateTokenString impl) : impl(impl) {}
+  public:
+    GenerationStrategy(ModuleFunc func) : func(func) {}
+
+    absl::Status operator()(Out &&out) const {
+      PluginStatus status{};
+      this->func(&out, &status);
+
+      return absl::ErrnoToStatus(status.errc, status.message);
+    }
+  };
+
+  // auto Evaluate(Out &&out) -> absl::Status { return this->impl(out); }
+
+  const GenerationStrategy Evaluate;
+
+  Module(ModuleFunc impl) : Evaluate(impl) {}
 
   /**
-   *  @brief Helper Class for specifying Module::GenerateTokenString(), provides
+   *  @brief Helper Class for specifying Module::GenerateTokenString, provides
    * a mini DSL
    */
   class Out {
@@ -110,16 +133,16 @@ public:
     enum Polarity { LEFT = 0x0, RIGHT = 0x1 };
 
   private:
-    std::shared_ptr<ContextProvider> cxt;
+    std::shared_ptr<ContextProvider> ctx;
 
-    ContextProvider *GetContext() { return cxt.get(); };
+    ContextProvider *GetContext() { return ctx.get(); };
 
     absl::Status status = absl::OkStatus();
     std::string text_buff;
 
     bool checkPort(Polarity p, std::string name, Node::MapType *&map);
-    auto createWildcardToken(std::string_view name, Node::MapType *&map)
-        -> std::unique_ptr<CodegenToken>;
+    // auto createWildcardToken(std::string_view name, Node::MapType *&map)
+    //     -> std::unique_ptr<CodegenToken>;
 
   public:
     using Inserter = std::back_insert_iterator<std::vector<Token>>;
@@ -128,7 +151,7 @@ public:
     std::unique_ptr<Legacy> legacy;
 
     Out(std::shared_ptr<ContextProvider> cxt, Inserter it, Module &parent)
-        : cxt(cxt), it(it), parent(parent) {
+        : ctx(cxt), it(it), parent(parent) {
       this->legacy = std::make_unique<Legacy>(*this);
     };
     ~Out() noexcept {
@@ -151,7 +174,7 @@ public:
      * no further codegen will be possible from this object
      */
     template <class T> auto GetConstant(std::string_view name) -> T {
-      if (auto s = cxt->GetConstant<T>(static_cast<Node *>(&parent), name);
+      if (auto s = ctx->GetConstant<T>(static_cast<Node *>(&parent), name);
           !s.ok()) {
         if (this->status.ok())
           this->status = s.status();
@@ -261,26 +284,35 @@ inline auto operator/(Module::Out::Polarity pol, std::string_view name)
   return {pol, name};
 }
 
+class Graph;
 /**
  * @brief Graph Node
  */
 class Graph : public Node {
 public:
-  using VariantType =
-      std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
-  using MapType = std::map<std::string, VariantType, std::less<>>;
+  using SubnodesMapVariant = std::variant<Module, Graph>;
+  using MapType = std::map<std::string, SubnodesMapVariant, std::less<>>;
 
 private:
+  // using SubnodesMapVariant =
+  //     std::variant<std::unique_ptr<Module>, std::unique_ptr<Graph>>;
+
   MapType subnodes;
 
   template <class T, class... Args>
   auto addNode(std::string_view name, Args... args) -> absl::StatusOr<T *>;
 
 public:
-  auto AddModule(std::string_view name, Module::GenerateTokenString impl)
+  Graph() {}
+
+  auto AddModule(std::string_view name, ModuleFunc impl)
       -> absl::StatusOr<Module *>;
   auto AddGraph(std::string_view name) -> absl::StatusOr<Graph *>;
   template <class T> auto GetNode(std::string_view name) -> absl::StatusOr<T *>;
+
+  inline auto GetSubnodesIt() -> MapType::iterator { return subnodes.begin(); }
+  inline auto GetSubnodesItEnd() -> MapType::iterator { return subnodes.end(); }
+  inline auto GetSubnodes() -> MapType * { return &this->subnodes; }
 };
 
 /**

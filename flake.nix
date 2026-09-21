@@ -41,6 +41,7 @@
           glm
           spdlog
           pugixml
+          gtest
 
           # documentation
           doxygen

@@ -1,10 +1,11 @@
 #pragma once
 #include "blender/ir_shim/ir_shim.hpp"
-#include "mir/node_graph/node_graph.hpp"
+#include "mir/node_graph/GraphContext.hpp"
 #include <absl/status/status.h>
 #include <absl/status/statusor.h>
 #include <map>
 #include <memory>
+#include <mollusk/plugins/plugins.hpp>
 #include <pugixml.hpp>
 #include <string>
 
@@ -13,6 +14,8 @@ namespace msk::blender {
 class XMLParser {
   pugi::xml_document doc;
 
+  ModuleStore *store;
+
 private:
   auto PopulateGraph(GraphShim &graph, GraphHandle current_graph,
                      pugi::xml_node xml_graph,
@@ -20,10 +23,11 @@ private:
       -> absl::Status;
 
 public:
+  XMLParser(ModuleStore *store) : store(store) {};
+
   auto XMLread(std::string_view path) -> absl::Status;
-  auto ParseGraph(std::string_view target_graph_id,
-                  std::shared_ptr<msk::ir::GraphContext> graph_context)
-      -> absl::StatusOr<std::shared_ptr<ir::Graph>>;
+  auto ParseGraph(std::string_view target_graph_id)
+      -> absl::StatusOr<std::shared_ptr<ir::GraphContext>>;
 };
 
 } // namespace msk::blender
