@@ -61,6 +61,25 @@ auto Port::EstablishConnection(Port &other) -> absl::Status {
   return absl::OkStatus();
 }
 
+auto Port::GetName() -> absl::StatusOr<std::string> {
+  std::string name = "val_";
+
+  if (this->IsLeft()) {
+    if (auto &c = std::get<ConnectionPointer>(this->connection)) {
+      if (auto *&r = c.get()->right_port) {
+        name += std::format("{}", reinterpret_cast<void *>(r));
+        return name;
+      }
+    } else {
+      return absl::InvalidArgumentError(std::format(
+          "Cannot get Name of a left port '{}' without a connection!",
+          reinterpret_cast<void *>(this)));
+    }
+  }
+  name += std::format("{}", reinterpret_cast<void *>(this));
+  return name;
+}
+
 // --- NODE ---
 
 auto addPort(Node::MapType &map, bool left, std::string_view name,

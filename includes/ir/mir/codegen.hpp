@@ -1,3 +1,4 @@
+#include <absl/status/statusor.h>
 #include <string>
 #include <variant>
 #pragma once
@@ -38,7 +39,7 @@ private:
 public:
   WildcardToken(Port *port) : port(port) {};
   ~WildcardToken() {}
-  std::string GetString();
+  auto GetString() -> absl::StatusOr<std::string>;
 };
 
 // using CodegenToken = std::variant<TextToken, WildcardToken>;

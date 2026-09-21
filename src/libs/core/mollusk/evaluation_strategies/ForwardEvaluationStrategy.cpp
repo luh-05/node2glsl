@@ -83,13 +83,20 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
   // Also discard any module that does not affect any connections
   if (auto mod_info = cxt->GetModuleInfo(&module).value_or(nullptr)) {
     auto conn_log = std::make_shared<ConnectionAccessLog>();
+
+    // Add all left connections
     for (auto left_port : mod_info->first) {
       if (auto *conn = std::get_if<msk::ir::Port::ConnectionPointer>(
               &left_port->connection)) {
         conn_log->first.insert(conn->get());
       }
     }
+
     for (auto right_port : mod_info->second) {
+      // Add right ports to list to generate constants
+      this->right_ports.insert(right_port);
+
+      // Add all right connections
       if (auto *conn =
               std::get_if<std::vector<msk::ir::Port::ConnectionPointer>>(
                   &right_port->connection)) {
@@ -126,12 +133,12 @@ auto ForwardEvaluationStrategy::orderSchedule() -> absl::Status {
 
   // Fill in deps map using connection access logs
   for (auto ordering : this->schedule) {
-    for (auto right_port : ordering.first->second) {
-      auto entry = ownership.find(right_port);
+    for (auto right_conenction : ordering.first->second) {
+      auto entry = ownership.find(right_conenction);
       if (entry != ownership.end()) {
         return absl::InternalError("Two indices claim to own the same port!");
       }
-      auto r = ownership.try_emplace(right_port, ordering.second);
+      auto r = ownership.try_emplace(right_conenction, ordering.second);
       if (!r.second) {
         return absl::InternalError("Failed to add IndexSet while ordering!");
       }
@@ -144,8 +151,8 @@ auto ForwardEvaluationStrategy::orderSchedule() -> absl::Status {
   // Map holding all dependencies
   DependencyMap dependencies;
   for (auto ordering : this->schedule) {
-    for (auto left_port : ordering.first->first) {
-      auto owner = ownership.find(left_port);
+    for (auto left_connection : ordering.first->first) {
+      auto owner = ownership.find(left_connection);
       if (owner == ownership.end())
         continue;
 
@@ -211,14 +218,51 @@ auto ForwardEvaluationStrategy::orderSchedule() -> absl::Status {
   return absl::OkStatus();
 }
 
+auto ForwardEvaluationStrategy::genGlobal(
+    msk::ir::Port *port, std::back_insert_iterator<TokenVector> &it)
+    -> absl::Status {
+  if (auto s = port->GetName(); s.ok()) {
+    *it = port->GetDataType() + " " + s.value() + ";\n";
+    return absl::OkStatus();
+  } else
+    return absl::AbortedError(std::format(
+        "While generating global definition: {}", s.status().ToString()));
+}
+
+auto ForwardEvaluationStrategy::genGlobals(
+    std::back_insert_iterator<TokenVector> &it) -> absl::Status {
+  for (auto *p : this->right_ports) {
+    if (auto s = this->genGlobal(p, it); !s.ok()) {
+      return s;
+    }
+  }
+
+  return absl::OkStatus();
+}
+
 auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
                                                std::string &out)
     -> absl::Status {
+  // Order Schedule first
   if (auto s = this->orderSchedule(); !s.ok()) {
     return absl::InvalidArgumentError(
         std::format("Graph could not be serialized: {}", s.ToString()));
   }
 
+  auto vit = std::back_inserter(this->tokens);
+  *vit = std::string(
+      "// --- GENERATED CODE, DO NOT EDIT ---\n// Global definitions\n\n");
+
+  // Then create global definitions
+  if (auto s = this->genGlobals(vit); !s.ok()) {
+    return s;
+  }
+
+  *vit = std::string("\n");
+
+  *vit = std::string("// Modules\n\n");
+
+  // Then append ordered modules
   auto schedule_second =
       this->schedule | std::views::transform([](auto &e) { return e.second; });
 
@@ -226,20 +270,26 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
     this->tokens.append_range(vectors.at(idx));
   }
 
+  // Then generate glsl from final token vector
   for (auto it = tokens.begin(); it != tokens.end(); it++) {
     // static int i = 0;
     auto token = &*it;
-    std::string token_string;
+    std::string glsl_string;
     if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
-      token_string = t->GetString();
+      glsl_string = t->GetString();
     } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
-      token_string = t->GetString();
+      if (auto s = t->GetString(); !s.ok()) {
+        return absl::AbortedError(
+            std::format("While evaluating tokens: {}", s.status().ToString()));
+      } else {
+        glsl_string = s.value();
+      }
     } else {
       return absl::InvalidArgumentError(
           std::format("Invalid Token Type in Token Evaluation: '{}'",
                       typeid(token).name()));
     }
-    out += token_string;
+    out += glsl_string;
   }
 
   return absl::OkStatus();

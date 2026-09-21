@@ -3,6 +3,7 @@
 #include "mir/node_graph/GraphContext.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include <absl/status/status.h>
+#include <iterator>
 #include <memory>
 #include <tuple>
 #include <unordered_set>
@@ -46,13 +47,18 @@ public:
 
 private:
   std::shared_ptr<ir::ContextProvider> cxt_prov;
+  std::unordered_set<msk::ir::Port *> right_ports;
+
+  bool pretty;
 
   auto evalGraph(ContextPointer cxt, ir::Graph &graph) -> absl::Status;
   auto evalModule(ContextPointer cxt, ir::Module &module) -> absl::Status;
 
   auto orderSchedule() -> absl::Status;
 
-  bool pretty;
+  auto genGlobal(msk::ir::Port *port,
+                 std::back_insert_iterator<TokenVector> &it) -> absl::Status;
+  auto genGlobals(std::back_insert_iterator<TokenVector> &it) -> absl::Status;
 
 public:
   ForwardEvaluationStrategy(bool pretty = false) : pretty(pretty) {}
