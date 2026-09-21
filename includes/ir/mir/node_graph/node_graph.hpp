@@ -44,6 +44,11 @@ public:
    * @return absl::OkStatus() if success
    */
   auto EstablishConnection(Port &other) -> absl::Status;
+
+  inline auto IsLeft() -> bool {
+    return !std::holds_alternative<std::vector<ConnectionPointer>>(
+        this->connection);
+  }
 };
 
 class TextToken;     // pimpl

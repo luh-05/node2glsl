@@ -63,6 +63,20 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
         std::format("Failed to evaluate Module: {}", s.ToString()));
   }
 
+  auto last_token = &*v.rbegin();
+
+  if (this->pretty) {
+    if (std::holds_alternative<msk::ir::WildcardToken>(*last_token)) {
+      *inserter = ir::TextToken("\n");
+    } else if (auto *tt = std::get_if<msk::ir::TextToken>(last_token)) {
+      if (*tt->GetString().rbegin() != '\n') {
+        *inserter = ir::TextToken("\n");
+      }
+    } else {
+      return absl::InternalError("Failed to match token type!");
+    }
+  }
+
   *inserter = ir::TextToken("}\n");
 
   // Convert port access to Connection access logs

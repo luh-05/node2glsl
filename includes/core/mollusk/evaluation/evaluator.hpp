@@ -52,7 +52,11 @@ private:
 
   auto orderSchedule() -> absl::Status;
 
+  bool pretty;
+
 public:
+  ForwardEvaluationStrategy(bool pretty = false) : pretty(pretty) {}
+
   auto GenerateTokens(ContextPointer cxt) -> absl::Status override;
   auto EvaluateTokens(ContextPointer cxt, std::string &out)
       -> absl::Status override;

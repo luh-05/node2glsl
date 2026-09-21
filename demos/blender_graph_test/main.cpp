@@ -41,7 +41,7 @@ int main() {
   CHECK_OK(parseTest, parser.ParseGraph("0"));
 
   msk::Evaluator eval(parseTest,
-                      std::make_unique<msk::ForwardEvaluationStrategy>());
+                      std::make_unique<msk::ForwardEvaluationStrategy>(true));
 
   std::string res;
   if (auto s = eval.Evaluate(res); !s.ok()) {
