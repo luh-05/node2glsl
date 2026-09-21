@@ -65,29 +65,29 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
 
   *inserter = ir::TextToken("}\n");
 
+  // Convert port access to Connection access logs
+  // Also discard any module that does not affect any connections
   if (auto mod_info = cxt->GetModuleInfo(&module).value_or(nullptr)) {
-    this->vectors.push_back(std::move(v));
-
     auto conn_log = std::make_shared<ConnectionAccessLog>();
-    conn_log->first = ConnectionSet();
-    conn_log->second = ConnectionSet();
     for (auto left_port : mod_info->first) {
-      conn_log->first.insert(
-          std::get<msk::ir::Port::ConnectionPointer>(left_port->connection)
-              .get());
+      if (auto *conn = std::get_if<msk::ir::Port::ConnectionPointer>(
+              &left_port->connection)) {
+        conn_log->first.insert(conn->get());
+      }
     }
     for (auto right_port : mod_info->second) {
-      if (!right_port)
-        continue;
       if (auto *conn =
               std::get_if<std::vector<msk::ir::Port::ConnectionPointer>>(
                   &right_port->connection)) {
         std::for_each(conn->begin(), conn->end(), [&conn_log](auto &e) {
+          if (!e)
+            return;
           conn_log->second.insert(e.get());
         });
       }
     }
 
+    this->vectors.push_back(std::move(v));
     this->schedule.push_back({std::move(conn_log), this->vectors.size() - 1});
   }
 
