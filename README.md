@@ -13,6 +13,7 @@ Utility to convert a shader node-graph to glsl
  - doxygen
  - sphinx
  - breathe
+ - gtest
 
 > [!TIP]
 > A **Nix flake** containing all dependencies is provided.
