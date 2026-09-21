@@ -20,7 +20,6 @@ bool Out::checkPort(Out::Polarity p, std::string name, Node::MapType *&map) {
   name | std::views::transform([](unsigned char c) { return std::tolower(c); });
 
   if (!map->contains(name)) {
-    // FIXME: Ports not implemented correctly yet, so this will always throw
     if (this->status.ok()) {
       this->status = absl::NotFoundError(
           std::format("Cound not find {} port '{}' (module: '{}')",

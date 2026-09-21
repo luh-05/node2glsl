@@ -21,34 +21,6 @@ namespace msk {
 
 auto ForwardEvaluationStrategy::evalGraph(ContextPointer cxt, ir::Graph &graph)
     -> absl::Status {
-  // for (auto it = cxt->graph->GetSubnodesIt();
-  //      it != cxt->graph->GetSubnodesItEnd(); it++) {
-  //   auto value = &it->second;
-  //
-  //   if (auto &g = std::get_if<ir::Graph>(value)) {
-  //     if (g) {
-  //       if (auto s = evalGraph(cxt, *g); !s.ok()) {
-  //         return s;
-  //       }
-  //     } else {
-  //       return absl::NotFoundError(
-  //           std::format("The graph '{}', is nullptr!", it->first));
-  //     }
-  //   } else if (auto &m = std::get_if<ir::Module>(value)) {
-  //     if (m) {
-  //       if (auto s = evalModule(cxt, m); !s.ok()) {
-  //         return s;
-  //       }
-  //     } else {
-  //       return absl::NotFoundError(
-  //           std::format("The node '{}', is nullptr!", it->first));
-  //     }
-  //   } else {
-  //     return absl::InternalError(
-  //         "Could not determine variant type to be neither Graph nor
-  //         Module!");
-  //   }
-  // }
   auto &subnodes = *graph.GetSubnodes();
   for (auto &[key, value] : subnodes) {
 
@@ -93,34 +65,26 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
 
   *inserter = ir::TextToken("}\n");
 
-  if (auto mod_info = cxt->GetModuleInfo(&module); mod_info.has_value()) {
+  if (auto mod_info = cxt->GetModuleInfo(&module).value_or(nullptr)) {
     this->vectors.push_back(std::move(v));
 
     auto conn_log = std::make_shared<ConnectionAccessLog>();
     conn_log->first = ConnectionSet();
     conn_log->second = ConnectionSet();
-    for (auto left_port : mod_info.value()->first) {
+    for (auto left_port : mod_info->first) {
       conn_log->first.insert(
           std::get<msk::ir::Port::ConnectionPointer>(left_port->connection)
               .get());
     }
-    for (auto right_port : mod_info.value()->second) {
+    for (auto right_port : mod_info->second) {
       if (!right_port)
         continue;
       if (auto *conn =
               std::get_if<std::vector<msk::ir::Port::ConnectionPointer>>(
                   &right_port->connection)) {
-        // if (!conn || conn->empty())
-        //   break;
         std::for_each(conn->begin(), conn->end(), [&conn_log](auto &e) {
           conn_log->second.insert(e.get());
         });
-        // if (conn_log->second.empty()) {
-        // return absl::InternalError("sdfsdaf");
-        // }
-        // for (auto e = conn->begin(); e != conn->end(); e++) {
-        //   // conn_log.second.insert(e->get());
-        // }
       }
     }
 
@@ -212,7 +176,7 @@ auto ForwardEvaluationStrategy::orderSchedule() -> absl::Status {
         break;
       }
 
-      // Otherwise move to next layer
+      // Otherwise move down dependency chain
       idx = *deps->second.begin();
     }
     if (visited_count >= indices_left.size()) {
@@ -223,16 +187,12 @@ auto ForwardEvaluationStrategy::orderSchedule() -> absl::Status {
   }
 
   // Reorder schedule accordingly
-  Schedule old_schedule = std::move(this->schedule);
-  auto mapped_indices =
-      order | std::views::transform([&old_schedule](auto &p) -> Index & {
-        return old_schedule[p].second;
-      });
-  this->schedule = Schedule();
-  std::for_each(mapped_indices.begin(), mapped_indices.end(),
-                [&old_schedule, this](auto &idx) {
-                  this->schedule.push_back(std::move(old_schedule[idx]));
-                });
+  auto old_schedule = std::move(this->schedule);
+  this->schedule = order |
+                   std::views::transform([&old_schedule](const auto &i) {
+                     return std::move(old_schedule[i]);
+                   }) |
+                   std::ranges::to<Schedule>();
 
   return absl::OkStatus();
 }

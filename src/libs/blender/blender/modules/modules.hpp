@@ -21,6 +21,7 @@ auto GenerateTokenStringFunctionNodeHashValue(Out &out) -> absl::Status;
 auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeFloatToInt(Out &out) -> absl::Status;
+
 auto GenerateTokenStringNodeGroupOutput(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeClamp(Out &out) -> absl::Status;
