@@ -4,15 +4,18 @@
 #include <absl/status/status.h>
 #include <map>
 #include <plugin_abi/plugin_abi.h>
+#include <span>
 #include <string>
 #include <vector>
 
 namespace msk {
 
-class ModuleStore {
+class PluginStore {
 public:
   using LookupType = std::map<std::string, ModuleFunc>;
   LookupType lookup;
+
+  std::vector<std::string> definitions;
 
 public:
   /// TODO: Make this an actual plugin implementation
@@ -27,6 +30,10 @@ public:
     }
 
     return f->second;
+  }
+
+  auto GetPPDefinitions() -> std::span<std::string> {
+    return this->definitions;
   }
 };
 

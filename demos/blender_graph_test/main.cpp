@@ -24,7 +24,7 @@ int main() {
   spdlog::flush_on(spdlog::level::debug);
   // GraphShim g(msk::ir::GraphContext graph_context);
 
-  msk::ModuleStore store;
+  msk::PluginStore store;
   if (auto s = store.FetchPlugin(); !s.ok()) {
     spdlog::error(s.ToString());
     return 1;

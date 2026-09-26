@@ -83,6 +83,10 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
   return true;
 }
 
+void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
+  callback("VALUE float", userdata);
+}
+
 void GetInfo(PluginInfo *info) {
   std::strncpy(info->id, "com.official.blender\0", PLUGIN_ID_MAX);
   std::strncpy(info->name, "Official Blender Plugin for XML import\0",

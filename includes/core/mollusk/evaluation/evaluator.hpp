@@ -60,6 +60,8 @@ private:
                  std::back_insert_iterator<TokenVector> &it) -> absl::Status;
   auto genGlobals(std::back_insert_iterator<TokenVector> &it) -> absl::Status;
 
+  auto prettify(std::string &glsl) -> absl::Status;
+
 public:
   ForwardEvaluationStrategy(bool pretty = false) : pretty(pretty) {}
 

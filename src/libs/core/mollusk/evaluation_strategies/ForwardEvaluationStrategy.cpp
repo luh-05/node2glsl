@@ -56,7 +56,8 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
   TokenVector v;
   auto inserter = std::back_inserter(v);
 
-  *inserter = ir::TextToken("{\n");
+  *inserter =
+      std::format("// Module '{}'\n{{\n", reinterpret_cast<void *>(&module));
 
   if (auto s = module.Evaluate({this->cxt_prov, inserter, module}); !s.ok()) {
     return absl::AbortedError(
@@ -65,17 +66,17 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
 
   auto last_token = &*v.rbegin();
 
-  if (this->pretty) {
-    if (std::holds_alternative<msk::ir::WildcardToken>(*last_token)) {
-      *inserter = ir::TextToken("\n");
-    } else if (auto *tt = std::get_if<msk::ir::TextToken>(last_token)) {
-      if (*tt->GetString().rbegin() != '\n') {
-        *inserter = ir::TextToken("\n");
-      }
-    } else {
-      return absl::InternalError("Failed to match token type!");
-    }
-  }
+  // if (this->pretty) {
+  //   if (std::holds_alternative<msk::ir::WildcardToken>(*last_token)) {
+  //     *inserter = ir::TextToken("\n");
+  //   } else if (auto *tt = std::get_if<msk::ir::TextToken>(last_token)) {
+  //     if (*tt->GetString().rbegin() != '\n') {
+  //       *inserter = ir::TextToken("\n");
+  //     }
+  //   } else {
+  //     return absl::InternalError("Failed to match token type!");
+  //   }
+  // }
 
   *inserter = ir::TextToken("}\n");
 
@@ -260,9 +261,13 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
 
   *vit = std::string("\n");
 
-  *vit = std::string("// Modules\n\n");
+  // Add function header
+  *vit = std::string("// Main Method\n");
+  *vit = std::string("int main() {\n");
 
   // Then append ordered modules
+  *vit = std::string("// Modules\n\n");
+
   auto schedule_second =
       this->schedule | std::views::transform([](auto &e) { return e.second; });
 
@@ -270,9 +275,11 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
     this->tokens.append_range(vectors.at(idx));
   }
 
+  // Finish with main function footer
+  *vit = std::string("}\n");
+
   // Then generate glsl from final token vector
   for (auto it = tokens.begin(); it != tokens.end(); it++) {
-    // static int i = 0;
     auto token = &*it;
     std::string glsl_string;
     if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
@@ -290,6 +297,24 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
                       typeid(token).name()));
     }
     out += glsl_string;
+  }
+
+  return absl::OkStatus();
+}
+
+auto ForwardEvaluationStrategy::prettify(std::string &glsl) -> absl::Status {
+  return absl::UnimplementedError(
+      "ForwardEvaluationStrategy::prettify is not implemented yet");
+
+  std::string p;
+
+  size_t scope = 0;
+  for (auto line : glsl | std::views::split('\n')) {
+    for (auto br_open : line | std::views::split('{')) {
+      p.append_range(br_open);
+      p.append("{\n");
+      scope++;
+    }
   }
 
   return absl::OkStatus();

@@ -51,7 +51,7 @@ TEST(BLENDER_GRAPH_TEST, GRAPH_SHIM) {
 }
 
 TEST(BLENDER_GRAPH_TEST, READ_GRAPH) {
-  msk::ModuleStore store;
+  msk::PluginStore store;
   ABSL_EXPECT_OK(store.FetchPlugin());
 
   msk::blender::XMLParser parser(&store);
@@ -63,7 +63,7 @@ TEST(BLENDER_GRAPH_TEST, READ_GRAPH) {
 
 TEST(BLENDER_GRAPH_TEST, PARSE_GRAPH) {
 
-  msk::ModuleStore store;
+  msk::PluginStore store;
   ABSL_EXPECT_OK(store.FetchPlugin());
 
   msk::blender::XMLParser parser(&store);
@@ -82,7 +82,7 @@ TEST(BLENDER_GRAPH_TEST, PARSE_GRAPH) {
 
 TEST(BLENDER_GRAPH_TEST, EVALUATE_GRAPH_LINEAR) {
 
-  msk::ModuleStore store;
+  msk::PluginStore store;
   ABSL_EXPECT_OK(store.FetchPlugin());
 
   msk::blender::XMLParser parser(&store);

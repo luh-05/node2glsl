@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 
 int main() {
-  msk::ModuleStore store;
+  msk::PluginStore store;
   if (auto s = store.FetchPlugin(); !s.ok()) {
     spdlog::error(s.ToString());
     return 1;

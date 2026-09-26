@@ -2,10 +2,11 @@
 #include "plugin_abi/plugin_abi.h"
 #include <absl/status/status.h>
 #include <mollusk/plugins/plugins.hpp>
+#include <vector>
 
 namespace msk {
 
-auto ModuleStore::FetchPlugin() -> absl::Status {
+auto PluginStore::FetchPlugin() -> absl::Status {
   if (!EnumerateModules(
           [](const char *name, ModuleFunc func, void *userdata) {
             auto &l = *static_cast<LookupType *>(userdata);
@@ -14,6 +15,13 @@ auto ModuleStore::FetchPlugin() -> absl::Status {
           &this->lookup)) {
     return absl::InternalError("Failed Enumerating Plugin Modules");
   }
+
+  EnumerateDefinitions(
+      [](const char *def, void *userdata) {
+        auto &vec = *static_cast<std::vector<std::string> *>(userdata);
+        vec.push_back(std::string(def));
+      },
+      &this->definitions);
 
   return absl::OkStatus();
 }

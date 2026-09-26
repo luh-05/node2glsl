@@ -14,7 +14,7 @@ namespace msk::blender {
 class XMLParser {
   pugi::xml_document doc;
 
-  ModuleStore *store;
+  PluginStore *store;
 
 private:
   auto PopulateGraph(GraphShim &graph, GraphHandle current_graph,
@@ -23,7 +23,7 @@ private:
       -> absl::Status;
 
 public:
-  XMLParser(ModuleStore *store) : store(store) {};
+  XMLParser(PluginStore *store) : store(store) {};
 
   auto XMLread(std::string_view path) -> absl::Status;
   auto ParseGraph(std::string_view target_graph_id)
