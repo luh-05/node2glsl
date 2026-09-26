@@ -20,66 +20,42 @@ void FuncWrapper(void *out, PluginStatus *status) {
 bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
   using namespace msk::blender;
 
-  if (!callback("DummyModule", FuncWrapper<GenerateTokenStringDummy>, userdata))
-    return false;
-  if (!callback("FunctionNodeBitMath",
-                FuncWrapper<GenerateTokenStringFunctionNodeBitMath>, userdata))
-    return false;
-  if (!callback("FunctionNodeBooleanMath",
-                FuncWrapper<GenerateTokenStringFunctionNodeBooleanMath>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeCompare",
-                FuncWrapper<GenerateTokenStringFunctionNodeCompare>, userdata))
-    return false;
-  if (!callback("FunctionNodeFloatToInt",
-                FuncWrapper<GenerateTokenStringFunctionNodeFloatToInt>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeHashValue",
-                FuncWrapper<GenerateTokenStringFunctionNodeHashValue>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeIntegerMath",
-                FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>,
-                userdata))
-    return false;
-  if (!callback("NodeGroupOutput",
-                FuncWrapper<GenerateTokenStringNodeGroupOutput>, userdata))
-    return false;
-  if (!callback("ShaderNodeClamp",
-                FuncWrapper<GenerateTokenStringShaderNodeClamp>, userdata))
-    return false;
-  if (!callback("ShaderNodeFloatCurve",
-                FuncWrapper<GenerateTokenStringShaderNodeFloatCurve>, userdata))
-    return false;
-  if (!callback("ShaderNodeMapRange",
-                FuncWrapper<GenerateTokenStringShaderNodeMapRange>, userdata))
-    return false;
-  if (!callback("ShaderNodeMath",
-                FuncWrapper<GenerateTokenStringShaderNodeMath>, userdata))
-    return false;
-  if (!callback("ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeInputBool",
-                FuncWrapper<GenerateTokenStringFunctionNodeInputBool>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeInputInt",
-                FuncWrapper<GenerateTokenStringFunctionNodeInputInt>, userdata))
-    return false;
-  if (!callback("FunctionNodeInputRotation",
-                FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>,
-                userdata))
-    return false;
-  if (!callback("FunctionNodeInputVector",
-                FuncWrapper<GenerateTokenStringFunctionNodeInputVector>,
-                userdata))
-    return false;
-  if (!callback("ShaderNodeValue",
-                FuncWrapper<GenerateTokenStringShaderNodeValue>, userdata))
-    return false;
+  constexpr std::pair<const char *, ModuleFunc> impls[] = {
+      {"DummyModule", FuncWrapper<GenerateTokenStringDummy>},
+      {"FunctionNodeBitMath",
+       FuncWrapper<GenerateTokenStringFunctionNodeBitMath>},
+      {"FunctionNodeBooleanMath",
+       FuncWrapper<GenerateTokenStringFunctionNodeBooleanMath>},
+      {"FunctionNodeCompare",
+       FuncWrapper<GenerateTokenStringFunctionNodeCompare>},
+      {"FunctionNodeFloatToInt",
+       FuncWrapper<GenerateTokenStringFunctionNodeFloatToInt>},
+      {"FunctionNodeHashValue",
+       FuncWrapper<GenerateTokenStringFunctionNodeHashValue>},
+      {"FunctionNodeIntegerMath",
+       FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>},
+      {"NodeGroupOutput", FuncWrapper<GenerateTokenStringNodeGroupOutput>},
+      {"ShaderNodeClamp", FuncWrapper<GenerateTokenStringShaderNodeClamp>},
+      {"ShaderNodeFloatCurve",
+       FuncWrapper<GenerateTokenStringShaderNodeFloatCurve>},
+      {"ShaderNodeMapRange",
+       FuncWrapper<GenerateTokenStringShaderNodeMapRange>},
+      {"ShaderNodeMath", FuncWrapper<GenerateTokenStringShaderNodeMath>},
+      {"ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>},
+      {"FunctionNodeInputBool",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputBool>},
+      {"FunctionNodeInputInt",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputInt>},
+      {"FunctionNodeInputRotation",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>},
+      {"FunctionNodeInputVector",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputVector>},
+      {"ShaderNodeValue", FuncWrapper<GenerateTokenStringShaderNodeValue>}};
+
+  for (const auto &[name, func] : impls) {
+    if (!callback(name, func, userdata))
+      return false;
+  }
   return true;
 }
 

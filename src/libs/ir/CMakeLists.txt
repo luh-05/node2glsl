@@ -10,7 +10,7 @@ add_library(abi_header_check STATIC abi_check.c)
 target_link_libraries(abi_header_check PRIVATE plugin_abi)
 
 set_target_properties(abi_header_check PROPERTIES
-    C_STANDARD 11
+    C_STANDARD 23
     C_STANDARD_REQUIRED ON
 )
 
