@@ -40,6 +40,8 @@ int main() {
   }
   CHECK_OK(parseTest, parser.ParseGraph("0"));
 
+  parseTest.get()->SetDefinitios(store.definitions);
+
   msk::Evaluator eval(parseTest,
                       std::make_unique<msk::ForwardEvaluationStrategy>(true));
 

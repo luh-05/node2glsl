@@ -252,14 +252,21 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
 
   auto vit = std::back_inserter(this->tokens);
   *vit = std::string(
-      "// --- GENERATED CODE, DO NOT EDIT ---\n// Global definitions\n\n");
+      "// --- GENERATED CODE, DO NOT EDIT ---\n// Global pp definitions\n\n");
+
+  // Then generate pp definitions
+  for (auto &s : cxt->GetDefinitions()) {
+    *vit = std::format("#define {}\n", s);
+  }
+
+  *vit = std::string("\n");
 
   // Then create global definitions
   if (auto s = this->genGlobals(vit); !s.ok()) {
     return s;
   }
 
-  *vit = std::string("\n");
+  *vit = std::string("\n// Global var definitions\n\n");
 
   // Add function header
   *vit = std::string("// Main Method\n");

@@ -99,6 +99,15 @@ public:
   using PortAccessLog = std::pair<PortSet, PortSet>;
   std::map<Node *, PortAccessLog> access_info;
 
+  // FIXME: Temporary
+  std::vector<std::string> definitions;
+  auto SetDefinitios(std::vector<std::string> defs) -> void {
+    this->definitions = defs;
+  }
+  auto GetDefinitions() -> std::vector<std::string> & {
+    return this->definitions;
+  }
+
   GraphContext() { this->graph = std::make_unique<ir::Graph>(); }
 
   template <class T>
