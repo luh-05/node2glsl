@@ -83,3 +83,11 @@ TEST(BLENDER_MODULES, DUMMY_MODULE) {
             "bla\nLeft port 'value0' resolves to: value0\nI'm not "
             "flushed!\n\nvalue2=value0+value1;\n");
 }
+
+auto shaderNodeMathHelper(std::string operation) {
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMath>(
+                {}, {{"operation0", operation}}),
+            "dflksdjflkj " + operation + " sadfalkjsdjfls");
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MATH_ADD) { shaderNodeMathHelper("ADD"); }
