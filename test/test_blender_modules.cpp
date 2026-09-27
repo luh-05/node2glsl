@@ -169,4 +169,76 @@ functionNodeBooleanMathHelper("NIMPLY", "(", "&& !", ");");
 
 
 
+//================================= BIT MATH ========================================================
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_NOT) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBitMath>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::RIGHT, "Value0"},
+                },
+                {{"operation0", "NOT"}}),
+            "Value0= ~A0;");
+}
 
+auto functionNodeBitMathHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "AND") {
+    op_c = "&";
+  } else if (operation == "OR") {
+    op_c = "|";
+  } else if (operation == "XOR") {
+    op_c = "^";
+  }
+
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBitMath>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::RIGHT, "Value0"},
+                },
+                {{"operation0", operation}}),
+            "Value0=A0" + op_c + "B0;");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_AND) {
+  functionNodeBitMathHelper("AND");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_OR) {
+  functionNodeBitMathHelper("OR");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_XOR) {
+  functionNodeBitMathHelper("XOR");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_SHIFT) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBitMath>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "Shift0"},
+                    {GraphShim::RIGHT, "Value0"},
+                },
+                {
+                  {"operation0", "SHIFT"}
+                }),
+                  "if (Shift0 > 0) {Value0=A0<<Shift0;}else if (Shift0 < 0) {Value0=A0>>(-Shift0);}else {Value0=A0;}");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_ROTATE) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBitMath>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "Shift0"},
+                    {GraphShim::RIGHT, "Value0"},
+                },
+                {
+                  {"operation0", "ROTATE"}
+                }),
+                  "if (Shift0 > 0) {Value0=(A0<<Shift0) | (A0>> (32 - Shift0));}else if (Shift0 < 0) {Value0=(A0>> (-Shift0)) | (A0<< (32 + Shift0));}else {Value0=A0;}");
+}
+//================================= BIT MATH =============================================

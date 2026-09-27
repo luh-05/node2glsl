@@ -17,7 +17,7 @@ auto GenerateTokenStringFunctionNodeBitMath(Out &out) -> absl::Status {
     return out.GetStatus();
   }
 
-  if (op_c == "AND" || op_c == "OR" || op_c == "XOR") {
+  if ((op_c == "AND") | (op_c == "OR") | (op_c == "XOR")) {
     std::string sign;
 
     if (op_c == "AND") {
