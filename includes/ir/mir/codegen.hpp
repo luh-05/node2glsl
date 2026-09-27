@@ -40,6 +40,7 @@ public:
   WildcardToken(Port *port) : port(port) {};
   ~WildcardToken() {}
   auto GetString() -> absl::StatusOr<std::string>;
+  auto GetPort() -> Port * { return this->port; }
 };
 
 // using CodegenToken = std::variant<TextToken, WildcardToken>;
