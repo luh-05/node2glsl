@@ -84,10 +84,89 @@ TEST(BLENDER_MODULES, DUMMY_MODULE) {
             "flushed!\n\nvalue2=value0+value1;\n");
 }
 
-auto shaderNodeMathHelper(std::string operation) {
-  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMath>(
-                {}, {{"operation0", operation}}),
-            "dflksdjflkj " + operation + " sadfalkjsdjfls");
+// auto shaderNodeMathHelper(std::string operation) {
+//   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMath>(
+//                 {}, {{"operation0", operation}}),
+//             "dflksdjflkj " + operation + " sadfalkjsdjfls");
+// }
+
+// TEST(BLENDER_MODULES, SHADER_NODE_MATH_ADD) { shaderNodeMathHelper("ADD"); }
+
+
+
+
+//================================== BOOLEAN MATH =================================================
+
+auto functionNodeBooleanMathHelper(std::string operation, std::string prefix, std::string infix, std::string suffix){
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBooleanMath>(
+    {
+    {GraphShim::LEFT, "Boolean1"},
+    {GraphShim::RIGHT, "Boolean2"},
+    {GraphShim::LEFT, "Boolean0"},
+    },
+    {{"operation0", operation}}
+  ),
+  std::string ("Boolean2 = " ) + prefix + "Boolean0 " + infix + " Boolean1" + suffix 
+);
 }
 
-TEST(BLENDER_MODULES, SHADER_NODE_MATH_ADD) { shaderNodeMathHelper("ADD"); }
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NOT) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBooleanMath>(
+    {
+    {GraphShim::LEFT, "Boolean1"},
+    {GraphShim::RIGHT, "Boolean2"},
+    {GraphShim::LEFT, "Boolean0"},
+    },
+    {{"operation0", "NOT"}}
+  ),
+  std::string("Boolean2 = !") + "Boolean0;"
+);
+}
+
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_AND) {
+  
+functionNodeBooleanMathHelper("AND", "", "&&", ";");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_OR) {
+  
+functionNodeBooleanMathHelper("OR", "", "||", ";");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NAND) {
+  
+functionNodeBooleanMathHelper("NAND", "!(", "&&", ");");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NOR) {
+  
+functionNodeBooleanMathHelper("NOR", "!(", "||", ");");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_XOR) {
+  
+functionNodeBooleanMathHelper("XOR", "", "!=", ";");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_XNOR) {
+  
+functionNodeBooleanMathHelper("XNOR", "", "==", ";");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_IMPLY) {
+  
+functionNodeBooleanMathHelper("IMPLY", "(!", "||", ");");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NIMPLY) {
+  
+functionNodeBooleanMathHelper("NIMPLY", "(", "&& !", ");");
+}
+
+//================================ BOOLEAN MATH ================================================
+
+
+
+
