@@ -24,6 +24,9 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
   } else if (op_c == "DIVIDE") {
     out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " / " +
         Out::LEFT / "Value1" + ";";
+  } else if (op_c == "MODULO") {
+    out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " % " +
+        Out::LEFT / "Value1" + ";";
   } else if (op_c == "POWER") {
     out + Out::RIGHT / "Value3" + " = int(pow(float(" + Out::LEFT / "Value0" +
         "), float(" + Out::LEFT / "Value1" + ")));";
@@ -58,13 +61,10 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
   } else if (op_c == "DIVIDE_CEIL") {
     out + Out::RIGHT / "Value3" + " = int(ceil(float(" + Out::LEFT / "Value0" +
         ") / float(" + Out::LEFT / "Value1" + ")));";
-  } else if (op_c == "MODULO") {
-    out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " % " +
-        Out::LEFT / "Value1" + ";";
   } else if (op_c == "FLOORED_MODULO") {
-    out + Out::RIGHT / "Value3" + " = ((" + Out::LEFT / "Value0" + " % " +
-        Out::LEFT / "Value1" + ") + " + Out::LEFT / "Value1" + ") % " +
-        Out::LEFT / "Value1" + ";";
+    out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" +
+        " - int(floor(float(" + Out::LEFT / "Value0" + ") / float(" +
+        Out::LEFT / "Value1" + "))) * " + Out::LEFT / "Value1" + ";";
   }
 
   else if (op_c == "GCD") {
