@@ -108,6 +108,15 @@ public:
     return this->definitions;
   }
 
+  // FIXME: Temporary
+  std::vector<CastPolicy> cast_policies;
+  auto SetCastPolicies(std::vector<CastPolicy> defs) -> void {
+    this->cast_policies = defs;
+  }
+  auto GetCastPolicies() -> std::vector<CastPolicy> & {
+    return this->cast_policies;
+  }
+
   GraphContext() { this->graph = std::make_unique<ir::Graph>(); }
 
   template <class T>

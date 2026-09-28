@@ -59,7 +59,6 @@ auto XMLParser::PopulateGraph(
     std::string node_name = xml_node.attribute("name").value();
     std::string node_type = xml_node.attribute("type").value();
 
-    // FIXME: Make every module a dummy module until all are implemented
     auto func = this->store->GetModuleFunc(node_type);
     if (!func.ok()) {
       return func.status();

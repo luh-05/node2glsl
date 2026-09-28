@@ -16,6 +16,7 @@ public:
   LookupType lookup;
 
   std::vector<std::string> definitions;
+  std::vector<msk::ir::CastPolicy> cast_policies;
 
 public:
   /// TODO: Make this an actual plugin implementation
@@ -34,6 +35,10 @@ public:
 
   auto GetPPDefinitions() -> std::span<std::string> {
     return this->definitions;
+  }
+
+  auto GetCastPolicies() -> std::span<msk::ir::CastPolicy> {
+    return this->cast_policies;
   }
 };
 

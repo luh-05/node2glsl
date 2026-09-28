@@ -63,6 +63,16 @@ void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
   callback("VALUE float", userdata);
 }
 
+void EnumerateCasts(CastPolicyCallback callback, void *userdata) {
+  constexpr std::tuple<const char *, const char *, const char *> policies[] = {
+      {"VECTOR", "VALUE", "length({})"},
+  };
+
+  for (const auto &[from, to, pattern] : policies) {
+    callback(from, to, pattern, userdata);
+  }
+}
+
 void GetInfo(PluginInfo *info) {
   std::strncpy(info->id, "com.official.blender\0", PLUGIN_ID_MAX);
   std::strncpy(info->name, "Official Blender Plugin for XML import\0",

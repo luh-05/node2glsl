@@ -286,17 +286,44 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
   *vit = std::string("}\n");
 
   // Then generate glsl from final token vector
-  for (auto it = tokens.begin(); it != tokens.end(); it++) {
-    auto token = &*it;
+  // for (auto it = tokens.begin(); it != tokens.end(); it++) {
+  for (auto &token : tokens) {
+    // auto token = &*it;
     std::string glsl_string;
-    if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
+    if (auto *t = std::get_if<msk::ir::TextToken>(&token)) {
       glsl_string = t->GetString();
-    } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
+    } else if (auto *t = std::get_if<msk::ir::WildcardToken>(&token)) {
+
       if (auto s = t->GetString(); !s.ok()) {
         return absl::AbortedError(
             std::format("While evaluating tokens: {}", s.status().ToString()));
       } else {
         glsl_string = s.value();
+
+        // Check type mismatch
+        if (t->GetPort()->IsLeft()) {
+          auto port_type_this = t->GetPort()->GetDataType();
+          auto port_type_other = std::get<msk::ir::Port::ConnectionPointer>(
+                                     t->GetPort()->connection)
+                                     ->right_port->GetDataType();
+          if (port_type_this != port_type_other) {
+            if (auto policy = std::ranges::find_if(
+                    cxt->cast_policies.begin(), cxt->cast_policies.end(),
+                    [&port_type_this, &port_type_other](auto &p) {
+                      return p.left_type == port_type_this &&
+                             p.right_type == port_type_other;
+                    });
+                policy == cxt->cast_policies.end()) {
+              return absl::InvalidArgumentError(
+                  std::format("No CastPolicy defined for '{}' -> '{}'!",
+                              port_type_other, port_type_this));
+            } else {
+              auto &pol = *policy;
+              glsl_string =
+                  std::format(std::runtime_format(pol.format), glsl_string);
+            }
+          }
+        }
       }
     } else {
       return absl::InvalidArgumentError(
