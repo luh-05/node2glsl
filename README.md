@@ -66,3 +66,6 @@ cmake --build --preset debug
 
 > [!IMPORTANT]
 > On Windows you might need to disable "Smart App Control" to run viz.exe
+
+# Usage
+`mollusk_cli` can be found in `bin/debug/mollusk_cli` after compilation. Run `mollusk_cli --helpfull` for usage instructions.
