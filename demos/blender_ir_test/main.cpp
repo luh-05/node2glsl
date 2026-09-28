@@ -42,7 +42,11 @@ int main() {
     if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
       token_string = t->GetString();
     } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
-      token_string = t->GetString();
+      if (auto s = t->GetString(); !s.ok()) {
+        spdlog::error(s.status().ToString());
+      } else {
+        token_string = s.value();
+      }
     }
 
     spdlog::warn("Token {}: {:?}", ++i, token_string);

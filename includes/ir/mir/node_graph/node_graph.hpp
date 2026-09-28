@@ -49,6 +49,10 @@ public:
     return !std::holds_alternative<std::vector<ConnectionPointer>>(
         this->connection);
   }
+
+  auto GetName() -> absl::StatusOr<std::string>;
+
+  inline auto GetDataType() -> std::string { return this->dataType; }
 };
 
 class TextToken;     // pimpl

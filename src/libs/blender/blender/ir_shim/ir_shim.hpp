@@ -6,6 +6,8 @@
 
 namespace msk::blender {
 
+// TODO: Move this over into core library and change parsing to use HostGraphAPI
+// and HostConstantAPI
 class GraphShim;
 
 class ModuleHandle {

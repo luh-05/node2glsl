@@ -8,6 +8,6 @@
 #include <spdlog/spdlog.h>
 
 TEST(BLENDER_PLUGIN_TEST, LOAD_BLENDER_PLUGIN) {
-  msk::ModuleStore store;
+  msk::PluginStore store;
   ABSL_EXPECT_OK(store.FetchPlugin());
 }

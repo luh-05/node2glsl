@@ -24,7 +24,7 @@ int main() {
   spdlog::flush_on(spdlog::level::debug);
   // GraphShim g(msk::ir::GraphContext graph_context);
 
-  msk::ModuleStore store;
+  msk::PluginStore store;
   if (auto s = store.FetchPlugin(); !s.ok()) {
     spdlog::error(s.ToString());
     return 1;
@@ -39,6 +39,8 @@ int main() {
     return 1;
   }
   CHECK_OK(parseTest, parser.ParseGraph("0"));
+
+  parseTest.get()->SetDefinitios(store.definitions);
 
   msk::Evaluator eval(parseTest,
                       std::make_unique<msk::ForwardEvaluationStrategy>(true));

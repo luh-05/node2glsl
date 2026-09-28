@@ -2,6 +2,7 @@ add_executable(blender_tests
   test_blender_ir.cpp
   test_blender_xml.cpp
   test_blender_plugin.cpp
+  test_blender_modules.cpp
 )
 target_link_libraries(blender_tests
   PRIVATE
