@@ -59,13 +59,5 @@ cmake --preset debug
 cmake --build --preset debug
 ```
 
-### Step 3 (Run)
-```sh
-./bin/debug/viz.exe --gpu_driver vulkan
-```
-
-> [!IMPORTANT]
-> On Windows you might need to disable "Smart App Control" to run viz.exe
-
 # Usage
 `mollusk_cli` can be found in `bin/debug/mollusk_cli` after compilation. Run `mollusk_cli --helpfull` for usage instructions.
