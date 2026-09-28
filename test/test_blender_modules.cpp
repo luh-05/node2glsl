@@ -263,7 +263,7 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_NOT_EQUAL) {
   functionNodeCompareHelper("NOT_EQUAL", "INT");
 }
 
-//============================= FLoat =====================================
+//============================= Float =====================================
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_LESS_THAN) {
   functionNodeCompareHelper("LESS_THAN", "FLOAT");
@@ -360,7 +360,7 @@ auto functionNodeCompareVectorDotProductHelper(std::string operation) {
   }
 }
 
-TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_LESS_THEN) {
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_LESS_THAN) {
   functionNodeCompareVectorDotProductHelper("LESS_THAN");
 }
 
@@ -437,7 +437,7 @@ auto functionNodeCompareVectorDirectionHelper(std::string operation) {
   }
 }
 
-TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_LESS_THEN) {
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_LESS_THAN) {
   functionNodeCompareVectorDirectionHelper("LESS_THAN");
 }
 
@@ -514,7 +514,7 @@ auto functionNodeCompareVectorElementHelper(std::string operation) {
   }
 }
 
-TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_LESS_THEN) {
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_LESS_THAN) {
   functionNodeCompareVectorElementHelper("LESS_THAN");
 }
 
@@ -585,7 +585,7 @@ auto functionNodeCompareVectorLengthHelper(std::string operation) {
   }
 }
 
-TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_LESS_THEN) {
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_LESS_THAN) {
   functionNodeCompareVectorLengthHelper("LESS_THAN");
 }
 
@@ -659,7 +659,7 @@ auto functionNodeCompareVectorAverageHelper(std::string operation) {
   }
 }
 
-TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_LESS_THEN) {
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_LESS_THAN) {
   functionNodeCompareVectorAverageHelper("LESS_THAN");
 }
 
@@ -725,7 +725,14 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MULTIPLY) {
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE) {
-  functionNodeIntegerMathBasicHelper("DIVIDE");
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "DIVIDE"}}),
+            "Value3 = (Value1 == 0 ? 0 : Value0 / Value1);");
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MODULO) {
@@ -847,17 +854,17 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE_CEIL) {
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_FLOORED_MODULO) {
-  EXPECT_EQ(
-      testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
-          {
-              {GraphShim::LEFT, "Value0"},
-              {GraphShim::LEFT, "Value1"},
-              {GraphShim::RIGHT, "Value3"},
-          },
-          {
-              {"operation0", "FLOORED_MODULO"},
-          }),
-      "Value3 = Value0 - int(floor(float(Value0) / float(Value1))) * Value1;");
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {
+                    {"operation0", "FLOORED_MODULO"},
+                }),
+            "Value3 = (Value1 == 0 ? 0 : Value0 - int(floor(float(Value0) / "
+            "float(Value1))) * Value1;)");
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_GCD) {
@@ -868,9 +875,9 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_GCD) {
                     {GraphShim::RIGHT, "Value3"},
                 },
                 {{"operation0", "GCD"}}),
-            "{if(Value0= 0 orValue1= 0){return max(Value0,Value1);}int result "
-            "= min(Value0,Value1);while (result>0){if(mod(Value0,result)==0 && "
-            "mod(Value1,result)==0){break;}result--;}Value3= result;}");
+            "{int gcd_x = abs(Value0);int gcd_y = abs(Value1);while (gcd_y != "
+            "0) {int gcd_tmp = gcd_x % gcd_y;gcd_x = gcd_y;gcd_y = "
+            "gcd_tmp;}Value3 = gcd_x;}");
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_LCM) {
@@ -885,4 +892,147 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_LCM) {
             "lcm_a;int lcm_y = lcm_b;while (lcm_y != 0) {int lcm_tmp = lcm_x % "
             "lcm_y;lcm_x = lcm_y;lcm_y = lcm_tmp;}Value3 = (lcm_x == 0) ? 0 : "
             "abs((lcm_a / lcm_x) * lcm_b);}");
+}
+
+//=========================================================================
+// ShaderNodeMapRange
+//=========================================================================
+
+auto shaderNodeMapRangeHelper(std::string data_type, std::string interpolation,
+                              bool clamp) {
+  std::string val, fmin, fmax, tmin, tmax, steps, res, glsl_type;
+
+  if (data_type == "FLOAT") {
+    val = "Value0";
+    fmin = "From Min0";
+    fmax = "From Max0";
+    tmin = "To Min0";
+    tmax = "To Max0";
+    steps = "Steps0";
+    res = "Result0";
+    glsl_type = "float";
+  } else if (data_type == "FLOAT_VECTOR") {
+    val = "Vector0";
+    fmin = "From Min1";
+    fmax = "From Max1";
+    tmin = "To Min1";
+    tmax = "To Max1";
+    steps = "Steps1";
+    res = "Vector0";
+    glsl_type = "vec3";
+  }
+
+  // Building blocks of the expected GLSL
+  const std::string factor =
+      "(" + val + " - " + fmin + ") / (" + fmax + " - " + fmin + ")";
+  const std::string to_range = "(" + tmax + " - " + tmin + ")";
+  const std::string to_bounds =
+      "min(" + tmin + ", " + tmax + "), max(" + tmin + ", " + tmax + "));";
+
+  std::string expected;
+
+  if (interpolation == "LINEAR") {
+    std::string body = tmin + " + " + factor + " * " + to_range;
+    expected = clamp ? res + " = clamp(" + body + ", " + to_bounds
+                     : res + " = " + body + ";";
+  } else if (interpolation == "STEPPED") {
+    std::string body = tmin + " + floor(" + factor + " * (" + steps +
+                       " + 1.0)) / " + steps + " * " + to_range;
+    expected = clamp ? res + " = clamp(" + body + ", " + to_bounds
+                     : res + " = " + body + ";";
+  } else if (interpolation == "SMOOTHSTEP") {
+    // The clamp flag has no effect here: the factor is always clamped to 0..1.
+    expected = "{" + glsl_type + " t = clamp(" + factor + ", 0.0, 1.0);" + res +
+               " = " + tmin + " + (t * t * (3.0 - 2.0 * t)) * " + to_range +
+               ";}";
+  } else if (interpolation == "SMOOTHERSTEP") {
+    // The clamp flag has no effect here: the factor is always clamped to 0..1.
+    expected = "{" + glsl_type + " t = clamp(" + factor + ", 0.0, 1.0);" + res +
+               " = " + tmin +
+               " + (t * t * t * (t * (t * 6.0 - 15.0) + 10.0)) * " + to_range +
+               ";}";
+  }
+
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMapRange>(
+                {
+                    {GraphShim::LEFT, val},
+                    {GraphShim::LEFT, fmin},
+                    {GraphShim::LEFT, fmax},
+                    {GraphShim::LEFT, tmin},
+                    {GraphShim::LEFT, tmax},
+                    {GraphShim::LEFT, steps},
+                    {GraphShim::RIGHT, res},
+                },
+                {{"data_type0", data_type},
+                 {"interpolation_type0", interpolation},
+                 {"clamp0", clamp ? "True" : "False"}}),
+            expected);
+}
+
+//============================== Float ====================================
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_LINEAR) {
+  shaderNodeMapRangeHelper("FLOAT", "LINEAR", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_LINEAR_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT", "LINEAR", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_STEPPED) {
+  shaderNodeMapRangeHelper("FLOAT", "STEPPED", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_STEPPED_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT", "STEPPED", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_SMOOTHSTEP) {
+  shaderNodeMapRangeHelper("FLOAT", "SMOOTHSTEP", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_SMOOTHSTEP_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT", "SMOOTHSTEP", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_SMOOTHERSTEP) {
+  shaderNodeMapRangeHelper("FLOAT", "SMOOTHERSTEP", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_FLOAT_SMOOTHERSTEP_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT", "SMOOTHERSTEP", true);
+}
+
+//============================== Vector ===================================
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_LINEAR) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "LINEAR", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_LINEAR_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "LINEAR", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_STEPPED) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "STEPPED", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_STEPPED_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "STEPPED", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHSTEP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHSTEP", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHSTEP_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHSTEP", true);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHERSTEP", false);
+}
+
+TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP_CLAMP) {
+  shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHERSTEP", true);
 }

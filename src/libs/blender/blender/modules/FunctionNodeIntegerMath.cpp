@@ -22,8 +22,9 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
     out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " * " +
         Out::LEFT / "Value1" + ";";
   } else if (op_c == "DIVIDE") {
-    out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " / " +
-        Out::LEFT / "Value1" + ";";
+    out + Out::RIGHT / "Value3" + " = (" + Out::LEFT / "Value1" +
+        " == 0 ? 0 : " + Out::LEFT / "Value0" + " / " + Out::LEFT / "Value1" +
+        ");";
   } else if (op_c == "MODULO") {
     out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" + " % " +
         Out::LEFT / "Value1" + ";";
@@ -62,30 +63,22 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
     out + Out::RIGHT / "Value3" + " = int(ceil(float(" + Out::LEFT / "Value0" +
         ") / float(" + Out::LEFT / "Value1" + ")));";
   } else if (op_c == "FLOORED_MODULO") {
-    out + Out::RIGHT / "Value3" + " = " + Out::LEFT / "Value0" +
-        " - int(floor(float(" + Out::LEFT / "Value0" + ") / float(" +
-        Out::LEFT / "Value1" + "))) * " + Out::LEFT / "Value1" + ";";
+    out + Out::RIGHT / "Value3" + " = (" + Out::LEFT / "Value1" +
+        " == 0 ? 0 : " + Out::LEFT / "Value0" + " - int(floor(float(" +
+        Out::LEFT / "Value0" + ") / float(" + Out::LEFT / "Value1" + "))) * " +
+        Out::LEFT / "Value1" + ";";
   }
 
   else if (op_c == "GCD") {
 
     out + "{";
-    out + "if(" + Out::LEFT / "Value0" + "= 0 or" + Out::LEFT / "Value1" +
-        "= 0){";
-    out + "return max(" + Out::LEFT / "Value0" + "," + Out::LEFT / "Value1" +
-        ");";
-    out + "}";
-    out + "int result = min(" + Out::LEFT / "Value0" + "," +
-        Out::LEFT / "Value1" + ");";
-
-    out + "while (result>0){";
-    out + "if(mod(" + Out::LEFT / "Value0" + ",result)==0 && mod(" +
-        Out::LEFT / "Value1" + ",result)==0){";
-    out + "break;";
-    out + "}";
-    out + "result--;";
-    out + "}";
-    out + Out::RIGHT / "Value3" + "= result;";
+    out + "int gcd_x = abs(" + Out::LEFT / "Value0" + ");";
+    out + "int gcd_y = abs(" + Out::LEFT / "Value1" + ");";
+    out + "while (gcd_y != 0) {";
+    out + "int gcd_tmp = gcd_x % gcd_y;";
+    out + "gcd_x = gcd_y;";
+    out + "gcd_y = gcd_tmp;}";
+    out + Out::RIGHT / "Value3" + " = gcd_x;";
     out + "}";
 
     return out.GetStatus();
@@ -96,8 +89,10 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
     out + "int lcm_a = abs(" + Out::LEFT / "Value0" + ");";
     out + "int lcm_b = abs(" + Out::LEFT / "Value1" + ");";
     out + "int lcm_x = lcm_a;" + "int lcm_y = lcm_b;";
-    out + "while (lcm_y != 0) {" + "int lcm_tmp = lcm_x % lcm_y;" +
-        "lcm_x = lcm_y;" + "lcm_y = lcm_tmp;" + "}";
+    out + "while (lcm_y != 0) {";
+    out + "int lcm_tmp = lcm_x % lcm_y;";
+    out + "lcm_x = lcm_y;";
+    out + "lcm_y = lcm_tmp;}";
     out + Out::RIGHT / "Value3" +
         " = (lcm_x == 0) ? 0 : abs((lcm_a / lcm_x) * lcm_b);";
     out + "}";
