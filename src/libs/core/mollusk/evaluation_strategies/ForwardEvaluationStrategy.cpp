@@ -13,6 +13,7 @@
 #include <numeric>
 #include <ranges>
 #include <spdlog/spdlog.h>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <variant>
@@ -64,8 +65,6 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
         std::format("Failed to evaluate Module: {}", s.ToString()));
   }
 
-  auto last_token = &*v.rbegin();
-
   // if (this->pretty) {
   //   if (std::holds_alternative<msk::ir::WildcardToken>(*last_token)) {
   //     *inserter = ir::TextToken("\n");
@@ -78,6 +77,15 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
   //   }
   // }
 
+  auto &last_token = *v.rbegin();
+  if (std::holds_alternative<msk::ir::WildcardToken>(last_token)) {
+    v.push_back(std::string("\n"));
+  } else {
+    auto &text = std::get<msk::ir::TextToken>(last_token);
+    if (!text.GetString().ends_with("\n")) {
+      v.push_back(std::string("\n"));
+    }
+  }
   *inserter = ir::TextToken("}\n");
 
   // Convert port access to Connection access logs
@@ -269,8 +277,8 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
   *vit = std::string("\n");
 
   // Add function header
-  *vit = std::string("// Main Method\n");
-  *vit = std::string("int main() {\n");
+  *vit = std::string("// Entry Point\n");
+  *vit = std::string("void p3d_main() {\n");
 
   // Then append ordered modules
   *vit = std::string("// Modules\n\n");
@@ -280,6 +288,7 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
 
   for (auto idx : schedule_second) {
     this->tokens.append_range(vectors.at(idx));
+    this->tokens.push_back(std::string("\n"));
   }
 
   // Finish with main function footer

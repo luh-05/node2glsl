@@ -31,6 +31,12 @@ auto GenerateTokenStringNodeGroupOutput(Out &out) -> absl::Status {
     }
   }
 
+  for (auto &res : left_ports | std::views::filter([](auto &e) {
+                     return e.first.starts_with("mollusk_debug");
+                   })) {
+    out + res.first + " = " + Out::LEFT / res.first + ";" = 1;
+  }
+
   return out.GetStatus();
 }
 

@@ -62,11 +62,17 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
 
 void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
   callback("VALUE float", userdata);
+  callback("VECTOR vec3", userdata);
+  callback("RGBA vec4", userdata);
+  callback("ROTATION vec3", userdata);
 }
 
 void EnumerateCasts(CastPolicyCallback callback, void *userdata) {
   constexpr std::tuple<const char *, const char *, const char *> policies[] = {
       {"VECTOR", "VALUE", "length({})"},
+      {"VALUE", "VECTOR", "vec3({0:}, {0:}, {0:})"},
+      {"VALUE", "RGBA", "vec4({0:}, {0:}, {0:}, 1.0f)"},
+      {"VALUE", "ROTATION", "vec3({0:}, {0:}, {0:})"},
   };
 
   for (const auto &[from, to, pattern] : policies) {
