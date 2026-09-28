@@ -32,7 +32,7 @@ int main() {
 
   msk::blender::XMLParser parser(&store);
 
-  std::string xml_text_file = "./demos/blender_graph_test/test.xml";
+  std::string xml_text_file = "./demos/blender_graph_test/cusi.xml";
   absl::Status status = parser.XMLread(xml_text_file);
   if (!status.ok()) {
     spdlog::error(status.ToString());

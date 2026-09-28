@@ -34,6 +34,7 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
        FuncWrapper<GenerateTokenStringFunctionNodeHashValue>},
       {"FunctionNodeIntegerMath",
        FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>},
+      {"NodeGroupInput", FuncWrapper<GenerateTokenStringNodeGroupInput>},
       {"NodeGroupOutput", FuncWrapper<GenerateTokenStringNodeGroupOutput>},
       {"ShaderNodeClamp", FuncWrapper<GenerateTokenStringShaderNodeClamp>},
       {"ShaderNodeFloatCurve",

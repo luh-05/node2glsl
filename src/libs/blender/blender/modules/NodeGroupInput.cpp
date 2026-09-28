@@ -8,22 +8,19 @@
 
 namespace msk::blender {
 
-auto GenerateTokenStringNodeGroupOutput(Out &out) -> absl::Status {
+auto GenerateTokenStringNodeGroupInput(Out &out) -> absl::Status {
   constexpr std::pair<const char *, const char *> magic_names[] = {
-      {"p3d_sdf0", "p3d_sdf"},
+      {"p3d_position0", "p3d_position"},
   };
-
-  auto &left_ports = out.parent.leftPorts;
-
+  auto &right_ports = out.parent.rightPorts;
   for (auto &[name, magic] : magic_names) {
     if (auto res =
-            std::ranges::find_if(left_ports.begin(), left_ports.end(),
+            std::ranges::find_if(right_ports.begin(), right_ports.end(),
                                  [&name](auto &e) { return e.first == name; });
-        res != left_ports.end()) {
-      out + magic + " = " + Out::LEFT / name + ";" = 1;
+        res != right_ports.end()) {
+      out + Out::RIGHT / name + " = " + magic + ";" = 1;
     }
   }
-
   return out.GetStatus();
 }
 
