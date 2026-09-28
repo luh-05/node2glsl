@@ -9,6 +9,7 @@
 #include <memory>
 #include <ranges>
 #include <span>
+#include <system_error>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -72,6 +73,10 @@ auto testImpl(std::vector<PortDefinition> ports,
   return text;
 }
 
+//=========================================================================
+// DummyModule
+//=========================================================================
+
 TEST(BLENDER_MODULES, DUMMY_MODULE) {
   EXPECT_EQ(testImpl<GenerateTokenStringDummy>(
                 {
@@ -83,6 +88,10 @@ TEST(BLENDER_MODULES, DUMMY_MODULE) {
             "bla\nLeft port 'value0' resolves to: value0\nI'm not "
             "flushed!\n\nvalue2=value0+value1;\n");
 }
+
+//=========================================================================
+// FunctionNodeBitMath
+//=========================================================================
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_NOT) {
   EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeBitMath>(
@@ -136,10 +145,9 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_SHIFT) {
                     {GraphShim::LEFT, "Shift0"},
                     {GraphShim::RIGHT, "Value0"},
                 },
-                {
-                  {"operation0", "SHIFT"}
-                }),
-                  "if (Shift0 > 0) {Value0=A0<<Shift0;}else if (Shift0 < 0) {Value0=A0>>(-Shift0);}else {Value0=A0;}");
+                {{"operation0", "SHIFT"}}),
+            "if (Shift0 > 0) {Value0=A0<<Shift0;}else if (Shift0 < 0) "
+            "{Value0=A0>>(-Shift0);}else {Value0=A0;}");
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_ROTATE) {
@@ -150,8 +158,731 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_BIT_MATH_ROTATE) {
                     {GraphShim::LEFT, "Shift0"},
                     {GraphShim::RIGHT, "Value0"},
                 },
+                {{"operation0", "ROTATE"}}),
+            "if (Shift0 > 0) {Value0=(A0<<Shift0) | (A0>> (32 - Shift0));}else "
+            "if (Shift0 < 0) {Value0=(A0>> (-Shift0)) | (A0<< (32 + "
+            "Shift0));}else {Value0=A0;}");
+}
+
+//=========================================================================
+// FunctionNodeFloatToInt
+//=========================================================================
+
+auto functionNodeFloatToIntHelper(std::string operation) {
+  std::string function;
+
+  if (operation == "ROUND") {
+    function = "round";
+  } else if (operation == "FLOOR") {
+    function = "floor";
+  } else if (operation == "CEILING") {
+    function = "ceil";
+  } else if (operation == "TRUNCATE") {
+    function = "trunc";
+  }
+
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeFloatToInt>(
                 {
-                  {"operation0", "ROTATE"}
+                    {GraphShim::LEFT, "Float0"},
+                    {GraphShim::RIGHT, "Integer0"},
+                },
+                {{"rounding_mode0", operation}}),
+            "Integer0 = int(" + function + "(Float0));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_FLOAT_TO_INT_ROUND) {
+  functionNodeFloatToIntHelper("ROUND");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_FLOAT_TO_INT_FLOOR) {
+  functionNodeFloatToIntHelper("FLOOR");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_FLOAT_TO_INT_CEILING) {
+  functionNodeFloatToIntHelper("CEILING");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_FLOAT_TO_INT_TRUNCATE) {
+  functionNodeFloatToIntHelper("TRUNCATE");
+}
+
+//=========================================================================
+// FunctionNodeCompare
+//=========================================================================
+
+auto functionNodeCompareHelper(std::string operation, std::string data_type) {
+  std::string op_c;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "==";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = "!=";
+  }
+
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::RIGHT, "Result0"},
+                },
+                {{"operation0", operation}, {"data_type0", data_type}}),
+            "Result0=A0" + op_c + "B0;");
+}
+
+//============================= Integer ===================================
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_LESS_THAN) {
+  functionNodeCompareHelper("LESS_THAN", "INT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_LESS_EQUAL) {
+  functionNodeCompareHelper("LESS_EQUAL", "INT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_GREATER_THAN) {
+  functionNodeCompareHelper("GREATER_THAN", "INT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_GREATER_EQUAL) {
+  functionNodeCompareHelper("GREATER_EQUAL", "INT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_EQUAL) {
+  functionNodeCompareHelper("EQUAL", "INT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_INT_NOT_EQUAL) {
+  functionNodeCompareHelper("NOT_EQUAL", "INT");
+}
+
+//============================= FLoat =====================================
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_LESS_THAN) {
+  functionNodeCompareHelper("LESS_THAN", "FLOAT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_LESS_EQUAL) {
+  functionNodeCompareHelper("LESS_EQUAL", "FLOAT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_GREATER_THAN) {
+  functionNodeCompareHelper("GREATER_THAN", "FLOAT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_GREATER_EQUAL) {
+  functionNodeCompareHelper("GREATER_EQUAL", "FLOAT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_EQUAL) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "Epsilon0"},
+                    {GraphShim::RIGHT, "Result0"},
+                },
+                {
+                    {"operation0", "EQUAL"},
+                    {"data_type0", "FLOAT"},
                 }),
-                  "if (Shift0 > 0) {Value0=(A0<<Shift0) | (A0>> (32 - Shift0));}else if (Shift0 < 0) {Value0=(A0>> (-Shift0)) | (A0<< (32 + Shift0));}else {Value0=A0;}");
+            "Result0= abs(A0-B0)<=Epsilon0;");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_NOT_EQUAL) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                {
+                    {GraphShim::LEFT, "A0"},
+                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "Epsilon0"},
+                    {GraphShim::RIGHT, "Result0"},
+                },
+                {
+                    {"operation0", "NOT_EQUAL"},
+                    {"data_type0", "FLOAT"},
+                }),
+            "Result0= abs(A0-B0)>Epsilon0;");
+}
+
+//============================== Vector ===================================
+
+//============================ Dot Product ================================
+
+auto functionNodeCompareVectorDotProductHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "<=";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = ">";
+  }
+
+  if (operation == "EQUAL" || operation == "NOT_EQUAL") {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::LEFT, "Epsilon0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "DOT_PRODUCT"}}),
+              "Result0= abs(dot(A0, B0) - C0) " + op_c + " Epsilon0;");
+  } else {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "DOT_PRODUCT"}}),
+              "Result0= dot(A0, B0) " + op_c + " C0;");
+  }
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_LESS_THEN) {
+  functionNodeCompareVectorDotProductHelper("LESS_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_LESS_EQUAL) {
+  functionNodeCompareVectorDotProductHelper("LESS_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_GREATER_THAN) {
+  functionNodeCompareVectorDotProductHelper("GREATER_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_GREATER_EQUAL) {
+  functionNodeCompareVectorDotProductHelper("GREATER_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_EQUAL) {
+  functionNodeCompareVectorDotProductHelper("EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DOT_PRODUCT_NOT_EQUAL) {
+  functionNodeCompareVectorDotProductHelper("NOT_EQUAL");
+}
+
+//============================= Direction =================================
+
+auto functionNodeCompareVectorDirectionHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "<=";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = ">";
+  }
+
+  if (operation == "EQUAL" || operation == "NOT_EQUAL") {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::LEFT, "Angle0"},
+                      {GraphShim::LEFT, "Epsilon0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "DIRECTION"}}),
+              "Result0= abs(acos(clamp(dot(normalize(A0), normalize(B0)), "
+              "-1.0, 1.0)) - Angle0) " +
+                  op_c + " Epsilon0;");
+  } else {
+    EXPECT_EQ(
+        testImpl<GenerateTokenStringFunctionNodeCompare>(
+            {
+                {GraphShim::LEFT, "A0"},
+                {GraphShim::LEFT, "B0"},
+                {GraphShim::LEFT, "C0"},
+                {GraphShim::LEFT, "Angle0"},
+                {GraphShim::RIGHT, "Result0"},
+            },
+            {{"operation0", operation},
+             {"data_type0", "VECTOR"},
+             {"mode0", "DIRECTION"}}),
+        "Result0= acos(clamp(dot(normalize(A0), normalize(B0)), -1.0, 1.0)) " +
+            op_c + " Angle0;");
+  }
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_LESS_THEN) {
+  functionNodeCompareVectorDirectionHelper("LESS_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_LESS_EQUAL) {
+  functionNodeCompareVectorDirectionHelper("LESS_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_GREATER_THAN) {
+  functionNodeCompareVectorDirectionHelper("GREATER_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_GREATER_EQUAL) {
+  functionNodeCompareVectorDirectionHelper("GREATER_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_EQUAL) {
+  functionNodeCompareVectorDirectionHelper("EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_DIRECTION_NOT_EQUAL) {
+  functionNodeCompareVectorDirectionHelper("NOT_EQUAL");
+}
+
+//============================== Element ==================================
+
+auto functionNodeCompareVectorElementHelper(std::string operation) {
+  std::string op_c;
+  std::string logical_op;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "<=";
+    logical_op = " && ";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = ">";
+    logical_op = " || ";
+  }
+
+  if (operation == "EQUAL" || operation == "NOT_EQUAL") {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::LEFT, "Epsilon0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "ELEMENT"}}),
+              "Result0= (abs(A0.x - B0.x) " + op_c + " Epsilon0)" + logical_op +
+                  "(abs(A0.y - B0.y) " + op_c + " Epsilon0)" + logical_op +
+                  "(abs(A0.z - B0.z) " + op_c + " Epsilon0);");
+  } else {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "ELEMENT"}}),
+              "Result0= (A0.x " + op_c + " B0.x) && (A0.y " + op_c +
+                  " B0.y) && (A0.z " + op_c + " B0.z);");
+  }
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_LESS_THEN) {
+  functionNodeCompareVectorElementHelper("LESS_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_LESS_EQUAL) {
+  functionNodeCompareVectorElementHelper("LESS_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_GREATER_THAN) {
+  functionNodeCompareVectorElementHelper("GREATER_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_GREATER_EQUAL) {
+  functionNodeCompareVectorElementHelper("GREATER_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_EQUAL) {
+  functionNodeCompareVectorElementHelper("EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_ELEMENT_NOT_EQUAL) {
+  functionNodeCompareVectorElementHelper("NOT_EQUAL");
+}
+
+//============================== Length ===================================
+
+auto functionNodeCompareVectorLengthHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "<=";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = ">";
+  }
+
+  if (operation == "EQUAL" || operation == "NOT_EQUAL") {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::LEFT, "Epsilon0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "LENGTH"}}),
+              "Result0= abs(length(A0) - length(B0)) " + op_c + " Epsilon0;");
+  } else {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "LENGTH"}}),
+              "Result0= length(A0) " + op_c + " length(B0);");
+  }
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_LESS_THEN) {
+  functionNodeCompareVectorLengthHelper("LESS_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_LESS_EQUAL) {
+  functionNodeCompareVectorLengthHelper("LESS_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_GREATER_THAN) {
+  functionNodeCompareVectorLengthHelper("GREATER_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_GREATER_EQUAL) {
+  functionNodeCompareVectorLengthHelper("GREATER_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_EQUAL) {
+  functionNodeCompareVectorLengthHelper("EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_LENGTH_NOT_EQUAL) {
+  functionNodeCompareVectorLengthHelper("NOT_EQUAL");
+}
+
+//============================== Average ==================================
+
+auto functionNodeCompareVectorAverageHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "LESS_THAN") {
+    op_c = "<";
+  } else if (operation == "LESS_EQUAL") {
+    op_c = "<=";
+  } else if (operation == "GREATER_THAN") {
+    op_c = ">";
+  } else if (operation == "GREATER_EQUAL") {
+    op_c = ">=";
+  } else if (operation == "EQUAL") {
+    op_c = "<=";
+  } else if (operation == "NOT_EQUAL") {
+    op_c = ">";
+  }
+
+  if (operation == "EQUAL" || operation == "NOT_EQUAL") {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::LEFT, "Epsilon0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "AVERAGE"}}),
+              "Result0= abs(((A0.x + A0.y + A0.z) / 3.0) - ((B0.x + B0.y + "
+              "B0.z) / 3.0)) " +
+                  op_c + " Epsilon0;");
+  } else {
+    EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
+                  {
+                      {GraphShim::LEFT, "A0"},
+                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "C0"},
+                      {GraphShim::RIGHT, "Result0"},
+                  },
+                  {{"operation0", operation},
+                   {"data_type0", "VECTOR"},
+                   {"mode0", "AVERAGE"}}),
+              "Result0= ((A0.x + A0.y + A0.z) / 3.0) " + op_c +
+                  " ((B0.x + B0.y + B0.z) / 3.0);");
+  }
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_LESS_THEN) {
+  functionNodeCompareVectorAverageHelper("LESS_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_LESS_EQUAL) {
+  functionNodeCompareVectorAverageHelper("LESS_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_GREATER_THAN) {
+  functionNodeCompareVectorAverageHelper("GREATER_THAN");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_GREATER_EQUAL) {
+  functionNodeCompareVectorAverageHelper("GREATER_EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_EQUAL) {
+  functionNodeCompareVectorAverageHelper("EQUAL");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_NOT_EQUAL) {
+  functionNodeCompareVectorAverageHelper("NOT_EQUAL");
+}
+
+//============================================================================
+// FunctionNodeIntegerMath
+//============================================================================
+
+auto functionNodeIntegerMathBasicHelper(std::string operation) {
+  std::string op_c;
+
+  if (operation == "ADD") {
+    op_c = "+";
+  } else if (operation == "SUBTRACT") {
+    op_c = "-";
+  } else if (operation == "MULTIPLY") {
+    op_c = "*";
+  } else if (operation == "DIVIDE") {
+    op_c = "/";
+  } else if (operation == "MODULO") {
+    op_c = "%";
+  }
+
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", operation}}),
+            "Value3 = Value0 " + op_c + " Value1;");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_ADD) {
+  functionNodeIntegerMathBasicHelper("ADD");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_SUBTRACT) {
+  functionNodeIntegerMathBasicHelper("SUBTRACT");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MULTIPLY) {
+  functionNodeIntegerMathBasicHelper("MULTIPLY");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE) {
+  functionNodeIntegerMathBasicHelper("DIVIDE");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MODULO) {
+  functionNodeIntegerMathBasicHelper("MODULO");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_POWER) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "POWER"}}),
+            "Value3 = int(pow(float(Value0), float(Value1)));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MIN) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "MINIMUM"}}),
+            "Value3 = min(Value0, Value1);");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MAX) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "MAXIMUM"}}),
+            "Value3 = max(Value0, Value1);");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_MULTIPLY_ADD) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::LEFT, "Value2"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "MULTIPLY_ADD"}}),
+            "Value3 = (Value0 * Value1) + Value2;");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_ABSOLUTE) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "ABSOLUTE"}}),
+            "Value3 = abs(Value0);");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_NEGATE) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "NEGATE"}}),
+            "Value3 = -(Value0);");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_SIGN) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "SIGN"}}),
+            "Value3 = int(sign(float(Value0)));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE_ROUND) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {
+                    {"operation0", "DIVIDE_ROUND"},
+                }),
+            "Value3 = int(round(float(Value0) / float(Value1)));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE_FLOOR) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {
+                    {"operation0", "DIVIDE_FLOOR"},
+                }),
+            "Value3 = int(floor(float(Value0) / float(Value1)));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_DIVIDE_CEIL) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {
+                    {"operation0", "DIVIDE_CEIL"},
+                }),
+            "Value3 = int(ceil(float(Value0) / float(Value1)));");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_FLOORED_MODULO) {
+  EXPECT_EQ(
+      testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+          {
+              {GraphShim::LEFT, "Value0"},
+              {GraphShim::LEFT, "Value1"},
+              {GraphShim::RIGHT, "Value3"},
+          },
+          {
+              {"operation0", "FLOORED_MODULO"},
+          }),
+      "Value3 = Value0 - int(floor(float(Value0) / float(Value1))) * Value1;");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_GCD) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "GCD"}}),
+            "{if(Value0= 0 orValue1= 0){return max(Value0,Value1);}int result "
+            "= min(Value0,Value1);while (result>0){if(mod(Value0,result)==0 && "
+            "mod(Value1,result)==0){break;}result--;}Value3= result;}");
+}
+
+TEST(BLENDER_MODULES, FUNCTION_NODE_INTEGER_MATH_LCM) {
+  EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeIntegerMath>(
+                {
+                    {GraphShim::LEFT, "Value0"},
+                    {GraphShim::LEFT, "Value1"},
+                    {GraphShim::RIGHT, "Value3"},
+                },
+                {{"operation0", "LCM"}}),
+            "{int lcm_a = abs(Value0);int lcm_b = abs(Value1);int lcm_x = "
+            "lcm_a;int lcm_y = lcm_b;while (lcm_y != 0) {int lcm_tmp = lcm_x % "
+            "lcm_y;lcm_x = lcm_y;lcm_y = lcm_tmp;}Value3 = (lcm_x == 0) ? 0 : "
+            "abs((lcm_a / lcm_x) * lcm_b);}");
 }
