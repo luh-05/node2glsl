@@ -97,8 +97,9 @@ TEST(BLENDER_MODULES, DUMMY_MODULE) {
 
 // TEST(BLENDER_MODULES, SHADER_NODE_MATH_ADD) { shaderNodeMathHelper("ADD"); }
 
-//================================== BOOLEAN MATH
-//=================================================
+//=========================================================================
+// FunctionNodeBooleanmath
+//=========================================================================
 
 auto functionNodeBooleanMathHelper(std::string operation, std::string prefix,
                                    std::string infix, std::string suffix) {
@@ -763,9 +764,9 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_VECTOR_AVERAGE_NOT_EQUAL) {
   functionNodeCompareVectorAverageHelper("NOT_EQUAL");
 }
 
-//============================================================================
+//=========================================================================
 // FunctionNodeIntegerMath
-//============================================================================
+//=========================================================================
 
 auto functionNodeIntegerMathBasicHelper(std::string operation) {
   std::string op_c;
@@ -1116,11 +1117,10 @@ TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP) {
 TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP_CLAMP) {
   shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHERSTEP", true);
 }
-//================================= BIT MATH
-//=============================================
 
-//================================= CLAMP
-//=========================================================
+//=========================================================================
+// ShaderNodeClamp
+//=========================================================================
 
 TEST(BLENDER_MODULES, SHADER_NODE_CLAMP_MINMAX) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeClamp>(
@@ -1144,10 +1144,12 @@ TEST(BLENDER_MODULES, SHADER_NODE_CLAMP_RANGE) {
                 {{"clamp_type0", "RANGE"}}),
             "Result0 = clamp(Value0, min(Min0, Max0), max(Min0, Max0));");
 }
-//====================== END CLAMP ========================
 
-//============= START SHADER NODE MATH ======================
-// ============== FIRST BLOCK ========================
+//=========================================================================
+// ShaderNodeMath
+//=========================================================================
+
+//============================= FIRST BLOCK ===============================
 auto shaderNodeMathHelper1(std::string operation, std::string clamp) {
   std::string sign;
   if (operation == "ADD") {
@@ -1239,10 +1241,9 @@ TEST(BLENDER_MODULES, SHADER_NODE_MATH_GREATER_THAN_NOCLAMP) {
 TEST(BLENDER_MODULES, SHADER_NODE_MATH_GREATER_THAN_CLAMP) {
   shaderNodeMathHelper1("GREATER_THAN", "True");
 }
-// ============ END OF FIRST BLOCK =======================
+//========================= END OF FIRST BLOCK ============================
 
-// =============== SECOND BLOCK (one function, one
-// variable)======================
+//================ SECOND BLOCK (one function, one variable)===============
 
 auto shaderNodeMathHelper2(std::string operation, std::string clamp) {
   std::string function;
@@ -1430,10 +1431,9 @@ TEST(BLENDER_MODULES, SHADER_NODE_MATH_RADIANS_CLAMP) {
   shaderNodeMathHelper2("RADIANS", "True");
 }
 
-// ======================= END OF SECOND BLOCK =======================
+//============================ END OF SECOND BLOCK ========================
 
-// ======================= THIRD BLOCK (one function, two
-// variables)======================
+//================ THIRD BLOCK (one function, two variables)===============
 auto shaderNodeMathHelper3(std::string operation, std::string clamp) {
   std::string function;
   if (operation == "POWER") {
@@ -1494,9 +1494,9 @@ TEST(BLENDER_MODULES, SHADER_NODE_MATH_ARCTAN2_NOCLAMP) {
 TEST(BLENDER_MODULES, SHADER_NODE_MATH_ARCTAN2_CLAMP) {
   shaderNodeMathHelper3("ARCTAN2", "True");
 }
-// ===================== END OF THIRD BLOCK =======================
+//=========================== END OF THIRD BLOCK ==========================
 
-// ===================== FOURTH BLOCK (all different) =======================
+//====================== FOURTH BLOCK (all different) =====================
 TEST(BLENDER_MODULES, SHADER_NODE_MATH_LOGARITHM_NOCLAMP) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMath>(
                 {
@@ -1574,11 +1574,12 @@ TEST(BLENDER_MODULES, SHADER_NODE_MATH_MULTIPLY_ADD_CLAMP) {
             "Value3=clamp(Value0*Value1+Value2, 0.0, 1.0);");
 }
 
-// ===================== END OF FOURTH BLOCK =======================
+//========================= END OF FOURTH BLOCK ===========================
 
-//====================== END SHADER NODE MATH =================
+//=========================================================================
+// ShaderNodeMix
+//=========================================================================
 
-//===================== SHADER NODE MIX ==========================
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_CLAMP) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
@@ -1664,4 +1665,3 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
                 {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A3, B3, Factor0);");
 }
-//======================= END SHADER NODE MIX ======================
