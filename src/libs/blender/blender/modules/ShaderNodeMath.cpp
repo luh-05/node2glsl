@@ -12,9 +12,9 @@ namespace msk::blender {
 auto GenerateTokenStringShaderNodeMath(Out &out) -> absl::Status {
   auto op_c = out.GetConstant<std::string>("operation0");
 
-TODO: // die inputs heißen überall andrees
-  bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
 
+  bool use_clamp = (out.GetConstant<std::string>("use_clamp0") == "True");
+// 2 variablen 1 sign
   if (op_c == "ADD" || op_c == "SUBTRACT" || op_c == "MULTIPLY" ||
       op_c == "DIVIDE" || op_c == "LESS_THAN" || op_c == "GREATER_THAN") {
     std::string sign;
@@ -37,7 +37,7 @@ TODO: // die inputs heißen überall andrees
 
     if (use_clamp) {
       out + Out::RIGHT / "Value3" + "=" + "clamp(" + Out::LEFT / "Value0" +
-          sign + Out::LEFT / "Value1" + ", " + ", 0.0, 1.0)" + ";";
+          sign + Out::LEFT / "Value1" + ", 0.0, 1.0)" + ";";
     } else {
       out + Out::RIGHT / "Value3" + "=" + Out::LEFT / "Value0" + sign +
           Out::LEFT / "Value1" + ";";
@@ -46,7 +46,7 @@ TODO: // die inputs heißen überall andrees
     return out.GetStatus();
   }
 
-  // alle mit function und einer variable
+  // alle mit function und einer variable (2nd Block)
 
   else if (op_c == "SQRT" || op_c == "INVERSE_SQRT" || op_c == "EXPONENT" ||
            op_c == "ABSOLUTE" || op_c == "FLOOR" || op_c == "SIGN" ||
@@ -61,7 +61,8 @@ TODO: // die inputs heißen überall andrees
     if (op_c == "SQRT") // sqrt(x)
     {
       function = "sqrt(";
-    } else if (op_c == "INVERSE_SQRT") // inverseqrt(x)
+    } 
+    else if (op_c == "INVERSE_SQRT") // inverseqrt(x)
     {
       function = "inversesqrt(";
 
@@ -118,7 +119,7 @@ TODO: // die inputs heißen überall andrees
 
   }
 
-  // alle mit function und 2 variablen
+  // alle mit function und 2 variablen (3rd Block)
   else if (op_c == "POWER" || op_c == "MINIMUM" || op_c == "MAXIMUM" ||
            op_c == "ARCTAN2") {
     std::string function;
@@ -152,7 +153,7 @@ TODO: // die inputs heißen überall andrees
     return out.GetStatus();
   }
 
-  // alle die ganz anders aufgebaut sind
+  // alle die ganz anders aufgebaut sind (4th Block)
 
   else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
@@ -163,11 +164,11 @@ TODO: // die inputs heißen überall andrees
     {
       if (use_clamp) {
         out + Out::RIGHT / "Value3" + "=" + "clamp(" + "log(" +
-            Out::LEFT / "Value0" + ") /" + "log(" + Out::LEFT / "Value1" + ")" +
-            ", 0.0. 1.0);";
+            Out::LEFT / "Value0" + ") / " + "log(" + Out::LEFT / "Value1" + ")" +
+            ", 0.0, 1.0);";
       } else {
         out + Out::RIGHT / "Value3" + "=" + "log(" + Out::LEFT / "Value0" +
-            ") /" + "log(" + Out::LEFT / "Value1" + ");";
+            ") / " + "log(" + Out::LEFT / "Value1" + ");";
       }
     }
 
@@ -176,20 +177,27 @@ TODO: // die inputs heißen überall andrees
       It outputs 1 if the difference of the two input values are less than
       epsilon. Used to check if two values are equal within a certain
       tolerance.
-      Value0 = Epsilon
+      Value0 = Epsilon //ich glaube doch Value2
+
       Value1, C0 = Inputs to be compared
 
       abs(Value1-C0)<=Value0
       */
 
-      if (use_clamp) {
-        out + Out::RIGHT / "Value3" + "=" + "clamp(float(abs(" +
-            Out::LEFT / "Value1" + " - " + Out::LEFT / "Value2" +
-            ") <= " + Out::LEFT / "Value0" + "), 0.0, 1.0)" + ";";
-      } else {
-        out + Out::RIGHT / "Value3" + "=" + "float(abs(" +
-            Out::LEFT / "Value1" + " - " + Out::LEFT / "Value2" +
-            ") <= " + Out::LEFT / "Value0" + ")" + ";";
+      if(use_clamp) {
+
+        out + "if(abs(" + Out::LEFT / "Value0" + "-" + Out::LEFT / "Value1" + ") <= Value2) {"
+            + Out::RIGHT / "Value3" + "=" + "clamp(1.0, 0.0, 1.0)" + ";"
+            + "} else {"
+            + Out::RIGHT / "Value3" + "=" + "clamp(0.0, 0.0, 1.0)" + ";"
+            + "}";
+      }
+      else {
+        out + "if(abs(" + Out::LEFT / "Value0" + "-" + Out::LEFT / "Value1" + ") <= Value2) {"
+            + Out::RIGHT / "Value3" + "=" + "1.0" + ";"
+            + "} else {"
+            + Out::RIGHT / "Value3" + "=" + "0.0" + ";"
+            + "}";
       }
     }
 
@@ -197,7 +205,7 @@ TODO: // die inputs heißen überall andrees
       // a * b + c
 
       if (use_clamp) {
-        out + Out::RIGHT / "Value3" + "=" + " clamp(" // clamp
+        out + Out::RIGHT / "Value3" + "=" + "clamp(" // clamp
             + Out::LEFT / "Value0" + "*" + Out::LEFT / "Value1" + "+" +
             Out::LEFT / "Value2" + ", 0.0, 1.0)" // clamp
             + ";";
