@@ -97,8 +97,9 @@ TEST(BLENDER_MODULES, DUMMY_MODULE) {
 
 // TEST(BLENDER_MODULES, SHADER_NODE_MATH_ADD) { shaderNodeMathHelper("ADD"); }
 
-//================================== BOOLEAN MATH
-//=================================================
+//=========================================================================
+// FunctionNodeBooleanmath
+//=========================================================================
 
 auto functionNodeBooleanMathHelper(std::string operation, std::string prefix,
                                    std::string infix, std::string suffix) {
@@ -164,11 +165,6 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NIMPLY) {
   functionNodeBooleanMathHelper("NIMPLY", "(", "&& !", ");");
 }
 
-//================================ BOOLEAN MATH
-//================================================
-
-//================================= BIT MATH
-//========================================================
 //=========================================================================
 // FunctionNodeBitMath
 //=========================================================================
@@ -1116,11 +1112,10 @@ TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP) {
 TEST(BLENDER_MODULES, SHADER_NODE_MAP_RANGE_VECTOR_SMOOTHERSTEP_CLAMP) {
   shaderNodeMapRangeHelper("FLOAT_VECTOR", "SMOOTHERSTEP", true);
 }
-//================================= BIT MATH
-//=============================================
 
-//================================= CLAMP
-//=========================================================
+//=========================================================================
+// ShaderNodeClamp
+//=========================================================================
 
 TEST(BLENDER_MODULES, SHADER_NODE_CLAMP_MINMAX) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeClamp>(
@@ -1144,10 +1139,12 @@ TEST(BLENDER_MODULES, SHADER_NODE_CLAMP_RANGE) {
                 {{"clamp_type0", "RANGE"}}),
             "Result0 = clamp(Value0, min(Min0, Max0), max(Min0, Max0));");
 }
-//====================== END CLAMP ========================
 
-//============= START SHADER NODE MATH ======================
-// ============== FIRST BLOCK ========================
+//=========================================================================
+// ShaderNodeMath
+//=========================================================================
+
+//============================= FIRST BLOCK ===============================
 auto shaderNodeMathHelper1(std::string operation, std::string clamp) {
   std::string sign;
   if (operation == "ADD") {
@@ -1578,7 +1575,10 @@ TEST(BLENDER_MODULES, SHADER_NODE_MATH_MULTIPLY_ADD_CLAMP) {
 
 //====================== END SHADER NODE MATH =================
 
-//===================== SHADER NODE MIX ==========================
+//=========================================================================
+// ShaderNodeMix
+//=========================================================================
+
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_CLAMP) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
@@ -1664,4 +1664,3 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
                 {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}}),
             "Result0=mix(A3, B3, Factor0);");
 }
-//======================= END SHADER NODE MIX ======================
