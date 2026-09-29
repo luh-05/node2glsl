@@ -29,4 +29,5 @@ target_sources(
     ./inputs/FunctionNodeInputString.cpp
     ./inputs/ShaderNodeValue.cpp
     ./ShaderNodeVectorMath.cpp
+    ./ShaderNodeSeperateXYZ.cpp
 )

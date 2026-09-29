@@ -46,6 +46,8 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
       {"ShaderNodeMapRange",
        FuncWrapper<GenerateTokenStringShaderNodeMapRange>},
       {"ShaderNodeMath", FuncWrapper<GenerateTokenStringShaderNodeMath>},
+      {"ShaderNodeSeperaeXYZ",
+       FuncWrapper<GenerateTokenStringShaderNodeSeperateXYZ>},
       {"ShaderNodeVectorMath",
        FuncWrapper<GenerateTokenStringShaderNodeVectorMath>},
       {"ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>},

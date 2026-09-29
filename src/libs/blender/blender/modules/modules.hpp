@@ -38,6 +38,8 @@ auto GenerateTokenStringShaderNodeMapRange(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeMath(Out &out) -> absl::Status;
 
+auto GenerateTokenStringShaderNodeSeperateXYZ(Out &out) -> absl::Status;
+
 auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status;
