@@ -66,7 +66,7 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status {
     out + Out::RIGHT / "Value3" + " = (" + Out::LEFT / "Value1" +
         " == 0 ? 0 : " + Out::LEFT / "Value0" + " - int(floor(float(" +
         Out::LEFT / "Value0" + ") / float(" + Out::LEFT / "Value1" + "))) * " +
-        Out::LEFT / "Value1" + ";";
+        Out::LEFT / "Value1" + ");";
   }
 
   else if (op_c == "GCD") {
