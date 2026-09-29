@@ -2,322 +2,322 @@
 <BlenderNodeGraphs exporter="RNA" version="1.3">
   <Graph name="SDF_Subtract.001" id="0" type="NodeGroup">
     <Node name="Group Output" type="NodeGroupOutput">
-      <Port name="p3d_sdf0" direction="in" type="VALUE" id="151d80d2a7635a4c808353877cf8e71f602fe2f5"/>
+      <Port name="p3d_sdf0" direction="in" type="VALUE" id="be35cfe6d4b0b3644e205ea4b7ef59b1174d0c3f"/>
       <Constant name="mute0" value="False" type="BOOLEAN"/>
       <Constant name="is_active_output0" value="True" type="BOOLEAN"/>
     </Node>
     <Graph name="SDF_Sphere" id="1" type="NodeGroup">
       <Node name="Group Input" type="NodeGroupInput">
-        <Port name="Position0" direction="out" type="VECTOR" id="a115d061524ab71adfcaa459a30afb8a0e5e24ec"/>
-        <Port name="Center0" direction="out" type="VECTOR" id="d9f5cac502b99991f108456132339475789e55b8"/>
-        <Port name="Radius0" direction="out" type="VALUE" id="341f21265d41a75cfa4109490c71d05b3556e7f1"/>
-        <Port name="0" direction="out" type="CUSTOM" id="aba87aa2d691710e8958453ceda12f9522725c3f"/>
+        <Port name="Position0" direction="out" type="VECTOR" id="1ed2eebf576a851840d539918f3a4e64f4d055d3"/>
+        <Port name="Center0" direction="out" type="VECTOR" id="9836e6d3b1af9e85cccea34e078456b7023222ab"/>
+        <Port name="Radius0" direction="out" type="VALUE" id="3efe2acb8b20edd8e9bf30c049829a336ea80357"/>
+        <Port name="0" direction="out" type="CUSTOM" id="5d0482620503449f4b20f09b25de6a5894597a35"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
-        <Port name="Position0" direction="in" type="VECTOR" id="5e6e18646bd2929461f9b6acaacc41ba6877855c"/>
-        <Port name="Center0" direction="in" type="VECTOR" id="9d00398b1f05bc6985eea4ddb8c5772116bc3d6a"/>
-        <Port name="Radius0" direction="in" type="VALUE" id="10ec59bed8b6e3404c40bc77048766b5c915942c"/>
+        <Port name="Position0" direction="in" type="VECTOR" id="b426f46e91504f51369cb40288c78a923f25b21b"/>
+        <Port name="Center0" direction="in" type="VECTOR" id="0becc2c7b2fb25fad00f3e4f58fe2e3336e86ba4"/>
+        <Port name="Radius0" direction="in" type="VALUE" id="c598dc21802c196f2d8abf7a4a6fa167af0c4399"/>
       </Node>
       <Node name="Group Output" type="NodeGroupOutput">
-        <Port name="Distance0" direction="in" type="VALUE" id="aaa41dc05a1baf7b6bc666ebd73afef06dcb4de4"/>
+        <Port name="Distance0" direction="in" type="VALUE" id="4ceff0e8fd773a8f314f853cd8c45fa61be85e6a"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="is_active_output0" value="True" type="BOOLEAN"/>
-        <Port name="Distance0" direction="out" type="VALUE" id="81e7aa6ff287816da24149e1d0be85fc1fa6f394"/>
+        <Port name="Distance0" direction="out" type="VALUE" id="83bd2086d18e05539aa6015d456d7a7e2a421c49"/>
       </Node>
       <Node name="Vector Math" type="ShaderNodeVectorMath">
-        <Port name="Vector0" direction="in" type="VECTOR" id="22d766bea03ca0bd73e872ff9c2348738bd8eb0c"/>
-        <Port name="Vector1" direction="in" type="VECTOR" id="4344242172cfeb2b24d2d0218ace4f472caef977"/>
-        <Port name="Vector2" direction="in" type="VECTOR" id="cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3"/>
-        <Port name="Scale0" direction="in" type="VALUE" id="6fce656ad05ca35608eef0eea34179c9a912df10"/>
-        <Port name="Vector3" direction="out" type="VECTOR" id="fe82210104e9399ea158a0921f83a54e5e814893"/>
-        <Port name="Value0" direction="out" type="VALUE" id="9b9bce745c486cd1700013f93a184bbb05199806"/>
+        <Port name="Vector0" direction="in" type="VECTOR" id="87f28094ffeaa122ec1a18a7191f360bd4bf7dbe"/>
+        <Port name="Vector1" direction="in" type="VECTOR" id="9d77631c77e381230a3235be8d74f2a22b5e77bf"/>
+        <Port name="Vector2" direction="in" type="VECTOR" id="99bb9c2e7cd0fa5c8886c1de3c6a9b6b5e573324"/>
+        <Port name="Scale0" direction="in" type="VALUE" id="0dbd70a7e48e30611195c0cfc46d6500c36dd499"/>
+        <Port name="Vector3" direction="out" type="VECTOR" id="1e9737482c1fbb0c05414b6c63b470fbddd14dda"/>
+        <Port name="Value0" direction="out" type="VALUE" id="adbe37492a66b4b2f2ebd8d21d593e181943a8ee"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="SUBTRACT" type="STRING"/>
       </Node>
-      <Node name="Vector_cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3" type="FunctionNodeInputVector">
+      <Node name="Vector_99bb9c2e7cd0fa5c8886c1de3c6a9b6b5e573324" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="5cba76ebe0f1e2f07b3540b53e3072b89ab2d56e"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="da3df1c193a86c3338a1b2eee7fa575db8e11ac9"/>
       </Node>
-      <Connection from="5cba76ebe0f1e2f07b3540b53e3072b89ab2d56e" to="cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3"/>
-      <Node name="Scale_6fce656ad05ca35608eef0eea34179c9a912df10" type="ShaderNodeValue">
+      <Connection from="da3df1c193a86c3338a1b2eee7fa575db8e11ac9" to="99bb9c2e7cd0fa5c8886c1de3c6a9b6b5e573324"/>
+      <Node name="Scale_0dbd70a7e48e30611195c0cfc46d6500c36dd499" type="ShaderNodeValue">
         <Constant name="Value0" value="1.0" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="49bebbe4509719758967953bac9651418ece41b7"/>
+        <Port name="Value1" direction="out" type="VALUE" id="af9ca9deda9e25865aff3e8f236421e502f07a64"/>
       </Node>
-      <Connection from="49bebbe4509719758967953bac9651418ece41b7" to="6fce656ad05ca35608eef0eea34179c9a912df10"/>
+      <Connection from="af9ca9deda9e25865aff3e8f236421e502f07a64" to="0dbd70a7e48e30611195c0cfc46d6500c36dd499"/>
       <Node name="Vector Math.001" type="ShaderNodeVectorMath">
-        <Port name="Vector0" direction="in" type="VECTOR" id="d0390fa66d0ebdec591300deae16d3757c76343c"/>
-        <Port name="Vector1" direction="in" type="VECTOR" id="0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5"/>
-        <Port name="Vector2" direction="in" type="VECTOR" id="96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9"/>
-        <Port name="Scale0" direction="in" type="VALUE" id="bf555f0165204ca8cd00e9e00d23e3b696260091"/>
-        <Port name="Vector3" direction="out" type="VECTOR" id="6a7a3d89620dc320b94343a7a53105121ec9291e"/>
-        <Port name="Value0" direction="out" type="VALUE" id="8756b38017c7bf7d20960b96dff784d793c22b0a"/>
+        <Port name="Vector0" direction="in" type="VECTOR" id="55a6bf311c063dcd4b0516692edddc9786cdaebd"/>
+        <Port name="Vector1" direction="in" type="VECTOR" id="f959ce183c66d8b44e757ad23e43c1f124cd71ca"/>
+        <Port name="Vector2" direction="in" type="VECTOR" id="71f00b0367646ec4b74c89a08bb926190f838792"/>
+        <Port name="Scale0" direction="in" type="VALUE" id="358470f6b825d773c15a186df71a1cb7fb06fbf9"/>
+        <Port name="Vector3" direction="out" type="VECTOR" id="2e96b8df51eb9088ccb24e3dd212de0d3e1745e5"/>
+        <Port name="Value0" direction="out" type="VALUE" id="742c335588a462919d0b8e29c0359bb928220470"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="LENGTH" type="STRING"/>
       </Node>
-      <Node name="Vector_0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5" type="FunctionNodeInputVector">
+      <Node name="Vector_f959ce183c66d8b44e757ad23e43c1f124cd71ca" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="a25fe92c16a1a6489894e4dba84780b70c21a62a"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="454c8ccbcf88914918ceab6500a5d78ad7bb5c07"/>
       </Node>
-      <Connection from="a25fe92c16a1a6489894e4dba84780b70c21a62a" to="0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5"/>
-      <Node name="Vector_96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9" type="FunctionNodeInputVector">
+      <Connection from="454c8ccbcf88914918ceab6500a5d78ad7bb5c07" to="f959ce183c66d8b44e757ad23e43c1f124cd71ca"/>
+      <Node name="Vector_71f00b0367646ec4b74c89a08bb926190f838792" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="5ed9f61debcc5a975aa2ea91ec4b0726344e3590"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="5f970482f23bf7ee950896b56c7896bed98adafa"/>
       </Node>
-      <Connection from="5ed9f61debcc5a975aa2ea91ec4b0726344e3590" to="96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9"/>
-      <Node name="Scale_bf555f0165204ca8cd00e9e00d23e3b696260091" type="ShaderNodeValue">
+      <Connection from="5f970482f23bf7ee950896b56c7896bed98adafa" to="71f00b0367646ec4b74c89a08bb926190f838792"/>
+      <Node name="Scale_358470f6b825d773c15a186df71a1cb7fb06fbf9" type="ShaderNodeValue">
         <Constant name="Value0" value="1.0" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="8251d8bcb2fc18578c4528dab03c42a33e95164f"/>
+        <Port name="Value1" direction="out" type="VALUE" id="ad1ec3ea5728d71395e78362923f9e16681be19a"/>
       </Node>
-      <Connection from="8251d8bcb2fc18578c4528dab03c42a33e95164f" to="bf555f0165204ca8cd00e9e00d23e3b696260091"/>
+      <Connection from="ad1ec3ea5728d71395e78362923f9e16681be19a" to="358470f6b825d773c15a186df71a1cb7fb06fbf9"/>
       <Node name="Math" type="ShaderNodeMath">
-        <Port name="Value0" direction="in" type="VALUE" id="ce7d5f8fd5c7b606b4f47ec6c6d2bfc63bf641e1"/>
-        <Port name="Value1" direction="in" type="VALUE" id="f9c80446e767115f94c49cb9328ea6f472fb70ec"/>
-        <Port name="Value2" direction="in" type="VALUE" id="7fbe01474f77f2d5edbbaa3acf608db86d302eff"/>
-        <Port name="Value3" direction="out" type="VALUE" id="5a3297665f74ed9d3dd1ee3c0b954ca8b60475b7"/>
+        <Port name="Value0" direction="in" type="VALUE" id="338ea8cf4b572b71809a59683449ebd38f4caf92"/>
+        <Port name="Value1" direction="in" type="VALUE" id="41bfcd1a924c5fc9a5162457c003efe0c41fa833"/>
+        <Port name="Value2" direction="in" type="VALUE" id="ed820292d5db7628130e93f0fb152d23a4670ea9"/>
+        <Port name="Value3" direction="out" type="VALUE" id="bb029d1210e99b907e83e7e5a9ff5663fcba062e"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="SUBTRACT" type="STRING"/>
         <Constant name="use_clamp0" value="False" type="BOOLEAN"/>
       </Node>
-      <Node name="Value_7fbe01474f77f2d5edbbaa3acf608db86d302eff" type="ShaderNodeValue">
+      <Node name="Value_ed820292d5db7628130e93f0fb152d23a4670ea9" type="ShaderNodeValue">
         <Constant name="Value0" value="0.5" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="e2b4f6b2be45df6a101730f2e3fa68db4c9a2668"/>
+        <Port name="Value1" direction="out" type="VALUE" id="0c5b5fc7d62dafcce3ebdaaac67dfc29dca29ec9"/>
       </Node>
-      <Connection from="e2b4f6b2be45df6a101730f2e3fa68db4c9a2668" to="7fbe01474f77f2d5edbbaa3acf608db86d302eff"/>
-      <Connection from="a115d061524ab71adfcaa459a30afb8a0e5e24ec" to="22d766bea03ca0bd73e872ff9c2348738bd8eb0c"/>
-      <Connection from="d9f5cac502b99991f108456132339475789e55b8" to="4344242172cfeb2b24d2d0218ace4f472caef977"/>
-      <Connection from="fe82210104e9399ea158a0921f83a54e5e814893" to="d0390fa66d0ebdec591300deae16d3757c76343c"/>
-      <Connection from="8756b38017c7bf7d20960b96dff784d793c22b0a" to="ce7d5f8fd5c7b606b4f47ec6c6d2bfc63bf641e1"/>
-      <Connection from="341f21265d41a75cfa4109490c71d05b3556e7f1" to="f9c80446e767115f94c49cb9328ea6f472fb70ec"/>
-      <Connection from="5a3297665f74ed9d3dd1ee3c0b954ca8b60475b7" to="aaa41dc05a1baf7b6bc666ebd73afef06dcb4de4"/>
+      <Connection from="0c5b5fc7d62dafcce3ebdaaac67dfc29dca29ec9" to="ed820292d5db7628130e93f0fb152d23a4670ea9"/>
+      <Connection from="1ed2eebf576a851840d539918f3a4e64f4d055d3" to="87f28094ffeaa122ec1a18a7191f360bd4bf7dbe"/>
+      <Connection from="9836e6d3b1af9e85cccea34e078456b7023222ab" to="9d77631c77e381230a3235be8d74f2a22b5e77bf"/>
+      <Connection from="1e9737482c1fbb0c05414b6c63b470fbddd14dda" to="55a6bf311c063dcd4b0516692edddc9786cdaebd"/>
+      <Connection from="742c335588a462919d0b8e29c0359bb928220470" to="338ea8cf4b572b71809a59683449ebd38f4caf92"/>
+      <Connection from="3efe2acb8b20edd8e9bf30c049829a336ea80357" to="41bfcd1a924c5fc9a5162457c003efe0c41fa833"/>
+      <Connection from="bb029d1210e99b907e83e7e5a9ff5663fcba062e" to="4ceff0e8fd773a8f314f853cd8c45fa61be85e6a"/>
     </Graph>
     <Node name="Group_WrapperIn" type="GeometryNodeGroupInput">
-      <Port name="Position0" direction="in" type="VECTOR" id="5ad26b8203fa7dad3a1a7c13f8a3d3d21ba9adea"/>
-      <Port name="Center0" direction="in" type="VECTOR" id="204864b3c4d50a7b1dcf04aad3ff86a1a7da1864"/>
-      <Port name="Radius0" direction="in" type="VALUE" id="aef83822ffd163dd5d42de46e18df59ac5f05f35"/>
+      <Port name="Position0" direction="in" type="VECTOR" id="a636575ad074f67d925e910e893eb8bf5edc0eff"/>
+      <Port name="Center0" direction="in" type="VECTOR" id="573001fc1fab7cc1c7d8aaf7ee70b66db7e660a5"/>
+      <Port name="Radius0" direction="in" type="VALUE" id="b6a7a4d68789938b6189468de360526c97bd0c80"/>
       <Constant name="mute0" value="False" type="BOOLEAN"/>
-      <Port name="Position0" direction="out" type="VECTOR" id="577486d39a3bca5627dae667d621a3e568e2a977"/>
-      <Port name="Center0" direction="out" type="VECTOR" id="894f8610430563dead9c52aae959cb3f03c52f07"/>
-      <Port name="Radius0" direction="out" type="VALUE" id="4c75b3611da06c572e7c629e132b354031f9fa3e"/>
+      <Port name="Position0" direction="out" type="VECTOR" id="506184fee8bd1b0776e9682f5b87c73aaebccbd5"/>
+      <Port name="Center0" direction="out" type="VECTOR" id="cba0da571229f8e791ae9493751bb4ac9afd62e1"/>
+      <Port name="Radius0" direction="out" type="VALUE" id="621a54fc8dc179b1f7aaca176ebd6ef4e6e4bd44"/>
     </Node>
     <Node name="Group_WrapperOut" type="GeometryNodeGroupOutput">
-      <Port name="Distance0" direction="out" type="VALUE" id="8ff69ccd27563f4eff38c82fc1c2524317151064"/>
-      <Port name="Distance0" direction="in" type="VALUE" id="4aa1dbc68779b317f87ce202c9503ed0b02c1926"/>
+      <Port name="Distance0" direction="out" type="VALUE" id="d70bc898f9b1a16025529ceeae75b606fcbd9602"/>
+      <Port name="Distance0" direction="in" type="VALUE" id="e19ce53f106b809f25ca0c8f58808d00a62fe3ff"/>
     </Node>
-    <Node name="Center_204864b3c4d50a7b1dcf04aad3ff86a1a7da1864" type="FunctionNodeInputVector">
+    <Node name="Center_573001fc1fab7cc1c7d8aaf7ee70b66db7e660a5" type="FunctionNodeInputVector">
       <Constant name="Value0" value="0.5" type="VALUE"/>
       <Constant name="Value1" value="0.5" type="VALUE"/>
       <Constant name="Value2" value="2.9802322387695312e-08" type="VALUE"/>
-      <Port name="Vector0" direction="out" type="VECTOR" id="e061d96d36aa06db353892fef1ae7833390c2b0d"/>
+      <Port name="Vector0" direction="out" type="VECTOR" id="a499de6c56b48cca7955b0f8f698814d3201dab2"/>
     </Node>
-    <Connection from="e061d96d36aa06db353892fef1ae7833390c2b0d" to="204864b3c4d50a7b1dcf04aad3ff86a1a7da1864"/>
-    <Node name="Radius_aef83822ffd163dd5d42de46e18df59ac5f05f35" type="ShaderNodeValue">
+    <Connection from="a499de6c56b48cca7955b0f8f698814d3201dab2" to="573001fc1fab7cc1c7d8aaf7ee70b66db7e660a5"/>
+    <Node name="Radius_b6a7a4d68789938b6189468de360526c97bd0c80" type="ShaderNodeValue">
       <Constant name="Value0" value="0.6500000357627869" type="VALUE"/>
-      <Port name="Value1" direction="out" type="VALUE" id="1d03d5b17cf58871e5d8ea09738fb182ce36200a"/>
+      <Port name="Value1" direction="out" type="VALUE" id="9028d69ff5dc8cf7c1fd98f12bcb918e5ea98d77"/>
     </Node>
-    <Connection from="1d03d5b17cf58871e5d8ea09738fb182ce36200a" to="aef83822ffd163dd5d42de46e18df59ac5f05f35"/>
-    <Connection from="577486d39a3bca5627dae667d621a3e568e2a977" to="5e6e18646bd2929461f9b6acaacc41ba6877855c"/>
-    <Connection from="894f8610430563dead9c52aae959cb3f03c52f07" to="9d00398b1f05bc6985eea4ddb8c5772116bc3d6a"/>
-    <Connection from="4c75b3611da06c572e7c629e132b354031f9fa3e" to="10ec59bed8b6e3404c40bc77048766b5c915942c"/>
-    <Connection from="81e7aa6ff287816da24149e1d0be85fc1fa6f394" to="4aa1dbc68779b317f87ce202c9503ed0b02c1926"/>
+    <Connection from="9028d69ff5dc8cf7c1fd98f12bcb918e5ea98d77" to="b6a7a4d68789938b6189468de360526c97bd0c80"/>
+    <Connection from="506184fee8bd1b0776e9682f5b87c73aaebccbd5" to="b426f46e91504f51369cb40288c78a923f25b21b"/>
+    <Connection from="cba0da571229f8e791ae9493751bb4ac9afd62e1" to="0becc2c7b2fb25fad00f3e4f58fe2e3336e86ba4"/>
+    <Connection from="621a54fc8dc179b1f7aaca176ebd6ef4e6e4bd44" to="c598dc21802c196f2d8abf7a4a6fa167af0c4399"/>
+    <Connection from="83bd2086d18e05539aa6015d456d7a7e2a421c49" to="e19ce53f106b809f25ca0c8f58808d00a62fe3ff"/>
     <Graph name="SDF_Sphere" id="2" type="NodeGroup">
       <Node name="Group Input" type="NodeGroupInput">
-        <Port name="Position0" direction="out" type="VECTOR" id="a115d061524ab71adfcaa459a30afb8a0e5e24ec"/>
-        <Port name="Center0" direction="out" type="VECTOR" id="d9f5cac502b99991f108456132339475789e55b8"/>
-        <Port name="Radius0" direction="out" type="VALUE" id="341f21265d41a75cfa4109490c71d05b3556e7f1"/>
-        <Port name="0" direction="out" type="CUSTOM" id="aba87aa2d691710e8958453ceda12f9522725c3f"/>
+        <Port name="Position0" direction="out" type="VECTOR" id="48e8f7d1f15b1f62701e7535d4cd7232c670afd9"/>
+        <Port name="Center0" direction="out" type="VECTOR" id="c9b30c91573d543f7e4e3d8cc1e7949e0cb2b32c"/>
+        <Port name="Radius0" direction="out" type="VALUE" id="f4acd286137873a62c7fe51184f622246dae9132"/>
+        <Port name="0" direction="out" type="CUSTOM" id="ddb88580a36b74b4ff986d7c0589872123cc6503"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
-        <Port name="Position0" direction="in" type="VECTOR" id="5e6e18646bd2929461f9b6acaacc41ba6877855c"/>
-        <Port name="Center0" direction="in" type="VECTOR" id="9d00398b1f05bc6985eea4ddb8c5772116bc3d6a"/>
-        <Port name="Radius0" direction="in" type="VALUE" id="10ec59bed8b6e3404c40bc77048766b5c915942c"/>
+        <Port name="Position0" direction="in" type="VECTOR" id="d4bd7ea12006d4dd9a75a778b3c2fa8b86ca438f"/>
+        <Port name="Center0" direction="in" type="VECTOR" id="c07dbafaaebd71df4ec95b5b3324c429258c662d"/>
+        <Port name="Radius0" direction="in" type="VALUE" id="badca7ab082d694a7396f786b36aabe89aeae7de"/>
       </Node>
       <Node name="Group Output" type="NodeGroupOutput">
-        <Port name="Distance0" direction="in" type="VALUE" id="aaa41dc05a1baf7b6bc666ebd73afef06dcb4de4"/>
+        <Port name="Distance0" direction="in" type="VALUE" id="aec66d21a4c6c62818274dca9032f4e346b4dab5"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="is_active_output0" value="True" type="BOOLEAN"/>
-        <Port name="Distance0" direction="out" type="VALUE" id="81e7aa6ff287816da24149e1d0be85fc1fa6f394"/>
+        <Port name="Distance0" direction="out" type="VALUE" id="9e005e386c892cf06d800d3a17616ffedfff29e9"/>
       </Node>
       <Node name="Vector Math" type="ShaderNodeVectorMath">
-        <Port name="Vector0" direction="in" type="VECTOR" id="22d766bea03ca0bd73e872ff9c2348738bd8eb0c"/>
-        <Port name="Vector1" direction="in" type="VECTOR" id="4344242172cfeb2b24d2d0218ace4f472caef977"/>
-        <Port name="Vector2" direction="in" type="VECTOR" id="cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3"/>
-        <Port name="Scale0" direction="in" type="VALUE" id="6fce656ad05ca35608eef0eea34179c9a912df10"/>
-        <Port name="Vector3" direction="out" type="VECTOR" id="fe82210104e9399ea158a0921f83a54e5e814893"/>
-        <Port name="Value0" direction="out" type="VALUE" id="9b9bce745c486cd1700013f93a184bbb05199806"/>
+        <Port name="Vector0" direction="in" type="VECTOR" id="ec2bb8a197c8d8703fee3027b1ec62ee4df70475"/>
+        <Port name="Vector1" direction="in" type="VECTOR" id="f76a09380223c476c4990cb80b9555d629eb02a6"/>
+        <Port name="Vector2" direction="in" type="VECTOR" id="4e80c89cdd8d5d621f7fc9137e1c9a89cf1b7dba"/>
+        <Port name="Scale0" direction="in" type="VALUE" id="b3e982dc8cad2a41df0572701e84ab9c5c0d0d54"/>
+        <Port name="Vector3" direction="out" type="VECTOR" id="f32c8ddf6051670a24dc8f3438f8b91262f502c9"/>
+        <Port name="Value0" direction="out" type="VALUE" id="387901913ac10ce9fbd45e6e61599f3964355197"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="SUBTRACT" type="STRING"/>
       </Node>
-      <Node name="Vector_cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3" type="FunctionNodeInputVector">
+      <Node name="Vector_4e80c89cdd8d5d621f7fc9137e1c9a89cf1b7dba" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="5cba76ebe0f1e2f07b3540b53e3072b89ab2d56e"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="1e837d42a7c5a6b645ecd4da10da815becde1308"/>
       </Node>
-      <Connection from="5cba76ebe0f1e2f07b3540b53e3072b89ab2d56e" to="cfd0dd57f04b42f8f984e722d33a59b5b1f7b3a3"/>
-      <Node name="Scale_6fce656ad05ca35608eef0eea34179c9a912df10" type="ShaderNodeValue">
+      <Connection from="1e837d42a7c5a6b645ecd4da10da815becde1308" to="4e80c89cdd8d5d621f7fc9137e1c9a89cf1b7dba"/>
+      <Node name="Scale_b3e982dc8cad2a41df0572701e84ab9c5c0d0d54" type="ShaderNodeValue">
         <Constant name="Value0" value="1.0" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="49bebbe4509719758967953bac9651418ece41b7"/>
+        <Port name="Value1" direction="out" type="VALUE" id="fa9b5957027a9f9380c435c6b3beaf384e99e379"/>
       </Node>
-      <Connection from="49bebbe4509719758967953bac9651418ece41b7" to="6fce656ad05ca35608eef0eea34179c9a912df10"/>
+      <Connection from="fa9b5957027a9f9380c435c6b3beaf384e99e379" to="b3e982dc8cad2a41df0572701e84ab9c5c0d0d54"/>
       <Node name="Vector Math.001" type="ShaderNodeVectorMath">
-        <Port name="Vector0" direction="in" type="VECTOR" id="d0390fa66d0ebdec591300deae16d3757c76343c"/>
-        <Port name="Vector1" direction="in" type="VECTOR" id="0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5"/>
-        <Port name="Vector2" direction="in" type="VECTOR" id="96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9"/>
-        <Port name="Scale0" direction="in" type="VALUE" id="bf555f0165204ca8cd00e9e00d23e3b696260091"/>
-        <Port name="Vector3" direction="out" type="VECTOR" id="6a7a3d89620dc320b94343a7a53105121ec9291e"/>
-        <Port name="Value0" direction="out" type="VALUE" id="8756b38017c7bf7d20960b96dff784d793c22b0a"/>
+        <Port name="Vector0" direction="in" type="VECTOR" id="4112b27df2913e4d8ba32efea75dc8395c5bc6c8"/>
+        <Port name="Vector1" direction="in" type="VECTOR" id="7746b9d113d6429e84fd6d4ebf708263d741eb92"/>
+        <Port name="Vector2" direction="in" type="VECTOR" id="41249fc9d81d72533fc1f4317c4bff0874ccb3bf"/>
+        <Port name="Scale0" direction="in" type="VALUE" id="f80c6fa4dfe9f799b475d40bbe0d0686e8019529"/>
+        <Port name="Vector3" direction="out" type="VECTOR" id="d527646cb437e7f103cecccfa637f10b344a7b3b"/>
+        <Port name="Value0" direction="out" type="VALUE" id="2fd9eb288d0c91bc292aa45576dfb7a081ac576d"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="LENGTH" type="STRING"/>
       </Node>
-      <Node name="Vector_0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5" type="FunctionNodeInputVector">
+      <Node name="Vector_7746b9d113d6429e84fd6d4ebf708263d741eb92" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="a25fe92c16a1a6489894e4dba84780b70c21a62a"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="a7908cc62bc3946bfc3696232d7c7703c4c4cade"/>
       </Node>
-      <Connection from="a25fe92c16a1a6489894e4dba84780b70c21a62a" to="0163db30c6d7f2c1cb3bc5f71bc14f02e8dd7ce5"/>
-      <Node name="Vector_96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9" type="FunctionNodeInputVector">
+      <Connection from="a7908cc62bc3946bfc3696232d7c7703c4c4cade" to="7746b9d113d6429e84fd6d4ebf708263d741eb92"/>
+      <Node name="Vector_41249fc9d81d72533fc1f4317c4bff0874ccb3bf" type="FunctionNodeInputVector">
         <Constant name="Value0" value="0.0" type="VALUE"/>
         <Constant name="Value1" value="0.0" type="VALUE"/>
         <Constant name="Value2" value="0.0" type="VALUE"/>
-        <Port name="Vector0" direction="out" type="VECTOR" id="5ed9f61debcc5a975aa2ea91ec4b0726344e3590"/>
+        <Port name="Vector0" direction="out" type="VECTOR" id="cf6d945c980618eddcbcf9aa435da3851156def5"/>
       </Node>
-      <Connection from="5ed9f61debcc5a975aa2ea91ec4b0726344e3590" to="96e91c9f66ac1d60ab9f1832a9d7e894d5e018b9"/>
-      <Node name="Scale_bf555f0165204ca8cd00e9e00d23e3b696260091" type="ShaderNodeValue">
+      <Connection from="cf6d945c980618eddcbcf9aa435da3851156def5" to="41249fc9d81d72533fc1f4317c4bff0874ccb3bf"/>
+      <Node name="Scale_f80c6fa4dfe9f799b475d40bbe0d0686e8019529" type="ShaderNodeValue">
         <Constant name="Value0" value="1.0" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="8251d8bcb2fc18578c4528dab03c42a33e95164f"/>
+        <Port name="Value1" direction="out" type="VALUE" id="ab74c53327a19382eb43ffcfc630b75bfc28483b"/>
       </Node>
-      <Connection from="8251d8bcb2fc18578c4528dab03c42a33e95164f" to="bf555f0165204ca8cd00e9e00d23e3b696260091"/>
+      <Connection from="ab74c53327a19382eb43ffcfc630b75bfc28483b" to="f80c6fa4dfe9f799b475d40bbe0d0686e8019529"/>
       <Node name="Math" type="ShaderNodeMath">
-        <Port name="Value0" direction="in" type="VALUE" id="ce7d5f8fd5c7b606b4f47ec6c6d2bfc63bf641e1"/>
-        <Port name="Value1" direction="in" type="VALUE" id="f9c80446e767115f94c49cb9328ea6f472fb70ec"/>
-        <Port name="Value2" direction="in" type="VALUE" id="7fbe01474f77f2d5edbbaa3acf608db86d302eff"/>
-        <Port name="Value3" direction="out" type="VALUE" id="5a3297665f74ed9d3dd1ee3c0b954ca8b60475b7"/>
+        <Port name="Value0" direction="in" type="VALUE" id="95d12d4ccbfca39b45c3e59c72f43912a2cbad42"/>
+        <Port name="Value1" direction="in" type="VALUE" id="7e035e0a6123d8b44057ecae801d0d60bec50f05"/>
+        <Port name="Value2" direction="in" type="VALUE" id="4ecce025ba322ff4a86940cdbafa190bdb604467"/>
+        <Port name="Value3" direction="out" type="VALUE" id="b30b7437c76caf1745bc653a743b621015f01ab0"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="SUBTRACT" type="STRING"/>
         <Constant name="use_clamp0" value="False" type="BOOLEAN"/>
       </Node>
-      <Node name="Value_7fbe01474f77f2d5edbbaa3acf608db86d302eff" type="ShaderNodeValue">
+      <Node name="Value_4ecce025ba322ff4a86940cdbafa190bdb604467" type="ShaderNodeValue">
         <Constant name="Value0" value="0.5" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="e2b4f6b2be45df6a101730f2e3fa68db4c9a2668"/>
+        <Port name="Value1" direction="out" type="VALUE" id="32a89d9398922d90b8d473d546df11f649ec78d6"/>
       </Node>
-      <Connection from="e2b4f6b2be45df6a101730f2e3fa68db4c9a2668" to="7fbe01474f77f2d5edbbaa3acf608db86d302eff"/>
-      <Connection from="a115d061524ab71adfcaa459a30afb8a0e5e24ec" to="22d766bea03ca0bd73e872ff9c2348738bd8eb0c"/>
-      <Connection from="d9f5cac502b99991f108456132339475789e55b8" to="4344242172cfeb2b24d2d0218ace4f472caef977"/>
-      <Connection from="fe82210104e9399ea158a0921f83a54e5e814893" to="d0390fa66d0ebdec591300deae16d3757c76343c"/>
-      <Connection from="8756b38017c7bf7d20960b96dff784d793c22b0a" to="ce7d5f8fd5c7b606b4f47ec6c6d2bfc63bf641e1"/>
-      <Connection from="341f21265d41a75cfa4109490c71d05b3556e7f1" to="f9c80446e767115f94c49cb9328ea6f472fb70ec"/>
-      <Connection from="5a3297665f74ed9d3dd1ee3c0b954ca8b60475b7" to="aaa41dc05a1baf7b6bc666ebd73afef06dcb4de4"/>
+      <Connection from="32a89d9398922d90b8d473d546df11f649ec78d6" to="4ecce025ba322ff4a86940cdbafa190bdb604467"/>
+      <Connection from="48e8f7d1f15b1f62701e7535d4cd7232c670afd9" to="ec2bb8a197c8d8703fee3027b1ec62ee4df70475"/>
+      <Connection from="c9b30c91573d543f7e4e3d8cc1e7949e0cb2b32c" to="f76a09380223c476c4990cb80b9555d629eb02a6"/>
+      <Connection from="f32c8ddf6051670a24dc8f3438f8b91262f502c9" to="4112b27df2913e4d8ba32efea75dc8395c5bc6c8"/>
+      <Connection from="2fd9eb288d0c91bc292aa45576dfb7a081ac576d" to="95d12d4ccbfca39b45c3e59c72f43912a2cbad42"/>
+      <Connection from="f4acd286137873a62c7fe51184f622246dae9132" to="7e035e0a6123d8b44057ecae801d0d60bec50f05"/>
+      <Connection from="b30b7437c76caf1745bc653a743b621015f01ab0" to="aec66d21a4c6c62818274dca9032f4e346b4dab5"/>
     </Graph>
     <Node name="Group.001_WrapperIn" type="GeometryNodeGroupInput">
-      <Port name="Position0" direction="in" type="VECTOR" id="13463c47320bcd48a234ff5cfbd30ac031e856ce"/>
-      <Port name="Center0" direction="in" type="VECTOR" id="22c07d6acbdccbb5b89b5b4b137e9eb16274b5b1"/>
-      <Port name="Radius0" direction="in" type="VALUE" id="b47a537fb83034e479cd2ed981d4da54dfb77a2a"/>
+      <Port name="Position0" direction="in" type="VECTOR" id="50757b2052c2b1c6bcbde748239ea0eef71fe648"/>
+      <Port name="Center0" direction="in" type="VECTOR" id="b09514d21557a307b59413dd10f12d0a0146d7c5"/>
+      <Port name="Radius0" direction="in" type="VALUE" id="9c51082b74ecd2324cd4bb3e9bc95bd82b361910"/>
       <Constant name="mute0" value="False" type="BOOLEAN"/>
-      <Port name="Position0" direction="out" type="VECTOR" id="87f58e8ff11a3d6246a598f6b3f6cf05297704dd"/>
-      <Port name="Center0" direction="out" type="VECTOR" id="8a301a345170c46b20339127ff3f1afb6539da1d"/>
-      <Port name="Radius0" direction="out" type="VALUE" id="0dfc0bd64d28e9661ab7101113da3947538ae9ef"/>
+      <Port name="Position0" direction="out" type="VECTOR" id="bacbfce05de060c63a5ef8fa0eaf3ccdb2a9f5a2"/>
+      <Port name="Center0" direction="out" type="VECTOR" id="696f2e9635e64168176db6b416734e720c84e5cd"/>
+      <Port name="Radius0" direction="out" type="VALUE" id="5eaf7190fa1c15a6c9f4a94a74754c5f0f55ce38"/>
     </Node>
     <Node name="Group.001_WrapperOut" type="GeometryNodeGroupOutput">
-      <Port name="Distance0" direction="out" type="VALUE" id="0d4fdcb11fdfe3cf1e42fd63af4272466f8111a4"/>
-      <Port name="Distance0" direction="in" type="VALUE" id="a6b254be28b04c4aba9e92f65776612b4f8eaab0"/>
+      <Port name="Distance0" direction="out" type="VALUE" id="adf2b5fb50bb6a1cf288690ed5aef31d34d6fd7f"/>
+      <Port name="Distance0" direction="in" type="VALUE" id="a9959b0d5bbc52bacb12922d92fd563b8e57912f"/>
     </Node>
-    <Node name="Center_22c07d6acbdccbb5b89b5b4b137e9eb16274b5b1" type="FunctionNodeInputVector">
+    <Node name="Center_b09514d21557a307b59413dd10f12d0a0146d7c5" type="FunctionNodeInputVector">
       <Constant name="Value0" value="0.5" type="VALUE"/>
       <Constant name="Value1" value="0.0" type="VALUE"/>
       <Constant name="Value2" value="0.0" type="VALUE"/>
-      <Port name="Vector0" direction="out" type="VECTOR" id="6fceeacf8f85d4d353c78b4f14d4c2d3f4a8d9cd"/>
+      <Port name="Vector0" direction="out" type="VECTOR" id="de66fb16159337c9ef48c178a57de3dc168f7b75"/>
     </Node>
-    <Connection from="6fceeacf8f85d4d353c78b4f14d4c2d3f4a8d9cd" to="22c07d6acbdccbb5b89b5b4b137e9eb16274b5b1"/>
-    <Node name="Radius_b47a537fb83034e479cd2ed981d4da54dfb77a2a" type="ShaderNodeValue">
+    <Connection from="de66fb16159337c9ef48c178a57de3dc168f7b75" to="b09514d21557a307b59413dd10f12d0a0146d7c5"/>
+    <Node name="Radius_9c51082b74ecd2324cd4bb3e9bc95bd82b361910" type="ShaderNodeValue">
       <Constant name="Value0" value="0.6000000238418579" type="VALUE"/>
-      <Port name="Value1" direction="out" type="VALUE" id="827868acf5997ccca508a2cf58a6b15896224b26"/>
+      <Port name="Value1" direction="out" type="VALUE" id="54538a08137f2a759358488d95b7ddda5f48da47"/>
     </Node>
-    <Connection from="827868acf5997ccca508a2cf58a6b15896224b26" to="b47a537fb83034e479cd2ed981d4da54dfb77a2a"/>
-    <Connection from="87f58e8ff11a3d6246a598f6b3f6cf05297704dd" to="5e6e18646bd2929461f9b6acaacc41ba6877855c"/>
-    <Connection from="8a301a345170c46b20339127ff3f1afb6539da1d" to="9d00398b1f05bc6985eea4ddb8c5772116bc3d6a"/>
-    <Connection from="0dfc0bd64d28e9661ab7101113da3947538ae9ef" to="10ec59bed8b6e3404c40bc77048766b5c915942c"/>
-    <Connection from="81e7aa6ff287816da24149e1d0be85fc1fa6f394" to="a6b254be28b04c4aba9e92f65776612b4f8eaab0"/>
+    <Connection from="54538a08137f2a759358488d95b7ddda5f48da47" to="9c51082b74ecd2324cd4bb3e9bc95bd82b361910"/>
+    <Connection from="bacbfce05de060c63a5ef8fa0eaf3ccdb2a9f5a2" to="d4bd7ea12006d4dd9a75a778b3c2fa8b86ca438f"/>
+    <Connection from="696f2e9635e64168176db6b416734e720c84e5cd" to="c07dbafaaebd71df4ec95b5b3324c429258c662d"/>
+    <Connection from="5eaf7190fa1c15a6c9f4a94a74754c5f0f55ce38" to="badca7ab082d694a7396f786b36aabe89aeae7de"/>
+    <Connection from="9e005e386c892cf06d800d3a17616ffedfff29e9" to="a9959b0d5bbc52bacb12922d92fd563b8e57912f"/>
     <Graph name="SDF_Subtract" id="3" type="NodeGroup">
       <Node name="Group Input" type="NodeGroupInput">
-        <Port name="Base (A)0" direction="out" type="VALUE" id="405331662d0e0521c5b55a7c12f62a72aff1e5f9"/>
-        <Port name="Remove (B)0" direction="out" type="VALUE" id="3cb2adc38690523a29b2f384b43867f786b68e55"/>
-        <Port name="0" direction="out" type="CUSTOM" id="0b467a4d88678c08455a733227026fc345b95f92"/>
+        <Port name="Base (A)0" direction="out" type="VALUE" id="0d9eba6c142a086322a7b4fdc3c322ceb9d58f86"/>
+        <Port name="Remove (B)0" direction="out" type="VALUE" id="6dec828bd2b8f405c3252338983db885717f7df1"/>
+        <Port name="0" direction="out" type="CUSTOM" id="c9ec781a53e840bfcd3ebbb83f8d0076efe5477f"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
-        <Port name="Base (A)0" direction="in" type="VALUE" id="21b5822b75906309d4726e6a5966d3e85097a805"/>
-        <Port name="Remove (B)0" direction="in" type="VALUE" id="ed74ee14b34a3d07a29fad68016a8dbd1c72aeaa"/>
+        <Port name="Base (A)0" direction="in" type="VALUE" id="62e63356d111fa00f57a4ac0fb0441ad1224169a"/>
+        <Port name="Remove (B)0" direction="in" type="VALUE" id="b09e6c8d3f334627f5eefc8091330b657d098abc"/>
       </Node>
       <Node name="Group Output" type="NodeGroupOutput">
-        <Port name="Distance0" direction="in" type="VALUE" id="20de09a6c7fe33bd999c202a4008119b5096df53"/>
+        <Port name="Distance0" direction="in" type="VALUE" id="290e90a6d992e56836987936538ad6d312a97058"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="is_active_output0" value="True" type="BOOLEAN"/>
-        <Port name="Distance0" direction="out" type="VALUE" id="df2b1c9a6a57154fd507c9e82fa91a1c77e3b3bf"/>
+        <Port name="Distance0" direction="out" type="VALUE" id="02ee7bd40cb9c08a489e34358aabb83499ac258f"/>
       </Node>
       <Node name="Math" type="ShaderNodeMath">
-        <Port name="Value0" direction="in" type="VALUE" id="f45e4cd1aa8ffd9a4f75af44a20826d680088283"/>
-        <Port name="Value1" direction="in" type="VALUE" id="c1968a50d6cfda6cd123da2ce41bfd2bd3df6fc5"/>
-        <Port name="Value2" direction="in" type="VALUE" id="8de7981e36441a6d69c3bd315cf6d23532285311"/>
-        <Port name="Value3" direction="out" type="VALUE" id="c6833633db547cca462bdcda489483b49d98a542"/>
+        <Port name="Value0" direction="in" type="VALUE" id="76cfbcc4f00043611b589407304efa49e396108e"/>
+        <Port name="Value1" direction="in" type="VALUE" id="2d4e06375752f3358248008cd3b2ff93fec21c68"/>
+        <Port name="Value2" direction="in" type="VALUE" id="f9ac248e7b6554ae866223acde78a05060b132fe"/>
+        <Port name="Value3" direction="out" type="VALUE" id="a00f3dbdc0be11ad1a77bf237942eade74b8d197"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="MULTIPLY" type="STRING"/>
         <Constant name="use_clamp0" value="False" type="BOOLEAN"/>
       </Node>
-      <Node name="Value_c1968a50d6cfda6cd123da2ce41bfd2bd3df6fc5" type="ShaderNodeValue">
+      <Node name="Value_2d4e06375752f3358248008cd3b2ff93fec21c68" type="ShaderNodeValue">
         <Constant name="Value0" value="-1.0" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="faf0da0b6fa975feceb50b40b201f0f8d19c8db7"/>
+        <Port name="Value1" direction="out" type="VALUE" id="eed353f635de2708de1c21dbd82231e3918b8590"/>
       </Node>
-      <Connection from="faf0da0b6fa975feceb50b40b201f0f8d19c8db7" to="c1968a50d6cfda6cd123da2ce41bfd2bd3df6fc5"/>
-      <Node name="Value_8de7981e36441a6d69c3bd315cf6d23532285311" type="ShaderNodeValue">
+      <Connection from="eed353f635de2708de1c21dbd82231e3918b8590" to="2d4e06375752f3358248008cd3b2ff93fec21c68"/>
+      <Node name="Value_f9ac248e7b6554ae866223acde78a05060b132fe" type="ShaderNodeValue">
         <Constant name="Value0" value="0.5" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="4edc3eec7fd50aeb9aee96434ea5a6c49ec8fb82"/>
+        <Port name="Value1" direction="out" type="VALUE" id="3ea02a855fbb2b63055ebf010dc51537118f8a28"/>
       </Node>
-      <Connection from="4edc3eec7fd50aeb9aee96434ea5a6c49ec8fb82" to="8de7981e36441a6d69c3bd315cf6d23532285311"/>
+      <Connection from="3ea02a855fbb2b63055ebf010dc51537118f8a28" to="f9ac248e7b6554ae866223acde78a05060b132fe"/>
       <Node name="Math.001" type="ShaderNodeMath">
-        <Port name="Value0" direction="in" type="VALUE" id="49c0f8e37669305606278a209945cafa188ed729"/>
-        <Port name="Value1" direction="in" type="VALUE" id="f394a6ca6bbcefe860f8093da3bf6c9a315e0dfe"/>
-        <Port name="Value2" direction="in" type="VALUE" id="7e259e65995d24ee3ee73efec4a1d25391e128eb"/>
-        <Port name="Value3" direction="out" type="VALUE" id="7a1c17ebd979208335fd0c284a7a7fed0196ff7e"/>
+        <Port name="Value0" direction="in" type="VALUE" id="c337e6583c074966b80974c246fa3112de58c2f8"/>
+        <Port name="Value1" direction="in" type="VALUE" id="85e8e2b6656d4d4616287aa055e9d51a891c68d9"/>
+        <Port name="Value2" direction="in" type="VALUE" id="8a5639258d771c297c1cb7a7be8a37e7336f35cf"/>
+        <Port name="Value3" direction="out" type="VALUE" id="42bb49d7df112d51ae593785736971861f8033ec"/>
         <Constant name="mute0" value="False" type="BOOLEAN"/>
         <Constant name="operation0" value="MAXIMUM" type="STRING"/>
         <Constant name="use_clamp0" value="False" type="BOOLEAN"/>
       </Node>
-      <Node name="Value_7e259e65995d24ee3ee73efec4a1d25391e128eb" type="ShaderNodeValue">
+      <Node name="Value_8a5639258d771c297c1cb7a7be8a37e7336f35cf" type="ShaderNodeValue">
         <Constant name="Value0" value="0.5" type="VALUE"/>
-        <Port name="Value1" direction="out" type="VALUE" id="348d3d53ba2fffbebbc6c4702fe6b7d6b462407a"/>
+        <Port name="Value1" direction="out" type="VALUE" id="72b38b1881b57350924352b1def3b2b8b9268acb"/>
       </Node>
-      <Connection from="348d3d53ba2fffbebbc6c4702fe6b7d6b462407a" to="7e259e65995d24ee3ee73efec4a1d25391e128eb"/>
-      <Connection from="3cb2adc38690523a29b2f384b43867f786b68e55" to="f45e4cd1aa8ffd9a4f75af44a20826d680088283"/>
-      <Connection from="405331662d0e0521c5b55a7c12f62a72aff1e5f9" to="49c0f8e37669305606278a209945cafa188ed729"/>
-      <Connection from="c6833633db547cca462bdcda489483b49d98a542" to="f394a6ca6bbcefe860f8093da3bf6c9a315e0dfe"/>
-      <Connection from="7a1c17ebd979208335fd0c284a7a7fed0196ff7e" to="20de09a6c7fe33bd999c202a4008119b5096df53"/>
+      <Connection from="72b38b1881b57350924352b1def3b2b8b9268acb" to="8a5639258d771c297c1cb7a7be8a37e7336f35cf"/>
+      <Connection from="6dec828bd2b8f405c3252338983db885717f7df1" to="76cfbcc4f00043611b589407304efa49e396108e"/>
+      <Connection from="0d9eba6c142a086322a7b4fdc3c322ceb9d58f86" to="c337e6583c074966b80974c246fa3112de58c2f8"/>
+      <Connection from="a00f3dbdc0be11ad1a77bf237942eade74b8d197" to="85e8e2b6656d4d4616287aa055e9d51a891c68d9"/>
+      <Connection from="42bb49d7df112d51ae593785736971861f8033ec" to="290e90a6d992e56836987936538ad6d312a97058"/>
     </Graph>
     <Node name="Group.002_WrapperIn" type="GeometryNodeGroupInput">
-      <Port name="Base (A)0" direction="in" type="VALUE" id="53b20a33ed01c0ec5b63b3e08bf2e4eb54b1544a"/>
-      <Port name="Remove (B)0" direction="in" type="VALUE" id="da0533e77ad85814b678f9f7ccd8af0bf5c5e74a"/>
+      <Port name="Base (A)0" direction="in" type="VALUE" id="62304a4f9d830cda2fca2ab93bd77afd4514566b"/>
+      <Port name="Remove (B)0" direction="in" type="VALUE" id="b9692a84a84dd5670c0095f6d2a9bd44311585ba"/>
       <Constant name="mute0" value="False" type="BOOLEAN"/>
-      <Port name="Base (A)0" direction="out" type="VALUE" id="c74f34716a6f278a54dfac06fb5191692135f752"/>
-      <Port name="Remove (B)0" direction="out" type="VALUE" id="af09bad16e144f021a3aecd5b3b62f6835379e44"/>
+      <Port name="Base (A)0" direction="out" type="VALUE" id="ccf534a76ad5d80a43b39c7f2d3b0db147884e00"/>
+      <Port name="Remove (B)0" direction="out" type="VALUE" id="2b57b5f6d364654e642649e989781434f939dcb9"/>
     </Node>
     <Node name="Group.002_WrapperOut" type="GeometryNodeGroupOutput">
-      <Port name="Distance0" direction="out" type="VALUE" id="51f65fb008964b7bc98abf8bd54788f1d9368c55"/>
-      <Port name="Distance0" direction="in" type="VALUE" id="8eefb615f7e3fe49ad0156c973655d5f4295e405"/>
+      <Port name="Distance0" direction="out" type="VALUE" id="678448f1ccd21e235a4aa9a50d5f39db87972948"/>
+      <Port name="Distance0" direction="in" type="VALUE" id="25ff7b6a75ad7ef9ac471bc577198a98be1a65b5"/>
     </Node>
-    <Connection from="c74f34716a6f278a54dfac06fb5191692135f752" to="21b5822b75906309d4726e6a5966d3e85097a805"/>
-    <Connection from="af09bad16e144f021a3aecd5b3b62f6835379e44" to="ed74ee14b34a3d07a29fad68016a8dbd1c72aeaa"/>
-    <Connection from="df2b1c9a6a57154fd507c9e82fa91a1c77e3b3bf" to="8eefb615f7e3fe49ad0156c973655d5f4295e405"/>
+    <Connection from="ccf534a76ad5d80a43b39c7f2d3b0db147884e00" to="62e63356d111fa00f57a4ac0fb0441ad1224169a"/>
+    <Connection from="2b57b5f6d364654e642649e989781434f939dcb9" to="b09e6c8d3f334627f5eefc8091330b657d098abc"/>
+    <Connection from="02ee7bd40cb9c08a489e34358aabb83499ac258f" to="25ff7b6a75ad7ef9ac471bc577198a98be1a65b5"/>
     <Node name="Group Input" type="NodeGroupInput">
-      <Port name="p3d_position0" direction="out" type="VECTOR" id="b29fb254ff494c1d5d6742239d69151789944cd0"/>
-      <Port name="0" direction="out" type="CUSTOM" id="173d2e4d52f2a61b66e3f5cc8960d8f1ec37d614"/>
+      <Port name="p3d_position0" direction="out" type="VECTOR" id="e0372fe73b9a754deb45e52db0d2fa5bc21a3511"/>
+      <Port name="0" direction="out" type="CUSTOM" id="04b4543ad08b2f2eec793bfdd9a00f4abbaadf36"/>
       <Constant name="mute0" value="False" type="BOOLEAN"/>
     </Node>
-    <Connection from="8ff69ccd27563f4eff38c82fc1c2524317151064" to="53b20a33ed01c0ec5b63b3e08bf2e4eb54b1544a"/>
-    <Connection from="0d4fdcb11fdfe3cf1e42fd63af4272466f8111a4" to="da0533e77ad85814b678f9f7ccd8af0bf5c5e74a"/>
-    <Connection from="51f65fb008964b7bc98abf8bd54788f1d9368c55" to="151d80d2a7635a4c808353877cf8e71f602fe2f5"/>
-    <Connection from="b29fb254ff494c1d5d6742239d69151789944cd0" to="5ad26b8203fa7dad3a1a7c13f8a3d3d21ba9adea"/>
-    <Connection from="b29fb254ff494c1d5d6742239d69151789944cd0" to="13463c47320bcd48a234ff5cfbd30ac031e856ce"/>
+    <Connection from="d70bc898f9b1a16025529ceeae75b606fcbd9602" to="6b4599d9898cd03d50ccc5ff2b130758a6ca329f"/>
+    <Connection from="752fa0b21eb97bb4520dfd09b1f3affffb28fd4f" to="d06b171b7a1eca450543b6f3a6cf3389434f366b"/>
+    <Connection from="e8891eb4b860211508d3f2b2372d5233ec9107ce" to="be35cfe6d4b0b3644e205ea4b7ef59b1174d0c3f"/>
+    <Connection from="e0372fe73b9a754deb45e52db0d2fa5bc21a3511" to="a636575ad074f67d925e910e893eb8bf5edc0eff"/>
+    <Connection from="e0372fe73b9a754deb45e52db0d2fa5bc21a3511" to="31bfab10f2200b8e68458353c1f103fccab0d221"/>
   </Graph>
 </BlenderNodeGraphs>
