@@ -57,6 +57,8 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
        FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>},
       {"FunctionNodeInputVector",
        FuncWrapper<GenerateTokenStringFunctionNodeInputVector>},
+      {"FunctionNodeInputString",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputString>},
       {"ShaderNodeValue", FuncWrapper<GenerateTokenStringShaderNodeValue>}};
 
   for (const auto &[name, func] : impls) {
@@ -72,6 +74,7 @@ void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
   callback("RGBA vec4", userdata);
   callback("ROTATION vec3", userdata);
   callback("BOOLEAN bool", userdata);
+  callback("STRING void", userdata);
 }
 
 void EnumerateCasts(CastPolicyCallback callback, void *userdata) {

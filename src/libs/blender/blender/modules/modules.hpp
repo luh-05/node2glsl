@@ -50,5 +50,7 @@ auto GenerateTokenStringFunctionNodeInputRotation(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeInputVector(Out &out) -> absl::Status;
 
+auto GenerateTokenStringFunctionNodeInputString(Out &out) -> absl::Status;
+
 auto GenerateTokenStringShaderNodeValue(Out &out) -> absl::Status;
 } // namespace msk::blender

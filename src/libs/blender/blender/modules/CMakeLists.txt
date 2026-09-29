@@ -26,6 +26,7 @@ target_sources(
     ./inputs/FunctionNodeInputInt.cpp
     ./inputs/FunctionNodeInputRotation.cpp
     ./inputs/FunctionNodeInputVector.cpp
+    ./inputs/FunctionNodeInputString.cpp
     ./inputs/ShaderNodeValue.cpp
     ./ShaderNodeVectorMath.cpp
 )
