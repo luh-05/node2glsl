@@ -38,7 +38,7 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
           Out::LEFT / "B1" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
           ", " + "1.0" + "))" + ";"; //Uni
 
-      } else if (clamp_factor&&factorMode=="UNIFORM") {
+      } else if (!clamp_factor&&factorMode=="UNIFORM") {
       out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
           Out::LEFT / "B1" + ", " + Out::LEFT / "Factor0" + ");";
     }
@@ -69,7 +69,7 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
 
     if (clamp_factor) {
       out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
-          Out::LEFT / "B3" + ", " + "clamp(" + Out::LEFT / "Factor0" + "," + "0.0" +
+          Out::LEFT / "B3" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
           ", " + "1.0" + "))" + ";";
 
     } else {

@@ -164,7 +164,7 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_BOOLEAN_MATH_NIMPLY) {
   functionNodeBooleanMathHelper("NIMPLY", "(", "&& !", ");");
 }
 
-//================================ BOOLEAN MATH
+//================================ BOOLEAN MATH END
 //================================================
 
 //================================= BIT MATH
@@ -1588,7 +1588,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_CLAMP) {
                     {GraphShim::RIGHT, "Result0"},
 
                 },
-                {{"data_type0", "FLOAT"}, {"clamp_factor0", "True"}}),
+                {{"data_type0", "FLOAT"}, {"clamp_factor0", "True"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A0, B0, clamp(Factor0, 0.0, 1.0));");
 }
 
@@ -1601,7 +1601,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_NOCLAMP) {
                     {GraphShim::RIGHT, "Result0"},
 
                 },
-                {{"data_type0", "FLOAT"}, {"clamp_factor0", "False"}}),
+                {{"data_type0", "FLOAT"}, {"clamp_factor0", "False"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A0, B0, Factor0);");
 }
 
@@ -1616,7 +1616,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP) {
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "True"},
-                 {"factor_mode0", "UNIFORM"}}),
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A1, B1, clamp(Factor0, 0.0, 1.0));");
 }
 
@@ -1633,7 +1633,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP) {
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "False"},
-                 {"factor_mode0", "UNIFORM"}}),
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A1, B1, Factor0);");
 }
 
@@ -1648,7 +1648,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_CLAMP) {
                     {GraphShim::RIGHT, "Result0"},
 
                 },
-                {{"data_type0", "ROTATION"}, {"clamp_factor0", "True"}}),
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "True"}, {"factor_mode0", "UNIFORM"},{"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A3, B3, clamp(Factor0, 0.0, 1.0));");
 }
 
@@ -1661,7 +1661,7 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
                     {GraphShim::RIGHT, "Result0"},
 
                 },
-                {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}}),
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
             "Result0=mix(A3, B3, Factor0);");
 }
 //======================= END SHADER NODE MIX ======================
