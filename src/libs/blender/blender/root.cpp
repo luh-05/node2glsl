@@ -34,6 +34,10 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
        FuncWrapper<GenerateTokenStringFunctionNodeHashValue>},
       {"FunctionNodeIntegerMath",
        FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>},
+      {"GeometryNodeGroupInput",
+       FuncWrapper<GenerateTokenStringGeometryNodeGroupInput>},
+      {"GeometryNodeGroupOutput",
+       FuncWrapper<GenerateTokenStringGeometryNodeGroupOutput>},
       {"NodeGroupInput", FuncWrapper<GenerateTokenStringNodeGroupInput>},
       {"NodeGroupOutput", FuncWrapper<GenerateTokenStringNodeGroupOutput>},
       {"ShaderNodeClamp", FuncWrapper<GenerateTokenStringShaderNodeClamp>},
@@ -42,6 +46,8 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
       {"ShaderNodeMapRange",
        FuncWrapper<GenerateTokenStringShaderNodeMapRange>},
       {"ShaderNodeMath", FuncWrapper<GenerateTokenStringShaderNodeMath>},
+      {"ShaderNodeVectorMath",
+       FuncWrapper<GenerateTokenStringShaderNodeVectorMath>},
       {"ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>},
       {"FunctionNodeInputBool",
        FuncWrapper<GenerateTokenStringFunctionNodeInputBool>},
@@ -65,6 +71,7 @@ void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
   callback("VECTOR vec3", userdata);
   callback("RGBA vec4", userdata);
   callback("ROTATION vec3", userdata);
+  callback("BOOLEAN bool", userdata);
 }
 
 void EnumerateCasts(CastPolicyCallback callback, void *userdata) {

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BlenderNodeGraphs exporter="FAST" version="0.1">
+  <Graph name="SDF_Subtract.001">
+    <Link from_socket="0x78a41165d62" to_socket="0x78a41165cc2"/>
+    <Link from_socket="0x78a41165ce2" to_socket="0x78a41165ca2"/>
+    <Link from_socket="0x78a41165c82" to_socket="0x78a41165e02"/>
+    <Link from_socket="0x78a41165c62" to_socket="0x78a41165dc2"/>
+    <Link from_socket="0x78a41165c62" to_socket="0x78a41165d42"/>
+    <Node name="Group Output" type="GROUP_OUTPUT">
+      <Attribute type="bool" name="is_active_output">
+        <Value name="v" value="True"/>
+      </Attribute>
+      <Attribute type="bool" name="mute">
+        <Value name="v" value="False"/>
+      </Attribute>
+      <Socket type="Geometry" name="Geometry0" direction="in" hash="0x78a41165e22"/>
+      <Socket type="p3d_sdf" name="p3d_sdf1" direction="in" hash="0x78a41165e02">
+        <Value name="v" value="0.0"/>
+      </Socket>
+      <Socket type="" name="2" direction="in" hash="0x78a41165de2"/>
+    </Node>
+    <Node name="Group" type="GROUP">
+      <Attribute type="bool" name="mute">
+        <Value name="v" value="False"/>
+      </Attribute>
+      <Attribute type="GeometryNodeTree" name="node_tree">
+        <Graph name="SDF_Sphere">
+          <Link from_socket="0x78a411675e2" to_socket="0x78a41167522"/>
+          <Link from_socket="0x78a411675c2" to_socket="0x78a41167502"/>
+          <Link from_socket="0x78a411674a2" to_socket="0x78a41167462"/>
+          <Link from_socket="0x78a41166fa2" to_socket="0x78a41166f82"/>
+          <Link from_socket="0x78a411675a2" to_socket="0x78a41166f62"/>
+          <Link from_socket="0x78a41166f22" to_socket="0x78a41167562"/>
+          <Node name="Group Input" type="GROUP_INPUT">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Position" name="Position0" direction="out" hash="0x78a411675e2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Center" name="Center1" direction="out" hash="0x78a411675c2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Radius" name="Radius2" direction="out" hash="0x78a411675a2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="" name="3" direction="out" hash="0x78a41167582"/>
+          </Node>
+          <Node name="Group Output" type="GROUP_OUTPUT">
+            <Attribute type="bool" name="is_active_output">
+              <Value name="v" value="True"/>
+            </Attribute>
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Distance" name="Distance0" direction="in" hash="0x78a41167562">
+              <Value name="v" value="0.0"/>
+            </Socket>
+            <Socket type="" name="1" direction="in" hash="0x78a41167542"/>
+          </Node>
+          <Node name="Vector Math" type="VECT_MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="SUBTRACT"/>
+            </Attribute>
+            <Socket type="Vector" name="Vector0" direction="in" hash="0x78a41167522">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector1" direction="in" hash="0x78a41167502">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector2" direction="in" hash="0x78a411674e2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Scale" name="Scale3" direction="in" hash="0x78a411674c2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector0" direction="out" hash="0x78a411674a2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="out" hash="0x78a41167482">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+          <Node name="Vector Math.001" type="VECT_MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="LENGTH"/>
+            </Attribute>
+            <Socket type="Vector" name="Vector0" direction="in" hash="0x78a41167462">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector1" direction="in" hash="0x78a41167442">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector2" direction="in" hash="0x78a41167422">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Scale" name="Scale3" direction="in" hash="0x78a41166fe2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector0" direction="out" hash="0x78a41166fc2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="out" hash="0x78a41166fa2">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+          <Node name="Math" type="MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="SUBTRACT"/>
+            </Attribute>
+            <Attribute type="bool" name="use_clamp">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Value" name="Value0" direction="in" hash="0x78a41166f82">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="in" hash="0x78a41166f62">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value2" direction="in" hash="0x78a41166f42">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value0" direction="out" hash="0x78a41166f22">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+        </Graph>
+      </Attribute>
+      <Socket type="Position" name="Position0" direction="in" hash="0x78a41165dc2">
+        <Value name="x" value="0.0"/>
+        <Value name="y" value="0.0"/>
+        <Value name="z" value="0.0"/>
+      </Socket>
+      <Socket type="Center" name="Center1" direction="in" hash="0x78a41165da2">
+        <Value name="x" value="0.5"/>
+        <Value name="y" value="0.5"/>
+        <Value name="z" value="2.9802322387695312e-08"/>
+      </Socket>
+      <Socket type="Radius" name="Radius2" direction="in" hash="0x78a41165d82">
+        <Value name="v" value="0.6500000357627869"/>
+      </Socket>
+      <Socket type="Distance" name="Distance0" direction="out" hash="0x78a41165d62">
+        <Value name="v" value="0.0"/>
+      </Socket>
+    </Node>
+    <Node name="Group.001" type="GROUP">
+      <Attribute type="bool" name="mute">
+        <Value name="v" value="False"/>
+      </Attribute>
+      <Attribute type="GeometryNodeTree" name="node_tree">
+        <Graph name="SDF_Sphere">
+          <Link from_socket="0x78a411675e2" to_socket="0x78a41167522"/>
+          <Link from_socket="0x78a411675c2" to_socket="0x78a41167502"/>
+          <Link from_socket="0x78a411674a2" to_socket="0x78a41167462"/>
+          <Link from_socket="0x78a41166fa2" to_socket="0x78a41166f82"/>
+          <Link from_socket="0x78a411675a2" to_socket="0x78a41166f62"/>
+          <Link from_socket="0x78a41166f22" to_socket="0x78a41167562"/>
+          <Node name="Group Input" type="GROUP_INPUT">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Position" name="Position0" direction="out" hash="0x78a411675e2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Center" name="Center1" direction="out" hash="0x78a411675c2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Radius" name="Radius2" direction="out" hash="0x78a411675a2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="" name="3" direction="out" hash="0x78a41167582"/>
+          </Node>
+          <Node name="Group Output" type="GROUP_OUTPUT">
+            <Attribute type="bool" name="is_active_output">
+              <Value name="v" value="True"/>
+            </Attribute>
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Distance" name="Distance0" direction="in" hash="0x78a41167562">
+              <Value name="v" value="0.0"/>
+            </Socket>
+            <Socket type="" name="1" direction="in" hash="0x78a41167542"/>
+          </Node>
+          <Node name="Vector Math" type="VECT_MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="SUBTRACT"/>
+            </Attribute>
+            <Socket type="Vector" name="Vector0" direction="in" hash="0x78a41167522">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector1" direction="in" hash="0x78a41167502">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector2" direction="in" hash="0x78a411674e2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Scale" name="Scale3" direction="in" hash="0x78a411674c2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector0" direction="out" hash="0x78a411674a2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="out" hash="0x78a41167482">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+          <Node name="Vector Math.001" type="VECT_MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="LENGTH"/>
+            </Attribute>
+            <Socket type="Vector" name="Vector0" direction="in" hash="0x78a41167462">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector1" direction="in" hash="0x78a41167442">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector2" direction="in" hash="0x78a41167422">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Scale" name="Scale3" direction="in" hash="0x78a41166fe2">
+              <Value name="v" value="1.0"/>
+            </Socket>
+            <Socket type="Vector" name="Vector0" direction="out" hash="0x78a41166fc2">
+              <Value name="x" value="0.0"/>
+              <Value name="y" value="0.0"/>
+              <Value name="z" value="0.0"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="out" hash="0x78a41166fa2">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+          <Node name="Math" type="MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="SUBTRACT"/>
+            </Attribute>
+            <Attribute type="bool" name="use_clamp">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Value" name="Value0" direction="in" hash="0x78a41166f82">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="in" hash="0x78a41166f62">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value2" direction="in" hash="0x78a41166f42">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value0" direction="out" hash="0x78a41166f22">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+        </Graph>
+      </Attribute>
+      <Socket type="Position" name="Position0" direction="in" hash="0x78a41165d42">
+        <Value name="x" value="0.0"/>
+        <Value name="y" value="0.0"/>
+        <Value name="z" value="0.0"/>
+      </Socket>
+      <Socket type="Center" name="Center1" direction="in" hash="0x78a41165d22">
+        <Value name="x" value="0.5"/>
+        <Value name="y" value="0.0"/>
+        <Value name="z" value="0.0"/>
+      </Socket>
+      <Socket type="Radius" name="Radius2" direction="in" hash="0x78a41165d02">
+        <Value name="v" value="0.6000000238418579"/>
+      </Socket>
+      <Socket type="Distance" name="Distance0" direction="out" hash="0x78a41165ce2">
+        <Value name="v" value="0.0"/>
+      </Socket>
+    </Node>
+    <Node name="Group.002" type="GROUP">
+      <Attribute type="bool" name="mute">
+        <Value name="v" value="False"/>
+      </Attribute>
+      <Attribute type="GeometryNodeTree" name="node_tree">
+        <Graph name="SDF_Subtract">
+          <Link from_socket="0x78a41165fc2" to_socket="0x78a41165f42"/>
+          <Link from_socket="0x78a41165fe2" to_socket="0x78a41165ec2"/>
+          <Link from_socket="0x78a41165ee2" to_socket="0x78a41165ea2"/>
+          <Link from_socket="0x78a41165e62" to_socket="0x78a41165f82"/>
+          <Node name="Group Input" type="GROUP_INPUT">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Base (A)" name="Base (A)0" direction="out" hash="0x78a41165fe2">
+              <Value name="v" value="0.0"/>
+            </Socket>
+            <Socket type="Remove (B)" name="Remove (B)1" direction="out" hash="0x78a41165fc2">
+              <Value name="v" value="0.0"/>
+            </Socket>
+            <Socket type="" name="2" direction="out" hash="0x78a41165fa2"/>
+          </Node>
+          <Node name="Group Output" type="GROUP_OUTPUT">
+            <Attribute type="bool" name="is_active_output">
+              <Value name="v" value="True"/>
+            </Attribute>
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Distance" name="Distance0" direction="in" hash="0x78a41165f82">
+              <Value name="v" value="0.0"/>
+            </Socket>
+            <Socket type="" name="1" direction="in" hash="0x78a41165f62"/>
+          </Node>
+          <Node name="Math" type="MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="MULTIPLY"/>
+            </Attribute>
+            <Attribute type="bool" name="use_clamp">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Value" name="Value0" direction="in" hash="0x78a41165f42">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="in" hash="0x78a41165f22">
+              <Value name="v" value="-1.0"/>
+            </Socket>
+            <Socket type="Value" name="Value2" direction="in" hash="0x78a41165f02">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value0" direction="out" hash="0x78a41165ee2">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+          <Node name="Math.001" type="MATH">
+            <Attribute type="bool" name="mute">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Attribute type="str" name="operation">
+              <Value name="v" value="MAXIMUM"/>
+            </Attribute>
+            <Attribute type="bool" name="use_clamp">
+              <Value name="v" value="False"/>
+            </Attribute>
+            <Socket type="Value" name="Value0" direction="in" hash="0x78a41165ec2">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value1" direction="in" hash="0x78a41165ea2">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value2" direction="in" hash="0x78a41165e82">
+              <Value name="v" value="0.5"/>
+            </Socket>
+            <Socket type="Value" name="Value0" direction="out" hash="0x78a41165e62">
+              <Value name="v" value="0.0"/>
+            </Socket>
+          </Node>
+        </Graph>
+      </Attribute>
+      <Socket type="Base (A)" name="Base (A)0" direction="in" hash="0x78a41165cc2">
+        <Value name="v" value="0.0"/>
+      </Socket>
+      <Socket type="Remove (B)" name="Remove (B)1" direction="in" hash="0x78a41165ca2">
+        <Value name="v" value="0.0"/>
+      </Socket>
+      <Socket type="Distance" name="Distance0" direction="out" hash="0x78a41165c82">
+        <Value name="v" value="0.0"/>
+      </Socket>
+    </Node>
+    <Node name="Group Input" type="GROUP_INPUT">
+      <Attribute type="bool" name="mute">
+        <Value name="v" value="False"/>
+      </Attribute>
+      <Socket type="p3d_position" name="p3d_position0" direction="out" hash="0x78a41165c62">
+        <Value name="x" value="0.0"/>
+        <Value name="y" value="0.0"/>
+        <Value name="z" value="0.0"/>
+      </Socket>
+      <Socket type="" name="1" direction="out" hash="0x78a41165c42"/>
+    </Node>
+  </Graph>
+</BlenderNodeGraphs>

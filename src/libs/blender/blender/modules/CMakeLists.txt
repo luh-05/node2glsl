@@ -13,6 +13,8 @@ target_sources(
     ./FunctionNodeFloatToInt.cpp
     ./FunctionNodeHashValue.cpp
     ./FunctionNodeIntegerMath.cpp
+    ./GeometryNodeGroupInput.cpp
+    ./GeometryNodeGroupOutput.cpp
     ./NodeGroupInput.cpp
     ./NodeGroupOutput.cpp
     ./ShaderNodeClamp.cpp
@@ -25,4 +27,5 @@ target_sources(
     ./inputs/FunctionNodeInputRotation.cpp
     ./inputs/FunctionNodeInputVector.cpp
     ./inputs/ShaderNodeValue.cpp
+    ./ShaderNodeVectorMath.cpp
 )

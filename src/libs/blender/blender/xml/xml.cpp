@@ -119,7 +119,8 @@ auto XMLParser::PopulateGraph(
 
   // subgraphs (recursive)
   for (pugi::xml_node xml_subgraph : xml_graph.children("Graph")) {
-    std::string subgraph_name = xml_subgraph.attribute("name").value();
+    auto id = std::string(xml_subgraph.attribute("id").value());
+    std::string subgraph_name = xml_subgraph.attribute("name").value() + id;
 
     auto subgraph_or = graph.AddSubGraph(current_graph, subgraph_name);
     if (!subgraph_or.ok())
