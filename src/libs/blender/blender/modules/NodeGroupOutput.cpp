@@ -37,6 +37,10 @@ auto GenerateTokenStringNodeGroupOutput(Out &out) -> absl::Status {
     out + res.first + " = " + Out::LEFT / res.first + ";" = 1;
   }
 
+  for (auto &res : out.parent.rightPorts) {
+    out + Out::RIGHT / res.first + " = " + Out::LEFT / res.first + ";" = 1;
+  }
+
   return out.GetStatus();
 }
 

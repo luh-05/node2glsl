@@ -104,6 +104,12 @@ auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status {
 
   }
 
+  else if (op_c == "LENGTH") {
+    out + Out::RIGHT / "Value0" + " = length(" + Out::LEFT / "Vector0" + ");";
+
+    return out.GetStatus();
+  }
+
   // alle mit function und 2 variablen
   else if (op_c == "POWER" || op_c == "MINIMUM" || op_c == "MAXIMUM" ||
            op_c == "ARCTAN2") {

@@ -9,9 +9,12 @@
 namespace msk::blender {
 
 auto GenerateTokenStringFunctionNodeInputVector(Out &out) -> absl::Status {
-  auto vector_var = out.GetConstant<std::string>("vector_dimensions0");
+  auto x = out.GetConstant<std::string>("Value0");
+  auto y = out.GetConstant<std::string>("Value1");
+  auto z = out.GetConstant<std::string>("Value2");
 
-  out + Out::RIGHT / "Vector0" + vector_var + ";";
+  out + Out::RIGHT / "Vector0" + " = vec3(" +
+      std::format("{}, {}, {}", x, y, z) + ");";
 
   return out.GetStatus();
 }
