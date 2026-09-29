@@ -26,8 +26,8 @@ auto GenerateTokenStringFunctionNodeFloatToInt(Out &out) -> absl::Status {
         std::format("Unknown operation: '{}'", mode));
   }
 
-  out + Out::RIGHT / "Integer" + " = int(" + function + "(" +
-      Out::LEFT / "Float" + "));";
+  out + Out::RIGHT / "Integer0" + " = int(" + function + "(" +
+      Out::LEFT / "Float0" + "));";
 
   return out.GetStatus();
 }

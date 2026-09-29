@@ -20,27 +20,40 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
   if (dataType == "FLOAT") {
 
     if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + "clamp(" + Out::LEFT / "A0" + "," + "0.0" +
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A0" + ", " +
+          Out::LEFT / "B0" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
           ", " + "1.0" + ")" + ")" + ";";
     } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B0" + ", " +
-          Out::LEFT / "C0" + ", " + Out::LEFT / "A0" + ";";
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A0" + ", " +
+          Out::LEFT / "B0" + ", " + Out::LEFT / "Factor0" + ");";
     }
+    return out.GetStatus();
   }
 
   else if (dataType == "VECTOR") {
 
-    // Uniform / Non Uniform beeinflusst nicht die ports
-    if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B1" + ", " +
-          Out::LEFT / "C1" + ", " + "clamp(" + Out::LEFT / "A1" + "," + "0.0" +
-          ", " + "1.0" + ")" + ";";
+    // Uniform: Factor0, Non Uniform: Factor1
+    if (clamp_factor&&factorMode=="UNIFORM") {
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+          Out::LEFT / "B1" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
+          ", " + "1.0" + "))" + ";"; //Uni
 
-    } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B1" + ", " +
-          Out::LEFT / "C1" + ", " + Out::LEFT / "A1" + ";";
+      } else if (!clamp_factor&&factorMode=="UNIFORM") {
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+          Out::LEFT / "B1" + ", " + Out::LEFT / "Factor0" + ");";
     }
+    else if (clamp_factor&&factorMode=="NON_UNIFORM") {
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+          Out::LEFT / "B1" + ", " + "clamp(" + Out::LEFT / "Factor1" + ", " + "0.0" +
+          ", " + "1.0" + "))" + ";"; //NonUni
+    } else if (!clamp_factor&&factorMode=="NON_UNIFORM") {
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+          Out::LEFT / "B1" + ", " + Out::LEFT / "Factor1" + ");";
+    }
+    else {
+      return absl::InvalidArgumentError(
+          std::format("Illegal value of factor mode constant: '{}'", factorMode));
+    } 
 
     return out.GetStatus();
   }
@@ -55,13 +68,13 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
   {
 
     if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B3" + ", " +
-          Out::LEFT / "C3" + ", " + "clamp(" + Out::LEFT / "A3" + "," + "0.0" +
-          ", " + "1.0" + ")" + ";";
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
+          Out::LEFT / "B3" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
+          ", " + "1.0" + "))" + ";";
 
     } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "B3" + ", " +
-          Out::LEFT / "C3" + ", " + Out::LEFT / "A3" + ";";
+      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
+          Out::LEFT / "B3" + ", " + Out::LEFT / "Factor0" + ");";
     }
 
     return out.GetStatus();
