@@ -1,0 +1,146 @@
+// --- GENERATED CODE, DO NOT EDIT ---
+// Global pp definitions
+
+#define VALUE float
+#define VECTOR vec3
+#define RGBA vec4
+#define ROTATION vec3
+#define BOOLEAN bool
+#define STRING void
+
+// Global var definitions
+
+VALUE val_0x555555624aa0;
+VALUE val_0x555555624590;
+VALUE val_0x5555556243c0;
+VALUE val_0x5555556232a0;
+VALUE val_0x555555623d10;
+RGBA val_0x555555627540;
+VALUE val_0x555555628170;
+INT val_0x555555626510;
+VALUE val_0x555555623a40;
+VECTOR val_0x555555626b30;
+VECTOR val_0x555555626d60;
+VALUE val_0x555555626200;
+VALUE val_0x555555623560;
+RGBA val_0x555555627130;
+INT val_0x555555626820;
+BOOLEAN val_0x555555625bd0;
+VALUE val_0x555555625e00;
+VALUE val_0x5555556287b0;
+VALUE val_0x555555628480;
+VECTOR val_0x55555561a1f0;
+
+// Entry Point
+void p3d_main() {
+// Modules
+
+// Module '0x555555624780'
+{
+val_0x555555624590=0.7999999523162842;
+}
+
+// Module '0x5555556249b0'
+{
+val_0x555555624aa0=0.5;
+}
+
+// Module '0x555555623950'
+{
+val_0x555555623a40=0.5;
+}
+
+// Module '0x5555556236c0'
+{
+val_0x555555623560=9.699999809265137;
+}
+
+// Module '0x555555623c60'
+{
+val_0x555555623d10=3.140000104904175;
+}
+
+// Module '0x555555623fb0'
+{
+val_0x5555556243c0=val_0x555555623d10*val_0x555555624590;
+}
+
+// Module '0x555555619f90'
+{
+val_0x55555561a1f0 = p3d_position;
+}
+
+// Module '0x555555622ed0'
+{
+val_0x5555556232a0=length(val_0x55555561a1f0)+val_0x555555623560;
+}
+
+// Module '0x55555561a530'
+{
+p3d_sdf = val_0x5555556232a0;
+mollusk_debug0 = vec3(val_0x555555623d10, val_0x555555623d10, val_0x555555623d10);
+mollusk_debug1 = vec4(val_0x555555623d10, val_0x555555623d10, val_0x555555623d10, 1.0f);
+mollusk_debug2 = vec3(val_0x5555556243c0, val_0x5555556243c0, val_0x5555556243c0);
+}
+
+// Module '0x5555556272e0'
+{
+val_0x555555627130 = vec3(0.800000011920929, 0.800000011920929, 0.800000011920929);
+}
+
+// Module '0x555555623400'
+{
+val_0x555555625e00=0.0;
+}
+
+// Module '0x555555626420'
+{
+val_0x555555626510=0;
+}
+
+// Module '0x555555626a40'
+{
+val_0x555555626b30 = vec3(0.0, 0.0, 0.0);
+}
+
+// Module '0x555555628390'
+{
+val_0x555555628480=0.08726649731397629;
+}
+
+// Module '0x555555626f10'
+{
+val_0x555555626d60 = vec3(0.0, 0.0, 0.0);
+}
+
+// Module '0x555555626730'
+{
+val_0x555555626820=0;
+}
+
+// Module '0x555555627730'
+{
+val_0x555555627540 = vec3(0.800000011920929, 0.800000011920929, 0.800000011920929);
+}
+
+// Module '0x555555626110'
+{
+val_0x555555626200=0.0;
+}
+
+// Module '0x555555628080'
+{
+val_0x555555628170=0.8999999761581421;
+}
+
+// Module '0x555555624cc0'
+{
+val_0x555555625bd0=val_0x555555625e00>val_0x555555626200;
+}
+
+// Module '0x5555556286c0'
+{
+val_0x5555556287b0=0.0010000000474974513;
+}
+
+}

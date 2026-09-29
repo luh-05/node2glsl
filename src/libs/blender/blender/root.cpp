@@ -34,6 +34,11 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
        FuncWrapper<GenerateTokenStringFunctionNodeHashValue>},
       {"FunctionNodeIntegerMath",
        FuncWrapper<GenerateTokenStringFunctionNodeIntegerMath>},
+      {"GeometryNodeGroupInput",
+       FuncWrapper<GenerateTokenStringGeometryNodeGroupInput>},
+      {"GeometryNodeGroupOutput",
+       FuncWrapper<GenerateTokenStringGeometryNodeGroupOutput>},
+      {"NodeGroupInput", FuncWrapper<GenerateTokenStringNodeGroupInput>},
       {"NodeGroupOutput", FuncWrapper<GenerateTokenStringNodeGroupOutput>},
       {"ShaderNodeClamp", FuncWrapper<GenerateTokenStringShaderNodeClamp>},
       {"ShaderNodeFloatCurve",
@@ -41,6 +46,10 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
       {"ShaderNodeMapRange",
        FuncWrapper<GenerateTokenStringShaderNodeMapRange>},
       {"ShaderNodeMath", FuncWrapper<GenerateTokenStringShaderNodeMath>},
+      {"ShaderNodeSeperaeXYZ",
+       FuncWrapper<GenerateTokenStringShaderNodeSeperateXYZ>},
+      {"ShaderNodeVectorMath",
+       FuncWrapper<GenerateTokenStringShaderNodeVectorMath>},
       {"ShaderNodeMix", FuncWrapper<GenerateTokenStringShaderNodeMix>},
       {"FunctionNodeInputBool",
        FuncWrapper<GenerateTokenStringFunctionNodeInputBool>},
@@ -50,6 +59,8 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
        FuncWrapper<GenerateTokenStringFunctionNodeInputRotation>},
       {"FunctionNodeInputVector",
        FuncWrapper<GenerateTokenStringFunctionNodeInputVector>},
+      {"FunctionNodeInputString",
+       FuncWrapper<GenerateTokenStringFunctionNodeInputString>},
       {"ShaderNodeValue", FuncWrapper<GenerateTokenStringShaderNodeValue>}};
 
   for (const auto &[name, func] : impls) {
@@ -61,6 +72,24 @@ bool EnumerateModules(PluginModuleCallback callback, void *userdata) {
 
 void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata) {
   callback("VALUE float", userdata);
+  callback("VECTOR vec3", userdata);
+  callback("RGBA vec4", userdata);
+  callback("ROTATION vec3", userdata);
+  callback("BOOLEAN bool", userdata);
+  callback("STRING void", userdata);
+}
+
+void EnumerateCasts(CastPolicyCallback callback, void *userdata) {
+  constexpr std::tuple<const char *, const char *, const char *> policies[] = {
+      {"VECTOR", "VALUE", "length({})"},
+      {"VALUE", "VECTOR", "vec3({0:}, {0:}, {0:})"},
+      {"VALUE", "RGBA", "vec4({0:}, {0:}, {0:}, 1.0f)"},
+      {"VALUE", "ROTATION", "vec3({0:}, {0:}, {0:})"},
+  };
+
+  for (const auto &[from, to, pattern] : policies) {
+    callback(from, to, pattern, userdata);
+  }
 }
 
 void GetInfo(PluginInfo *info) {

@@ -1,7 +1,9 @@
+#include "mir/codegen.hpp"
 #include "mir/node_graph/node_graph.hpp"
 #include "plugin_abi/plugin_abi.h"
 #include <absl/status/status.h>
 #include <mollusk/plugins/plugins.hpp>
+#include <spdlog/spdlog.h>
 #include <vector>
 
 namespace msk {
@@ -22,6 +24,15 @@ auto PluginStore::FetchPlugin() -> absl::Status {
         vec.push_back(std::string(def));
       },
       &this->definitions);
+
+  EnumerateCasts(
+      [](const char *from, const char *to, const char *pattern,
+         void *userdata) {
+        auto &vec = *static_cast<std::vector<msk::ir::CastPolicy> *>(userdata);
+        vec.push_back(
+            {std::string(from), std::string(to), std::string(pattern)});
+      },
+      &this->cast_policies);
 
   return absl::OkStatus();
 }

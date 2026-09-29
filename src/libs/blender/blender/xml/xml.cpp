@@ -59,7 +59,6 @@ auto XMLParser::PopulateGraph(
     std::string node_name = xml_node.attribute("name").value();
     std::string node_type = xml_node.attribute("type").value();
 
-    // FIXME: Make every module a dummy module until all are implemented
     auto func = this->store->GetModuleFunc(node_type);
     if (!func.ok()) {
       return func.status();
@@ -120,7 +119,8 @@ auto XMLParser::PopulateGraph(
 
   // subgraphs (recursive)
   for (pugi::xml_node xml_subgraph : xml_graph.children("Graph")) {
-    std::string subgraph_name = xml_subgraph.attribute("name").value();
+    auto id = std::string(xml_subgraph.attribute("id").value());
+    std::string subgraph_name = xml_subgraph.attribute("name").value() + id;
 
     auto subgraph_or = graph.AddSubGraph(current_graph, subgraph_name);
     if (!subgraph_or.ok())

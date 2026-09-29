@@ -43,5 +43,15 @@ public:
   auto GetPort() -> Port * { return this->port; }
 };
 
+/**
+ * @brief Policy for resolving heterogenous connections
+ */
+class CastPolicy {
+public:
+  std::string right_type;
+  std::string left_type;
+  std::string format;
+};
+
 // using CodegenToken = std::variant<TextToken, WildcardToken>;
 } // namespace msk::ir

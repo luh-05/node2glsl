@@ -13,6 +13,7 @@
 #include <numeric>
 #include <ranges>
 #include <spdlog/spdlog.h>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <variant>
@@ -64,8 +65,6 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
         std::format("Failed to evaluate Module: {}", s.ToString()));
   }
 
-  auto last_token = &*v.rbegin();
-
   // if (this->pretty) {
   //   if (std::holds_alternative<msk::ir::WildcardToken>(*last_token)) {
   //     *inserter = ir::TextToken("\n");
@@ -78,6 +77,15 @@ auto ForwardEvaluationStrategy::evalModule(ContextPointer cxt,
   //   }
   // }
 
+  auto &last_token = *v.rbegin();
+  if (std::holds_alternative<msk::ir::WildcardToken>(last_token)) {
+    v.push_back(std::string("\n"));
+  } else {
+    auto &text = std::get<msk::ir::TextToken>(last_token);
+    if (!text.GetString().ends_with("\n")) {
+      v.push_back(std::string("\n"));
+    }
+  }
   *inserter = ir::TextToken("}\n");
 
   // Convert port access to Connection access logs
@@ -269,8 +277,8 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
   *vit = std::string("\n");
 
   // Add function header
-  *vit = std::string("// Main Method\n");
-  *vit = std::string("int main() {\n");
+  *vit = std::string("// Entry Point\n");
+  *vit = std::string("void p3d_main() {\n");
 
   // Then append ordered modules
   *vit = std::string("// Modules\n\n");
@@ -280,23 +288,51 @@ auto ForwardEvaluationStrategy::EvaluateTokens(ContextPointer cxt,
 
   for (auto idx : schedule_second) {
     this->tokens.append_range(vectors.at(idx));
+    this->tokens.push_back(std::string("\n"));
   }
 
   // Finish with main function footer
   *vit = std::string("}\n");
 
   // Then generate glsl from final token vector
-  for (auto it = tokens.begin(); it != tokens.end(); it++) {
-    auto token = &*it;
+  // for (auto it = tokens.begin(); it != tokens.end(); it++) {
+  for (auto &token : tokens) {
+    // auto token = &*it;
     std::string glsl_string;
-    if (auto *t = std::get_if<msk::ir::TextToken>(token)) {
+    if (auto *t = std::get_if<msk::ir::TextToken>(&token)) {
       glsl_string = t->GetString();
-    } else if (auto *t = std::get_if<msk::ir::WildcardToken>(token)) {
+    } else if (auto *t = std::get_if<msk::ir::WildcardToken>(&token)) {
+
       if (auto s = t->GetString(); !s.ok()) {
         return absl::AbortedError(
             std::format("While evaluating tokens: {}", s.status().ToString()));
       } else {
         glsl_string = s.value();
+
+        // Check type mismatch
+        if (t->GetPort()->IsLeft()) {
+          auto port_type_this = t->GetPort()->GetDataType();
+          auto port_type_other = std::get<msk::ir::Port::ConnectionPointer>(
+                                     t->GetPort()->connection)
+                                     ->right_port->GetDataType();
+          if (port_type_this != port_type_other) {
+            if (auto policy = std::ranges::find_if(
+                    cxt->cast_policies.begin(), cxt->cast_policies.end(),
+                    [&port_type_this, &port_type_other](auto &p) {
+                      return p.left_type == port_type_this &&
+                             p.right_type == port_type_other;
+                    });
+                policy == cxt->cast_policies.end()) {
+              return absl::InvalidArgumentError(
+                  std::format("No CastPolicy defined for '{}' -> '{}'!",
+                              port_type_other, port_type_this));
+            } else {
+              auto &pol = *policy;
+              glsl_string =
+                  std::format(std::runtime_format(pol.format), glsl_string);
+            }
+          }
+        }
       }
     } else {
       return absl::InvalidArgumentError(

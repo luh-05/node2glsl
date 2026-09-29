@@ -13,6 +13,7 @@ Utility to convert a shader node-graph to glsl
  - doxygen
  - sphinx
  - breathe
+ - gtest
 
 > [!TIP]
 > A **Nix flake** containing all dependencies is provided.
@@ -25,7 +26,7 @@ Utility to convert a shader node-graph to glsl
   
 **Step 3:** Open "MSYS2 UCRT64" shell and install the required packages with the following command:
 ```sh
-pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-doxygen mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-shaderc mingw-w64-ucrt-x86_64-sdl3 mingw-w64-ucrt-x86_64-abseil-cpp mingw-w64-ucrt-x86_64-pugixml mingw-w64-ucrt-x86_64-glm
+pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-doxygen mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-shaderc mingw-w64-ucrt-x86_64-sdl3 mingw-w64-ucrt-x86_64-abseil-cpp mingw-w64-ucrt-x86_64-pugixml mingw-w64-ucrt-x86_64-glm mingw-w64-ucrt-x86_64-gtest
 
 ```
 **Step 4:** Download ninja https://github.com/ninja-build/ninja/releases. Put the .exe in a place you like (for this example "C:\Program Files\ninja") **and add that path to the PATH environment variable too**  
@@ -58,10 +59,5 @@ cmake --preset debug
 cmake --build --preset debug
 ```
 
-### Step 3 (Run)
-```sh
-./bin/debug/viz.exe --gpu_driver vulkan
-```
-
-> [!IMPORTANT]
-> On Windows you might need to disable "Smart App Control" to run viz.exe
+# Usage
+`mollusk_cli` can be found in `bin/debug/mollusk_cli` after compilation. Run `mollusk_cli --helpfull` for usage instructions.

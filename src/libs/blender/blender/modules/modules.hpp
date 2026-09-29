@@ -22,6 +22,12 @@ auto GenerateTokenStringFunctionNodeIntegerMath(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeFloatToInt(Out &out) -> absl::Status;
 
+auto GenerateTokenStringGeometryNodeGroupInput(Out &out) -> absl::Status;
+
+auto GenerateTokenStringGeometryNodeGroupOutput(Out &out) -> absl::Status;
+
+auto GenerateTokenStringNodeGroupInput(Out &out) -> absl::Status;
+
 auto GenerateTokenStringNodeGroupOutput(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeClamp(Out &out) -> absl::Status;
@@ -32,6 +38,10 @@ auto GenerateTokenStringShaderNodeMapRange(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeMath(Out &out) -> absl::Status;
 
+auto GenerateTokenStringShaderNodeSeperateXYZ(Out &out) -> absl::Status;
+
+auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status;
+
 auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeInputBool(Out &out) -> absl::Status;
@@ -41,6 +51,8 @@ auto GenerateTokenStringFunctionNodeInputInt(Out &out) -> absl::Status;
 auto GenerateTokenStringFunctionNodeInputRotation(Out &out) -> absl::Status;
 
 auto GenerateTokenStringFunctionNodeInputVector(Out &out) -> absl::Status;
+
+auto GenerateTokenStringFunctionNodeInputString(Out &out) -> absl::Status;
 
 auto GenerateTokenStringShaderNodeValue(Out &out) -> absl::Status;
 } // namespace msk::blender

@@ -32,7 +32,7 @@ int main() {
 
   msk::blender::XMLParser parser(&store);
 
-  std::string xml_text_file = "./demos/blender_graph_test/test.xml";
+  std::string xml_text_file = "./demos/blender_graph_test/cusi.xml";
   absl::Status status = parser.XMLread(xml_text_file);
   if (!status.ok()) {
     spdlog::error(status.ToString());
@@ -41,6 +41,7 @@ int main() {
   CHECK_OK(parseTest, parser.ParseGraph("0"));
 
   parseTest.get()->SetDefinitios(store.definitions);
+  parseTest.get()->SetCastPolicies(store.cast_policies);
 
   msk::Evaluator eval(parseTest,
                       std::make_unique<msk::ForwardEvaluationStrategy>(true));

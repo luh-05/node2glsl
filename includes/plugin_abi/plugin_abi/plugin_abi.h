@@ -143,6 +143,16 @@ typedef void (*PluginDefinitionCallback)(const char *def, void *userdata);
  */
 void EnumerateDefinitions(PluginDefinitionCallback callback, void *userdata);
 
+// Callback for castpolicy Enumeration
+typedef void (*CastPolicyCallback)(const char *from, const char *to,
+                                   const char *pattern, void *userdata);
+
+/** @brief Enumerates all cast policies
+ *  @param callback - callback that passes cast policies
+ *  @param userdata = structure to pass to callback
+ */
+void EnumerateCasts(CastPolicyCallback callback, void *userdata);
+
 // Struct containing plugin metadata
 typedef struct {
   char id[PLUGIN_ID_MAX];
