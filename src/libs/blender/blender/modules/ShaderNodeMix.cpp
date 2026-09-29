@@ -34,20 +34,20 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
 
     // Uniform: Factor0, Non Uniform: Factor1
     if (clamp_factor&&factorMode=="UNIFORM") {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+      out + Out::RIGHT / "Result1" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
           Out::LEFT / "B1" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
           ", " + "1.0" + "))" + ";"; //Uni
 
       } else if (!clamp_factor&&factorMode=="UNIFORM") {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+      out + Out::RIGHT / "Result1" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
           Out::LEFT / "B1" + ", " + Out::LEFT / "Factor0" + ");";
     }
     else if (clamp_factor&&factorMode=="NON_UNIFORM") {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+      out + Out::RIGHT / "Result1" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
           Out::LEFT / "B1" + ", " + "clamp(" + Out::LEFT / "Factor1" + ", " + "0.0" +
           ", " + "1.0" + "))" + ";"; //NonUni
     } else if (!clamp_factor&&factorMode=="NON_UNIFORM") {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
+      out + Out::RIGHT / "Result1" + "=" + "mix(" + Out::LEFT / "A1" + ", " +
           Out::LEFT / "B1" + ", " + Out::LEFT / "Factor1" + ");";
     }
     else {
@@ -68,12 +68,12 @@ auto GenerateTokenStringShaderNodeMix(Out &out) -> absl::Status {
   {
 
     if (clamp_factor) {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
+      out + Out::RIGHT / "Result3" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
           Out::LEFT / "B3" + ", " + "clamp(" + Out::LEFT / "Factor0" + ", " + "0.0" +
           ", " + "1.0" + "))" + ";";
 
     } else {
-      out + Out::RIGHT / "Result0" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
+      out + Out::RIGHT / "Result3" + "=" + "mix(" + Out::LEFT / "A3" + ", " +
           Out::LEFT / "B3" + ", " + Out::LEFT / "Factor0" + ");";
     }
 
