@@ -208,7 +208,6 @@ else if(op_c == "NORMALIZE"){
     out + Out::RIGHT / "Vector3" + "=" + Out::LEFT / "Vector0" + "*" + Out::LEFT / "Scale0" + ";";
     return out.GetStatus();
   }
-  else if(op_c == "")
 
   
   else {
