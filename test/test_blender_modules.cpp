@@ -1624,42 +1624,69 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_NOCLAMP) {
             "Result0=mix(A0, B0, Factor0);");
 }
 
-TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP) {
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP_UNIFORM) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
                     {GraphShim::LEFT, "A1"},
                     {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result1"},
 
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "True"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A1, B1, clamp(Factor0, 0.0, 1.0));");
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, clamp(Factor0, 0.0, 1.0));");
 }
 
 // Uniform / Non Uniform makes no difference
 
-TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP) {
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP_UNIFORM) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
                     {GraphShim::LEFT, "A1"},
                     {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result1"},
 
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "False"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A1, B1, Factor0);");
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, Factor0);");
 }
 
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP_NONUNIFORM) {
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
+                {
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
+                    {GraphShim::LEFT, "Factor1"},
+                    {GraphShim::RIGHT, "Result1"},
+
+                },
+                {{"data_type0", "VECTOR"},
+                 {"clamp_factor0", "True"},
+                 {"factor_mode0", "NON_UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, clamp(Factor1, 0.0, 1.0));");
+}
+
+// Uniform / Non Uniform makes no difference
+
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP_NONUNIFORM) {
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
+                {
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
+                    {GraphShim::LEFT, "Factor1"},
+                    {GraphShim::RIGHT, "Result1"},
+
+                },
+                {{"data_type0", "VECTOR"},
+                 {"clamp_factor0", "False"},
+                 {"factor_mode0", "NON_UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, Factor1);");
+}
 // TODO: NON UNIFORM
 
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_CLAMP) {
@@ -1668,15 +1695,11 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_CLAMP) {
                     {GraphShim::LEFT, "A3"},
                     {GraphShim::LEFT, "B3"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result3"},
 
                 },
-                {{"data_type0", "ROTATION"},
-                 {"clamp_factor0", "True"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A3, B3, clamp(Factor0, 0.0, 1.0));");
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "True"}, {"factor_mode0", "UNIFORM"},{"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result3=mix(A3, B3, clamp(Factor0, 0.0, 1.0));");
 }
 
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
@@ -1685,15 +1708,11 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
                     {GraphShim::LEFT, "A3"},
                     {GraphShim::LEFT, "B3"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result3"},
 
                 },
-                {{"data_type0", "ROTATION"},
-                 {"clamp_factor0", "False"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A3, B3, Factor0);");
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result3=mix(A3, B3, Factor0);");
 }
 
 //=========================================================================
