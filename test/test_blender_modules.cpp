@@ -293,6 +293,8 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_FLOAT_TO_INT_TRUNCATE) {
 
 auto functionNodeCompareHelper(std::string operation, std::string data_type) {
   std::string op_c;
+  std::string input_port1;
+  std::string input_port2;
 
   if (operation == "LESS_THAN") {
     op_c = "<";
@@ -308,14 +310,22 @@ auto functionNodeCompareHelper(std::string operation, std::string data_type) {
     op_c = "!=";
   }
 
+  if (data_type == "INT") {
+    input_port1 = "A0";
+    input_port2 = "B0";
+  } else if (data_type == "FLOAT") {
+    input_port1 = "A1";
+    input_port2 = "B1";
+  }
+
   EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                 {
-                    {GraphShim::LEFT, "A0"},
-                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, input_port1},
+                    {GraphShim::LEFT, input_port2},
                     {GraphShim::RIGHT, "Result0"},
                 },
                 {{"operation0", operation}, {"data_type0", data_type}}),
-            "Result0=A0" + op_c + "B0;");
+            "Result0=" + input_port1 + op_c + input_port2 + ";");
 }
 
 //============================= Integer ===================================
@@ -365,8 +375,8 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_GREATER_EQUAL) {
 TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_EQUAL) {
   EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                 {
-                    {GraphShim::LEFT, "A0"},
-                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Epsilon0"},
                     {GraphShim::RIGHT, "Result0"},
                 },
@@ -374,14 +384,14 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_EQUAL) {
                     {"operation0", "EQUAL"},
                     {"data_type0", "FLOAT"},
                 }),
-            "Result0= abs(A0-B0)<=Epsilon0;");
+            "Result0= abs(A1-B1)<=Epsilon0;");
 }
 
 TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_NOT_EQUAL) {
   EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                 {
-                    {GraphShim::LEFT, "A0"},
-                    {GraphShim::LEFT, "B0"},
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Epsilon0"},
                     {GraphShim::RIGHT, "Result0"},
                 },
@@ -389,7 +399,7 @@ TEST(BLENDER_MODULES, FUNCTION_NODE_COMPARE_FLOAT_NOT_EQUAL) {
                     {"operation0", "NOT_EQUAL"},
                     {"data_type0", "FLOAT"},
                 }),
-            "Result0= abs(A0-B0)>Epsilon0;");
+            "Result0= abs(A1-B1)>Epsilon0;");
 }
 
 //============================== Vector ===================================
@@ -416,8 +426,8 @@ auto functionNodeCompareVectorDotProductHelper(std::string operation) {
   if (operation == "EQUAL" || operation == "NOT_EQUAL") {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::LEFT, "Epsilon0"},
                       {GraphShim::RIGHT, "Result0"},
@@ -425,19 +435,19 @@ auto functionNodeCompareVectorDotProductHelper(std::string operation) {
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "DOT_PRODUCT"}}),
-              "Result0= abs(dot(A0, B0) - C0) " + op_c + " Epsilon0;");
+              "Result0= abs(dot(A2, B2) - C0) " + op_c + " Epsilon0;");
   } else {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::RIGHT, "Result0"},
                   },
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "DOT_PRODUCT"}}),
-              "Result0= dot(A0, B0) " + op_c + " C0;");
+              "Result0= dot(A2, B2) " + op_c + " C0;");
   }
 }
 
@@ -487,8 +497,8 @@ auto functionNodeCompareVectorDirectionHelper(std::string operation) {
   if (operation == "EQUAL" || operation == "NOT_EQUAL") {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::LEFT, "Angle0"},
                       {GraphShim::LEFT, "Epsilon0"},
@@ -497,15 +507,15 @@ auto functionNodeCompareVectorDirectionHelper(std::string operation) {
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "DIRECTION"}}),
-              "Result0= abs(acos(clamp(dot(normalize(A0), normalize(B0)), "
+              "Result0= abs(acos(clamp(dot(normalize(A2), normalize(B2)), "
               "-1.0, 1.0)) - Angle0) " +
                   op_c + " Epsilon0;");
   } else {
     EXPECT_EQ(
         testImpl<GenerateTokenStringFunctionNodeCompare>(
             {
-                {GraphShim::LEFT, "A0"},
-                {GraphShim::LEFT, "B0"},
+                {GraphShim::LEFT, "A2"},
+                {GraphShim::LEFT, "B2"},
                 {GraphShim::LEFT, "C0"},
                 {GraphShim::LEFT, "Angle0"},
                 {GraphShim::RIGHT, "Result0"},
@@ -513,7 +523,7 @@ auto functionNodeCompareVectorDirectionHelper(std::string operation) {
             {{"operation0", operation},
              {"data_type0", "VECTOR"},
              {"mode0", "DIRECTION"}}),
-        "Result0= acos(clamp(dot(normalize(A0), normalize(B0)), -1.0, 1.0)) " +
+        "Result0= acos(clamp(dot(normalize(A2), normalize(B2)), -1.0, 1.0)) " +
             op_c + " Angle0;");
   }
 }
@@ -567,8 +577,8 @@ auto functionNodeCompareVectorElementHelper(std::string operation) {
   if (operation == "EQUAL" || operation == "NOT_EQUAL") {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::LEFT, "Epsilon0"},
                       {GraphShim::RIGHT, "Result0"},
@@ -576,22 +586,22 @@ auto functionNodeCompareVectorElementHelper(std::string operation) {
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "ELEMENT"}}),
-              "Result0= (abs(A0.x - B0.x) " + op_c + " Epsilon0)" + logical_op +
-                  "(abs(A0.y - B0.y) " + op_c + " Epsilon0)" + logical_op +
-                  "(abs(A0.z - B0.z) " + op_c + " Epsilon0);");
+              "Result0= (abs(A2.x - B2.x) " + op_c + " Epsilon0)" + logical_op +
+                  "(abs(A2.y - B2.y) " + op_c + " Epsilon0)" + logical_op +
+                  "(abs(A2.z - B2.z) " + op_c + " Epsilon0);");
   } else {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::RIGHT, "Result0"},
                   },
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "ELEMENT"}}),
-              "Result0= (A0.x " + op_c + " B0.x) && (A0.y " + op_c +
-                  " B0.y) && (A0.z " + op_c + " B0.z);");
+              "Result0= (A2.x " + op_c + " B2.x) && (A2.y " + op_c +
+                  " B2.y) && (A2.z " + op_c + " B2.z);");
   }
 }
 
@@ -641,8 +651,8 @@ auto functionNodeCompareVectorLengthHelper(std::string operation) {
   if (operation == "EQUAL" || operation == "NOT_EQUAL") {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::LEFT, "Epsilon0"},
                       {GraphShim::RIGHT, "Result0"},
@@ -650,19 +660,19 @@ auto functionNodeCompareVectorLengthHelper(std::string operation) {
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "LENGTH"}}),
-              "Result0= abs(length(A0) - length(B0)) " + op_c + " Epsilon0;");
+              "Result0= abs(length(A2) - length(B2)) " + op_c + " Epsilon0;");
   } else {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::RIGHT, "Result0"},
                   },
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "LENGTH"}}),
-              "Result0= length(A0) " + op_c + " length(B0);");
+              "Result0= length(A2) " + op_c + " length(B2);");
   }
 }
 
@@ -712,8 +722,8 @@ auto functionNodeCompareVectorAverageHelper(std::string operation) {
   if (operation == "EQUAL" || operation == "NOT_EQUAL") {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::LEFT, "Epsilon0"},
                       {GraphShim::RIGHT, "Result0"},
@@ -721,22 +731,22 @@ auto functionNodeCompareVectorAverageHelper(std::string operation) {
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "AVERAGE"}}),
-              "Result0= abs(((A0.x + A0.y + A0.z) / 3.0) - ((B0.x + B0.y + "
-              "B0.z) / 3.0)) " +
+              "Result0= abs(((A2.x + A2.y + A2.z) / 3.0) - ((B2.x + B2.y + "
+              "B2.z) / 3.0)) " +
                   op_c + " Epsilon0;");
   } else {
     EXPECT_EQ(testImpl<GenerateTokenStringFunctionNodeCompare>(
                   {
-                      {GraphShim::LEFT, "A0"},
-                      {GraphShim::LEFT, "B0"},
+                      {GraphShim::LEFT, "A2"},
+                      {GraphShim::LEFT, "B2"},
                       {GraphShim::LEFT, "C0"},
                       {GraphShim::RIGHT, "Result0"},
                   },
                   {{"operation0", operation},
                    {"data_type0", "VECTOR"},
                    {"mode0", "AVERAGE"}}),
-              "Result0= ((A0.x + A0.y + A0.z) / 3.0) " + op_c +
-                  " ((B0.x + B0.y + B0.z) / 3.0);");
+              "Result0= ((A2.x + A2.y + A2.z) / 3.0) " + op_c +
+                  " ((B2.x + B2.y + B2.z) / 3.0);");
   }
 }
 
@@ -1614,42 +1624,69 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_FLOAT_NOCLAMP) {
             "Result0=mix(A0, B0, Factor0);");
 }
 
-TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP) {
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP_UNIFORM) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
                     {GraphShim::LEFT, "A1"},
                     {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result1"},
 
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "True"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A1, B1, clamp(Factor0, 0.0, 1.0));");
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, clamp(Factor0, 0.0, 1.0));");
 }
 
 // Uniform / Non Uniform makes no difference
 
-TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP) {
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP_UNIFORM) {
   EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
                 {
                     {GraphShim::LEFT, "A1"},
                     {GraphShim::LEFT, "B1"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result1"},
 
                 },
                 {{"data_type0", "VECTOR"},
                  {"clamp_factor0", "False"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A1, B1, Factor0);");
+                 {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, Factor0);");
 }
 
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_CLAMP_NONUNIFORM) {
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
+                {
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
+                    {GraphShim::LEFT, "Factor1"},
+                    {GraphShim::RIGHT, "Result1"},
+
+                },
+                {{"data_type0", "VECTOR"},
+                 {"clamp_factor0", "True"},
+                 {"factor_mode0", "NON_UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, clamp(Factor1, 0.0, 1.0));");
+}
+
+// Uniform / Non Uniform makes no difference
+
+TEST(BLENDER_MODULES, SHADER_NODE_MIX_VECTOR_NOCLAMP_NONUNIFORM) {
+  EXPECT_EQ(testImpl<GenerateTokenStringShaderNodeMix>(
+                {
+                    {GraphShim::LEFT, "A1"},
+                    {GraphShim::LEFT, "B1"},
+                    {GraphShim::LEFT, "Factor1"},
+                    {GraphShim::RIGHT, "Result1"},
+
+                },
+                {{"data_type0", "VECTOR"},
+                 {"clamp_factor0", "False"},
+                 {"factor_mode0", "NON_UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result1=mix(A1, B1, Factor1);");
+}
 // TODO: NON UNIFORM
 
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_CLAMP) {
@@ -1658,15 +1695,11 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_CLAMP) {
                     {GraphShim::LEFT, "A3"},
                     {GraphShim::LEFT, "B3"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result3"},
 
                 },
-                {{"data_type0", "ROTATION"},
-                 {"clamp_factor0", "True"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A3, B3, clamp(Factor0, 0.0, 1.0));");
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "True"}, {"factor_mode0", "UNIFORM"},{"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result3=mix(A3, B3, clamp(Factor0, 0.0, 1.0));");
 }
 
 TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
@@ -1675,15 +1708,11 @@ TEST(BLENDER_MODULES, SHADER_NODE_MIX_ROTATION_NOCLAMP) {
                     {GraphShim::LEFT, "A3"},
                     {GraphShim::LEFT, "B3"},
                     {GraphShim::LEFT, "Factor0"},
-                    {GraphShim::RIGHT, "Result0"},
+                    {GraphShim::RIGHT, "Result3"},
 
                 },
-                {{"data_type0", "ROTATION"},
-                 {"clamp_factor0", "False"},
-                 {"factor_mode0", "UNIFORM"},
-                 {"clamp_result0", "False"},
-                 {"blend_type0", "MIX"}}),
-            "Result0=mix(A3, B3, Factor0);");
+                {{"data_type0", "ROTATION"}, {"clamp_factor0", "False"}, {"factor_mode0", "UNIFORM"}, {"clamp_result0", "False"}, {"blend_type0", "MIX"}}),
+            "Result3=mix(A3, B3, Factor0);");
 }
 
 //=========================================================================
