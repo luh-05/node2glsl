@@ -140,18 +140,11 @@ auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status {
 
   // alle die ganz anders aufgebaut sind
 
-  else if (op_c == "LOGARITHM" || op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
+  else if ( op_c == "COMPARE" || op_c == "MULTIPLY_ADD") {
 
-    if (op_c ==
-        "LOGARITHM") // es gibt nur natürlichen logarithmus und log2 in glsl
-    /*log_b(x) = log_2(x) / log_2(b)
-    bzw log_b(x) = log(x) / log(b)*/
-    {
-      out + Out::RIGHT / "Vector3" + "=" + "log(" + Out::LEFT / "Vector0" +
-          ") /" + "log(" + Out::LEFT / "Vector1" + ");";
-    }
+    
 
-    else if (op_c == "COMPARE") {
+    if (op_c == "COMPARE") {
       /*The compare node outputs either 0 or 1.
       It outputs 1 if the difference of the two input values are less than
       epsilon. Used to check if two values are equal within a certain
