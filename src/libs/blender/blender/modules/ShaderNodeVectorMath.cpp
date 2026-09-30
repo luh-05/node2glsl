@@ -44,9 +44,7 @@ auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status {
            op_c == "ABSOLUTE" || op_c == "FLOOR" || op_c == "SIGN" ||
            op_c == "CEIL" || op_c == "FRACT" || op_c == "TRUNC" ||
            op_c == "ROUND" || op_c == "SINE" || op_c == "COSINE" ||
-           op_c == "TANGENT" || op_c == "ARCSINE" || op_c == "ARCCOSINE" ||
-           op_c == "ARCTANGENT" || op_c == "SINH" || op_c == "COSH" ||
-           op_c == "TANH" || op_c == "RADIANS") {
+           op_c == "TANGENT") {
 
     std::string function;
 
@@ -82,21 +80,7 @@ auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status {
       function = "cos(";
     } else if (op_c == "TANGENT") {
       function = "tan(";
-    } else if (op_c == "ARCSINE") {
-      function = "asin(";
-    } else if (op_c == "ARCCOSINE") {
-      function = "acos(";
-    } else if (op_c == "ARCTANGENT") {
-      function = "atan(";
-    } else if (op_c == "SINH") {
-      function = "sinh(";
-    } else if (op_c == "COSH") {
-      function = "cosh(";
-    } else if (op_c == "TANH") {
-      function = "tanh(";
-    } else if (op_c == "RADIANS") {
-      function = "radians(";
-    }
+    } 
 
     out + Out::RIGHT / "Vector3" + "=" + function + Out::LEFT / "Vector0" +
         ")" + ";";
@@ -174,9 +158,63 @@ auto GenerateTokenStringShaderNodeVectorMath(Out &out) -> absl::Status {
 
     return absl::UnimplementedError(std::format(
         "Given Operation has not been implemented yet: '{}’", op_c));
-  } else {
+  } 
+  else if(op_c == "CROSS_PRODUCT") {
+    out + Out::RIGHT / "Vector3" + "=" + "cross(" + Out::LEFT / "Vector0" + ", " +
+        Out::LEFT / "Vector1" + ")" + ";";
+    return out.GetStatus();
+  }
+  else if(op_c == "PROJECT") {
+   return absl::UnimplementedError(std::format(
+        "Given Operation has not been implemented yet: '{}’", op_c));
+  } //mathe 
+
+  else if(op_c == "REFLECT") {
+    out + Out::RIGHT / "Vector3" + "=" + "reflect(" + Out::LEFT / "Vector0" + ", " +
+        Out::LEFT / "Vector1" + ")" + ";";
+    return out.GetStatus();
+  } else if(op_c == "REFRACT") {
+    out + Out::RIGHT / "Vector3" + "=" + "refract(" + Out::LEFT / "Vector0" + ", " +
+        Out::LEFT / "Vector1" + ", " + Out::LEFT / "Vector2" + ")" + ";";
+    return out.GetStatus();
+  } 
+  else if(op_c == "FACEFORWARD") {
+    out + Out::RIGHT / "Vector3" + "=" + "faceforward(" + Out::LEFT / "Vector0" +
+        ", " + Out::LEFT / "Vector1" + ", " + Out::LEFT / "Vector2" + ")" +
+        ";";
+    return out.GetStatus();
+  }
+else if(op_c == "DOT_PRODUCT"){
+    out + Out::RIGHT / "Value0" + "=" + "dot(" + Out::LEFT / "Vector0" + ", " +
+        Out::LEFT / "Vector1" + ")" + ";";
+    return out.GetStatus();
+  }
+  
+else if(op_c == "DISTANCE"){
+    out + Out::RIGHT / "Value0" + "=" + "distance(" + Out::LEFT / "Vector0" + ", " +
+        Out::LEFT / "Vector1" + ")" + ";";
+    return out.GetStatus();
+  }
+else if(op_c == "NORMALIZE"){
+    out + Out::RIGHT / "Vector3" + "=" + "normalize(" + Out::LEFT / "Vector0" + ")" + ";";
+    return out.GetStatus();
+  }
+  else if(op_c == "LENGTH"){
+    out + Out::RIGHT / "Value0" + "=" + "length(" + Out::LEFT / "Vector0" + ")" + ";";
+    return out.GetStatus();
+  }
+  else if(op_c == "SCALE"){
+    //Vector 0 * Vector 1
+    out + Out::RIGHT / "Vector3" + "=" + Out::LEFT / "Vector0" + "*" + Out::LEFT / "Scale0" + ";";
+    return out.GetStatus();
+  }
+  else if(op_c == "")
+
+  
+  else {
     return absl::InvalidArgumentError(
         std::format("Illegal value of operand constant: '{}'", op_c));
   }
+  
 }
 } // namespace msk::blender
