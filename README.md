@@ -1,5 +1,5 @@
 # Mollusk
-Utility to convert a shader node-graph to glsl
+Utility to convert a some source node graph to Cuttlefish Shader Interface GLSL (Volume Shader).
 
 ## Installation
 **Prerequisites**:
